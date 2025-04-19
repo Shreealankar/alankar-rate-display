@@ -61,6 +61,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				gold: {
+					DEFAULT: '#D4AF37',
+					light: '#F6E05E',
+					dark: '#B7922A',
+				},
+				jewelry: {
+					gold: '#D4AF37',
+					silver: '#C0C0C0',
+					black: '#111111',
+					accent: '#E8D8A0',
 				}
 			},
 			borderRadius: {
