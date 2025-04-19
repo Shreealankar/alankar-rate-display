@@ -24,17 +24,21 @@ export const RateDisplay = () => {
           return;
         }
         
+        console.log('Fetched rates data:', ratesData);
+        
         // Process rates data
         if (ratesData && ratesData.length > 0) {
           const goldRateData = ratesData.find(rate => rate.metal_type === 'gold');
           const silverRateData = ratesData.find(rate => rate.metal_type === 'silver');
           
           if (goldRateData) {
+            console.log('Setting gold rate:', goldRateData.rate_per_gram);
             setGoldRate(goldRateData.rate_per_gram);
           }
           
           if (silverRateData) {
-            // Convert silver rate to per 10g for display
+            console.log('Setting silver rate:', silverRateData.rate_per_gram);
+            // Silver rate is already per 10g in the database
             setSilverRate(silverRateData.rate_per_gram);
           }
           

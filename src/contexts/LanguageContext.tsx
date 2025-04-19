@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'mr';
@@ -111,7 +110,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Terms page
     'terms.title': 'नियम व अटी',
     'terms.subtitle': 'कृपया आमचे नियम व अटी काळजीपूर्वक वाचा',
-    'terms.scan': 'तपशीलवार अटींसाठी QR कोड स्कॅन करा',
+    'terms.scan': 'तपशीलवार अटींसाठी संपर्क साधा',
     
     // Help page
     'help.title': 'मदत आणि समर्थन',

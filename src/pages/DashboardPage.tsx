@@ -79,17 +79,25 @@ const DashboardPage = () => {
     
     try {
       // Get existing records first
-      const { data: existingGold } = await supabase
+      const { data: existingGold, error: goldQueryError } = await supabase
         .from('rates')
         .select('id')
         .eq('metal_type', 'gold')
         .maybeSingle();
       
-      const { data: existingSilver } = await supabase
+      if (goldQueryError) {
+        console.error('Error querying gold rate:', goldQueryError);
+      }
+      
+      const { data: existingSilver, error: silverQueryError } = await supabase
         .from('rates')
         .select('id')
         .eq('metal_type', 'silver')
         .maybeSingle();
+      
+      if (silverQueryError) {
+        console.error('Error querying silver rate:', silverQueryError);
+      }
       
       // Update gold rate
       if (existingGold?.id) {
@@ -103,6 +111,7 @@ const DashboardPage = () => {
           .eq('id', existingGold.id);
         
         if (goldError) {
+          console.error('Error updating gold rate:', goldError);
           throw goldError;
         }
       } else {
@@ -116,6 +125,7 @@ const DashboardPage = () => {
           });
         
         if (goldError) {
+          console.error('Error inserting gold rate:', goldError);
           throw goldError;
         }
       }
@@ -132,6 +142,7 @@ const DashboardPage = () => {
           .eq('id', existingSilver.id);
         
         if (silverError) {
+          console.error('Error updating silver rate:', silverError);
           throw silverError;
         }
       } else {
@@ -145,6 +156,7 @@ const DashboardPage = () => {
           });
         
         if (silverError) {
+          console.error('Error inserting silver rate:', silverError);
           throw silverError;
         }
       }

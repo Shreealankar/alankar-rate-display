@@ -77,7 +77,7 @@ export const Footer = () => {
               </li>
               <li className="flex justify-between">
                 <span>{language === 'mr' ? 'रविवार' : 'Sunday'}</span>
-                <span>{language === 'mr' ? 'सकाळी ११:०० - संध्या. ६:००' : '11:00 AM - 6:00 PM'}</span>
+                <span>{language === 'mr' ? 'सकाळी ११:०० - संध्या. ८:००' : '11:00 AM - 8:00 PM'}</span>
               </li>
             </ul>
           </div>
