@@ -3,9 +3,11 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export const RateDisplay = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [goldRate, setGoldRate] = useState<number>(62400);
   const [silverRate, setSilverRate] = useState<number>(6250); // Default value for silver per 10g
   const [lastUpdated, setLastUpdated] = useState<string>(new Date().toLocaleString());
@@ -15,12 +17,18 @@ export const RateDisplay = () => {
   useEffect(() => {
     const fetchRates = async () => {
       try {
+        setLoading(true);
         const { data: ratesData, error } = await supabase
           .from('rates')
           .select('*');
         
         if (error) {
           console.error('Error fetching rates:', error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch current rates.",
+            variant: "destructive",
+          });
           return;
         }
         
@@ -53,6 +61,11 @@ export const RateDisplay = () => {
         }
       } catch (err) {
         console.error('Unexpected error fetching rates:', err);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while fetching rates.",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
@@ -71,6 +84,10 @@ export const RateDisplay = () => {
         }, 
         (payload) => {
           console.log('Rates change detected:', payload);
+          toast({
+            title: "Rates Updated",
+            description: "The rates have been updated.",
+          });
           // Refresh data when rates are updated
           fetchRates();
         }
@@ -80,7 +97,7 @@ export const RateDisplay = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [toast]);
 
   return (
     <div className="w-full max-w-3xl mx-auto">
