@@ -34,6 +34,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.per1kg': 'per 1kg',
     'home.address': 'Near Bank Of Maharashtra, Lohoner 423301',
     'home.contact': 'Contact: 9921612155',
+    'home.lastUpdated': 'Last updated',
     
     // About page
     'about.title': 'About Us',
@@ -68,7 +69,7 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.title': 'Rate Management',
     'dashboard.update': 'Update Rates',
     'dashboard.goldRate': 'Gold Rate (per 10gm)',
-    'dashboard.silverRate': 'Silver Rate (per 1kg)',
+    'dashboard.silverRate': 'Silver Rate (per 10gm)',
     'dashboard.save': 'Save Changes',
     'dashboard.logout': 'Logout',
     'dashboard.success': 'Rates updated successfully',
@@ -96,6 +97,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.per1kg': 'प्रति १ किलो',
     'home.address': 'बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१',
     'home.contact': 'संपर्क: ९९२१६१२१५५',
+    'home.lastUpdated': 'शेवटचे अपडेट',
     
     // About page
     'about.title': 'आमच्याबद्दल',
@@ -130,7 +132,7 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.title': 'दर व्यवस्थापन',
     'dashboard.update': 'दर अपडेट करा',
     'dashboard.goldRate': 'सोन्याचा दर (प्रति १० ग्रॅम)',
-    'dashboard.silverRate': 'चांदीचा दर (प्रति १ किलो)',
+    'dashboard.silverRate': 'चांदीचा दर (प्रति १० ग्रॅम)',
     'dashboard.save': 'बदल साठवा',
     'dashboard.logout': 'लॉगआउट',
     'dashboard.success': 'दर यशस्वीरित्या अपडेट केले',

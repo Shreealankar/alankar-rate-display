@@ -8,15 +8,17 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [goldRate, setGoldRate] = useState('62400');
-  const [silverRate, setSilverRate] = useState('82000');
+  const [goldRate, setGoldRate] = useState('');
+  const [silverRate, setSilverRate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   
   // Check if user is logged in
   useEffect(() => {
@@ -25,24 +27,102 @@ const DashboardPage = () => {
       navigate('/login');
     }
   }, [navigate]);
+
+  // Fetch current rates when component mounts
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('rates')
+          .select('*');
+          
+        if (error) {
+          console.error('Error fetching rates:', error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch current rates.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        if (data) {
+          const goldRateData = data.find(rate => rate.metal_type === 'gold');
+          const silverRateData = data.find(rate => rate.metal_type === 'silver');
+          
+          if (goldRateData) {
+            setGoldRate(goldRateData.rate_per_gram.toString());
+          }
+          
+          if (silverRateData) {
+            setSilverRate(silverRateData.rate_per_gram.toString());
+          }
+        }
+      } catch (err) {
+        console.error('Unexpected error:', err);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    
+    fetchCurrentRates();
+  }, [toast]);
   
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     navigate('/');
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // In a real app, this would update rates in Supabase
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Update gold rate
+      const { error: goldError } = await supabase
+        .from('rates')
+        .upsert({ 
+          metal_type: 'gold', 
+          rate_per_gram: parseFloat(goldRate),
+          updated_at: new Date().toISOString()
+        }, { 
+          onConflict: 'metal_type' 
+        });
+      
+      if (goldError) {
+        throw goldError;
+      }
+      
+      // Update silver rate
+      const { error: silverError } = await supabase
+        .from('rates')
+        .upsert({ 
+          metal_type: 'silver', 
+          rate_per_gram: parseFloat(silverRate),
+          updated_at: new Date().toISOString()
+        }, { 
+          onConflict: 'metal_type' 
+        });
+      
+      if (silverError) {
+        throw silverError;
+      }
+      
       toast({
         title: "Success",
         description: t('dashboard.success'),
       });
-    }, 1000);
+      
+    } catch (error) {
+      console.error('Error updating rates:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update rates. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -68,7 +148,7 @@ const DashboardPage = () => {
               <CardHeader>
                 <CardTitle>{t('dashboard.update')}</CardTitle>
                 <CardDescription>
-                  Update the current gold and silver rates
+                  {initialLoading ? 'Loading current rates...' : 'Update the current gold and silver rates'}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -83,12 +163,14 @@ const DashboardPage = () => {
                       value={goldRate}
                       onChange={(e) => setGoldRate(e.target.value)}
                       required
+                      disabled={initialLoading}
+                      placeholder={initialLoading ? "Loading..." : "Enter gold rate"}
                     />
                   </div>
                   
                   <div className="space-y-2">
                     <label htmlFor="silverRate" className="text-sm font-medium">
-                      {t('dashboard.silverRate')}
+                      {t('dashboard.silverRate')} ({t('home.per10gm')})
                     </label>
                     <Input
                       id="silverRate"
@@ -96,32 +178,21 @@ const DashboardPage = () => {
                       value={silverRate}
                       onChange={(e) => setSilverRate(e.target.value)}
                       required
+                      disabled={initialLoading}
+                      placeholder={initialLoading ? "Loading..." : "Enter silver rate"}
                     />
                   </div>
                   
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={isLoading}
+                    disabled={isLoading || initialLoading}
                   >
                     {isLoading ? 'Saving...' : t('dashboard.save')}
                   </Button>
                 </form>
               </CardContent>
             </Card>
-          </div>
-        </section>
-        
-        {/* Note about Supabase Integration */}
-        <section className="py-8 bg-accent/10">
-          <div className="container px-4">
-            <div className="max-w-2xl mx-auto bg-card p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold mb-2">Supabase Integration Note</h3>
-              <p className="text-muted-foreground">
-                To enable real-time rate updates and secure owner authentication, please connect your 
-                Lovable project to Supabase using the Supabase button at the top right of the interface.
-              </p>
-            </div>
           </div>
         </section>
       </main>

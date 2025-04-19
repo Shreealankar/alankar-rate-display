@@ -25,30 +25,20 @@ const AboutPage = () => {
         {/* Main Content */}
         <section className="py-16 bg-background">
           <div className="container px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8 max-w-4xl mx-auto">
               <div>
-                <img 
-                  src="/lovable-uploads/726ba192-f434-4ff0-8deb-c3e3ace6f5aa.png"
-                  alt="QR Code" 
-                  className="rounded-lg shadow-lg max-w-sm mx-auto md:mx-0"
-                />
+                <h2 className="text-2xl font-bold text-primary mb-4">{t('about.story')}</h2>
+                <p className="text-muted-foreground">{t('about.story.content')}</p>
               </div>
               
-              <div className="space-y-8">
-                <div>
-                  <h2 className="text-2xl font-bold text-primary mb-4">{t('about.story')}</h2>
-                  <p className="text-muted-foreground">{t('about.story.content')}</p>
-                </div>
-                
-                <div>
-                  <h2 className="text-2xl font-bold text-primary mb-4">{t('about.vision')}</h2>
-                  <p className="text-muted-foreground">{t('about.vision.content')}</p>
-                </div>
-                
-                <div>
-                  <h2 className="text-2xl font-bold text-primary mb-4">{t('about.mission')}</h2>
-                  <p className="text-muted-foreground">{t('about.mission.content')}</p>
-                </div>
+              <div>
+                <h2 className="text-2xl font-bold text-primary mb-4">{t('about.vision')}</h2>
+                <p className="text-muted-foreground">{t('about.vision.content')}</p>
+              </div>
+              
+              <div>
+                <h2 className="text-2xl font-bold text-primary mb-4">{t('about.mission')}</h2>
+                <p className="text-muted-foreground">{t('about.mission.content')}</p>
               </div>
             </div>
           </div>

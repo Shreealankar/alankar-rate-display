@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { MessageSquare } from 'lucide-react';
 
 export const Footer = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -35,14 +35,14 @@ export const Footer = () => {
                 className="flex items-center gap-2 text-sm text-primary hover:text-primary/80"
               >
                 <MessageSquare className="h-4 w-4" />
-                <span>WhatsApp</span>
+                <span>{language === 'mr' ? 'व्हाट्सएप' : 'WhatsApp'}</span>
               </a>
             </div>
           </div>
           
           {/* Quick Links */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4">{language === 'mr' ? 'जलद लिंक्स' : 'Quick Links'}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/" className="text-sm text-muted-foreground hover:text-primary">
@@ -69,15 +69,15 @@ export const Footer = () => {
           
           {/* Business Hours */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4">Business Hours</h3>
+            <h3 className="text-lg font-semibold mb-4">{language === 'mr' ? 'व्यवसाय वेळा' : 'Business Hours'}</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex justify-between">
-                <span>Monday - Saturday</span>
-                <span>10:00 AM - 8:00 PM</span>
+                <span>{language === 'mr' ? 'सोमवार - शनिवार' : 'Monday - Saturday'}</span>
+                <span>{language === 'mr' ? 'सकाळी १०:०० - संध्या. ८:००' : '10:00 AM - 8:00 PM'}</span>
               </li>
               <li className="flex justify-between">
-                <span>Sunday</span>
-                <span>11:00 AM - 6:00 PM</span>
+                <span>{language === 'mr' ? 'रविवार' : 'Sunday'}</span>
+                <span>{language === 'mr' ? 'सकाळी ११:०० - संध्या. ६:००' : '11:00 AM - 6:00 PM'}</span>
               </li>
             </ul>
           </div>
@@ -85,7 +85,7 @@ export const Footer = () => {
         
         <div className="border-t mt-8 pt-4">
           <p className="text-xs text-center text-muted-foreground">
-            &copy; {new Date().getFullYear()} {t('app.name')}. All rights reserved.
+            &copy; {new Date().getFullYear()} {t('app.name')}. {language === 'mr' ? 'सर्व हक्क राखीव.' : 'All rights reserved.'}
           </p>
         </div>
       </div>
