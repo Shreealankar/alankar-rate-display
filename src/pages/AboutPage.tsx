@@ -76,7 +76,7 @@ const AboutPage = () => {
                       </li>
                       <li className="flex justify-between">
                         <span>Sunday</span>
-                        <span>11:00 AM - 6:00 PM</span>
+                        <span>11:00 AM - 8:00 PM</span>
                       </li>
                     </ul>
                   </div>

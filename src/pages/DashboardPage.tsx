@@ -78,34 +78,75 @@ const DashboardPage = () => {
     setIsLoading(true);
     
     try {
-      // Update gold rate
-      const { error: goldError } = await supabase
+      // Get existing records first
+      const { data: existingGold } = await supabase
         .from('rates')
-        .upsert({ 
-          metal_type: 'gold', 
-          rate_per_gram: parseFloat(goldRate),
-          updated_at: new Date().toISOString()
-        }, { 
-          onConflict: 'metal_type' 
-        });
+        .select('id')
+        .eq('metal_type', 'gold')
+        .maybeSingle();
       
-      if (goldError) {
-        throw goldError;
+      const { data: existingSilver } = await supabase
+        .from('rates')
+        .select('id')
+        .eq('metal_type', 'silver')
+        .maybeSingle();
+      
+      // Update gold rate
+      if (existingGold?.id) {
+        // Update existing record
+        const { error: goldError } = await supabase
+          .from('rates')
+          .update({ 
+            rate_per_gram: parseFloat(goldRate),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingGold.id);
+        
+        if (goldError) {
+          throw goldError;
+        }
+      } else {
+        // Insert new record
+        const { error: goldError } = await supabase
+          .from('rates')
+          .insert({ 
+            metal_type: 'gold', 
+            rate_per_gram: parseFloat(goldRate),
+            updated_at: new Date().toISOString()
+          });
+        
+        if (goldError) {
+          throw goldError;
+        }
       }
       
       // Update silver rate
-      const { error: silverError } = await supabase
-        .from('rates')
-        .upsert({ 
-          metal_type: 'silver', 
-          rate_per_gram: parseFloat(silverRate),
-          updated_at: new Date().toISOString()
-        }, { 
-          onConflict: 'metal_type' 
-        });
-      
-      if (silverError) {
-        throw silverError;
+      if (existingSilver?.id) {
+        // Update existing record
+        const { error: silverError } = await supabase
+          .from('rates')
+          .update({ 
+            rate_per_gram: parseFloat(silverRate),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingSilver.id);
+        
+        if (silverError) {
+          throw silverError;
+        }
+      } else {
+        // Insert new record  
+        const { error: silverError } = await supabase
+          .from('rates')
+          .insert({ 
+            metal_type: 'silver', 
+            rate_per_gram: parseFloat(silverRate),
+            updated_at: new Date().toISOString()
+          });
+        
+        if (silverError) {
+          throw silverError;
+        }
       }
       
       toast({
