@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -46,6 +45,14 @@ export const Header = () => {
           <Link to="/about" className="text-sm font-medium transition-colors hover:text-primary">
             {t('nav.about')}
           </Link>
+          <a 
+            href="https://sites.google.com/d/1OsSpycKJH855XnV9wX7PNR4Ls9UWGApe/p/1BlGeaRPtKXN4keJe3Jlz_1Xr9DmMYq9M/edit"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium transition-colors hover:text-primary"
+          >
+            {language === 'mr' ? 'दागिने डिझाईन' : 'Jewelry Design'}
+          </a>
           <Link to="/terms" className="text-sm font-medium transition-colors hover:text-primary">
             {t('nav.terms')}
           </Link>
@@ -97,10 +104,15 @@ export const Header = () => {
                 </Link>
               </SheetClose>
               <SheetClose asChild>
-                <Link to="/terms" className="flex items-center gap-2 p-2 hover:bg-accent rounded-md">
+                <a 
+                  href="https://sites.google.com/d/1OsSpycKJH855XnV9wX7PNR4Ls9UWGApe/p/1BlGeaRPtKXN4keJe3Jlz_1Xr9DmMYq9M/edit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 p-2 hover:bg-accent rounded-md"
+                >
                   <Book className="h-5 w-5" />
-                  <span>{t('nav.terms')}</span>
-                </Link>
+                  <span>{language === 'mr' ? 'दागिने डिझाईन' : 'Jewelry Design'}</span>
+                </a>
               </SheetClose>
               <SheetClose asChild>
                 <Link to="/help" className="flex items-center gap-2 p-2 hover:bg-accent rounded-md">

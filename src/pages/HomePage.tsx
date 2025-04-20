@@ -1,4 +1,3 @@
-
 import { useLanguage } from '@/contexts/LanguageContext';
 import { RateDisplay } from '@/components/RateDisplay';
 import { Header } from '@/components/layout/Header';
@@ -27,10 +26,10 @@ const HomePage = () => {
               className="w-32 h-32 object-contain mb-4"
             />
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              {t('home.title')}
+              Gold & Silver Jewelry Shop
             </h1>
             <p className="text-xl md:text-2xl max-w-3xl">
-              {t('home.subtitle')}
+              Fine Jewelry Shop Since 1998
             </p>
             <div className="flex flex-col items-center space-y-2">
               <p className="text-lg text-gold-light">{t('home.address')}</p>

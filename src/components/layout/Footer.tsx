@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Instagram, Youtube } from 'lucide-react';
 
 export const Footer = () => {
   const { t, language } = useLanguage();
@@ -55,6 +55,16 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <a 
+                  href="https://sites.google.com/d/1OsSpycKJH855XnV9wX7PNR4Ls9UWGApe/p/1BlGeaRPtKXN4keJe3Jlz_1Xr9DmMYq9M/edit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-primary"
+                >
+                  {language === 'mr' ? 'दागिने डिझाईन' : 'Jewelry Design'}
+                </a>
+              </li>
+              <li>
                 <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary">
                   {t('nav.terms')}
                 </Link>
@@ -70,16 +80,34 @@ export const Footer = () => {
           {/* Business Hours */}
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4">{language === 'mr' ? 'व्यवसाय वेळा' : 'Business Hours'}</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex justify-between">
-                <span>{language === 'mr' ? 'सोमवार - शनिवार' : 'Monday - Saturday'}</span>
-                <span>{language === 'mr' ? 'सकाळी १०:०० - संध्या. ८:००' : '10:00 AM - 8:00 PM'}</span>
-              </li>
-              <li className="flex justify-between">
-                <span>{language === 'mr' ? 'रविवार' : 'Sunday'}</span>
-                <span>{language === 'mr' ? 'सकाळी ११:०० - संध्या. ८:००' : '11:00 AM - 8:00 PM'}</span>
-              </li>
-            </ul>
+            <p className="text-sm text-muted-foreground">
+              {language === 'mr' ? 'सकाळी ९:३० - संध्या. ७:१५' : '9:30 AM - 7:15 PM'}
+            </p>
+
+            {/* Social Media Links */}
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-4">{language === 'mr' ? 'सोशल मीडिया' : 'Social Media'}</h3>
+              <div className="flex flex-col space-y-2">
+                <a 
+                  href="https://www.instagram.com/shreealankar2112?igsh=bjRpNDVueDU3N2xw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+                >
+                  <Instagram className="h-4 w-4" />
+                  <span>Instagram</span>
+                </a>
+                <a 
+                  href="https://youtube.com/@shreealankar2112?si=YIhhPakGGb2y2v8R"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
+                >
+                  <Youtube className="h-4 w-4" />
+                  <span>YouTube</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         
