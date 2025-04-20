@@ -71,9 +71,37 @@ export const RateDisplay = () => {
             }
           }
         } else {
-          // No rates found, use defaults
+          // No rates found, use defaults and initialize the rates in Supabase
           setGoldRate(62400);
           setSilverRate(6250);
+          
+          console.log('No rates found, initializing default rates');
+          
+          // Try to initialize rates if they don't exist
+          try {
+            // Initialize gold rate
+            await supabase
+              .from('rates')
+              .insert({ 
+                metal_type: 'gold', 
+                rate_per_gram: 62400,
+                updated_at: new Date().toISOString()
+              });
+              
+            // Initialize silver rate
+            await supabase
+              .from('rates')
+              .insert({ 
+                metal_type: 'silver', 
+                rate_per_gram: 6250,
+                updated_at: new Date().toISOString()
+              });
+              
+            console.log('Default rates initialized successfully');
+          } catch (initError) {
+            console.error('Error initializing default rates:', initError);
+            // This is non-critical, so we don't show an error toast
+          }
         }
       } catch (err) {
         console.error('Unexpected error fetching rates:', err);
