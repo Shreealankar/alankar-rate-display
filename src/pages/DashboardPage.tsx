@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -28,11 +29,70 @@ const DashboardPage = () => {
     }
   }, [navigate]);
 
-  // Fetch current rates when component mounts
+  // Initialize rates if empty and fetch current rates when component mounts
   useEffect(() => {
-    const fetchCurrentRates = async () => {
+    const initializeAndFetchRates = async () => {
       try {
-        const { data, error } = await supabase
+        setInitialLoading(true);
+        
+        // First check if we have any rates at all
+        const { data: existingRates, error: checkError } = await supabase
+          .from('rates')
+          .select('*');
+          
+        if (checkError) {
+          console.error('Error checking rates:', checkError);
+          toast({
+            title: "Error",
+            description: "Failed to check current rates.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // If no rates exist, initialize with default values
+        if (!existingRates || existingRates.length === 0) {
+          console.log('No rates found, initializing with defaults');
+          
+          // Initialize gold rate
+          const { error: goldInitError } = await supabase
+            .from('rates')
+            .insert({ 
+              metal_type: 'gold', 
+              rate_per_gram: 62400,
+              updated_at: new Date().toISOString()
+            });
+          
+          if (goldInitError) {
+            console.error('Error initializing gold rate:', goldInitError);
+            toast({
+              title: "Error",
+              description: "Failed to initialize gold rate.",
+              variant: "destructive",
+            });
+          }
+          
+          // Initialize silver rate  
+          const { error: silverInitError } = await supabase
+            .from('rates')
+            .insert({ 
+              metal_type: 'silver', 
+              rate_per_gram: 6250,
+              updated_at: new Date().toISOString()
+            });
+          
+          if (silverInitError) {
+            console.error('Error initializing silver rate:', silverInitError);
+            toast({
+              title: "Error",
+              description: "Failed to initialize silver rate.",
+              variant: "destructive",
+            });
+          }
+        }
+        
+        // Now fetch the rates (either existing or newly initialized)
+        const { data: ratesData, error } = await supabase
           .from('rates')
           .select('*');
           
@@ -46,9 +106,11 @@ const DashboardPage = () => {
           return;
         }
         
-        if (data) {
-          const goldRateData = data.find(rate => rate.metal_type === 'gold');
-          const silverRateData = data.find(rate => rate.metal_type === 'silver');
+        console.log('Fetched rates after init:', ratesData);
+        
+        if (ratesData && ratesData.length > 0) {
+          const goldRateData = ratesData.find(rate => rate.metal_type === 'gold');
+          const silverRateData = ratesData.find(rate => rate.metal_type === 'silver');
           
           if (goldRateData) {
             setGoldRate(goldRateData.rate_per_gram.toString());
@@ -60,12 +122,17 @@ const DashboardPage = () => {
         }
       } catch (err) {
         console.error('Unexpected error:', err);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while fetching rates.",
+          variant: "destructive",
+        });
       } finally {
         setInitialLoading(false);
       }
     };
     
-    fetchCurrentRates();
+    initializeAndFetchRates();
   }, [toast]);
   
   const handleLogout = () => {
@@ -87,6 +154,13 @@ const DashboardPage = () => {
       
       if (goldQueryError) {
         console.error('Error querying gold rate:', goldQueryError);
+        toast({
+          title: "Error",
+          description: "Failed to query gold rate record.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
       }
       
       const { data: existingSilver, error: silverQueryError } = await supabase
@@ -97,6 +171,13 @@ const DashboardPage = () => {
       
       if (silverQueryError) {
         console.error('Error querying silver rate:', silverQueryError);
+        toast({
+          title: "Error",
+          description: "Failed to query silver rate record.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
       }
       
       // Update gold rate
@@ -112,7 +193,13 @@ const DashboardPage = () => {
         
         if (goldError) {
           console.error('Error updating gold rate:', goldError);
-          throw goldError;
+          toast({
+            title: "Error",
+            description: "Failed to update gold rate.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
         }
       } else {
         // Insert new record
@@ -126,7 +213,13 @@ const DashboardPage = () => {
         
         if (goldError) {
           console.error('Error inserting gold rate:', goldError);
-          throw goldError;
+          toast({
+            title: "Error",
+            description: "Failed to insert gold rate.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
         }
       }
       
@@ -143,7 +236,13 @@ const DashboardPage = () => {
         
         if (silverError) {
           console.error('Error updating silver rate:', silverError);
-          throw silverError;
+          toast({
+            title: "Error",
+            description: "Failed to update silver rate.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
         }
       } else {
         // Insert new record  
@@ -157,7 +256,13 @@ const DashboardPage = () => {
         
         if (silverError) {
           console.error('Error inserting silver rate:', silverError);
-          throw silverError;
+          toast({
+            title: "Error",
+            description: "Failed to insert silver rate.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          return;
         }
       }
       
@@ -241,7 +346,12 @@ const DashboardPage = () => {
                     className="w-full" 
                     disabled={isLoading || initialLoading}
                   >
-                    {isLoading ? 'Saving...' : t('dashboard.save')}
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Saving...
+                      </span>
+                    ) : t('dashboard.save')}
                   </Button>
                 </form>
               </CardContent>
