@@ -11,9 +11,17 @@ export const RateDisplay = () => {
   const { toast } = useToast();
   const [goldRate, setGoldRate] = useState<number | null>(null);
   const [silverRate, setSilverRate] = useState<number | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string>(new Date().toLocaleString());
+  const [lastUpdated, setLastUpdated] = useState<string>(formatDate(new Date()));
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+
+  // Helper function to format date as DD/MM/YYYY
+  function formatDate(date: Date): string {
+    const dd = String(date.getDate()).padStart(2, "0");
+    const mm = String(date.getMonth() + 1).padStart(2, "0"); // Jan is 0
+    const yyyy = date.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
 
   // Fetch rates from Supabase
   useEffect(() => {
@@ -21,11 +29,11 @@ export const RateDisplay = () => {
       try {
         setLoading(true);
         setError(false);
-        
+
         const { data: ratesData, error } = await supabase
           .from('rates')
           .select('*');
-        
+
         if (error) {
           console.error('Error fetching rates:', error);
           setError(true);
@@ -36,14 +44,14 @@ export const RateDisplay = () => {
           });
           return;
         }
-        
+
         console.log('Fetched rates data:', ratesData);
-        
+
         // Process rates data
         if (ratesData && ratesData.length > 0) {
           const goldRateData = ratesData.find(rate => rate.metal_type === 'gold');
           const silverRateData = ratesData.find(rate => rate.metal_type === 'silver');
-          
+
           if (goldRateData) {
             console.log('Setting gold rate:', goldRateData.rate_per_gram);
             setGoldRate(goldRateData.rate_per_gram);
@@ -51,7 +59,7 @@ export const RateDisplay = () => {
             // Default fallback
             setGoldRate(62400);
           }
-          
+
           if (silverRateData) {
             console.log('Setting silver rate:', silverRateData.rate_per_gram);
             setSilverRate(silverRateData.rate_per_gram);
@@ -59,44 +67,44 @@ export const RateDisplay = () => {
             // Default fallback
             setSilverRate(6250);
           }
-          
+
           // Set last updated timestamp
           if (goldRateData || silverRateData) {
             const latestUpdate = [goldRateData, silverRateData]
               .filter(Boolean)
               .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())[0];
-            
+
             if (latestUpdate) {
-              setLastUpdated(new Date(latestUpdate.updated_at).toLocaleString());
+              setLastUpdated(formatDate(new Date(latestUpdate.updated_at)));
             }
           }
         } else {
           // No rates found, use defaults and initialize the rates in Supabase
           setGoldRate(62400);
           setSilverRate(6250);
-          
+
           console.log('No rates found, initializing default rates');
-          
+
           // Try to initialize rates if they don't exist
           try {
             // Initialize gold rate
             await supabase
               .from('rates')
-              .insert({ 
-                metal_type: 'gold', 
+              .insert({
+                metal_type: 'gold',
                 rate_per_gram: 62400,
                 updated_at: new Date().toISOString()
               });
-              
+
             // Initialize silver rate
             await supabase
               .from('rates')
-              .insert({ 
-                metal_type: 'silver', 
+              .insert({
+                metal_type: 'silver',
                 rate_per_gram: 6250,
                 updated_at: new Date().toISOString()
               });
-              
+
             console.log('Default rates initialized successfully');
           } catch (initError) {
             console.error('Error initializing default rates:', initError);
@@ -121,12 +129,12 @@ export const RateDisplay = () => {
     // Set up real-time subscription to rates table
     const channel = supabase
       .channel('rates-changes')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'rates' 
-        }, 
+      .on('postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'rates'
+        },
         (payload) => {
           console.log('Rates change detected:', payload);
           toast({
@@ -147,7 +155,7 @@ export const RateDisplay = () => {
   return (
     <div className="w-full max-w-3xl mx-auto">
       <h2 className="text-2xl font-bold text-center mb-4">{t('home.rates')}</h2>
-      
+
       {error ? (
         <div className="text-center p-6 bg-destructive/10 rounded-lg border border-destructive">
           <p className="text-destructive font-semibold">
@@ -183,7 +191,7 @@ export const RateDisplay = () => {
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="border-2 border-jewelry-silver hover:shadow-lg transition-all duration-300">
               <CardHeader className="bg-jewelry-silver/10 pb-2">
                 <CardTitle className="text-center text-xl text-jewelry-silver">
@@ -208,7 +216,7 @@ export const RateDisplay = () => {
               </CardContent>
             </Card>
           </div>
-          
+
           <p className="text-sm text-muted-foreground text-center mt-4">
             {t('home.lastUpdated')}: {lastUpdated}
           </p>
@@ -217,3 +225,4 @@ export const RateDisplay = () => {
     </div>
   );
 };
+
