@@ -20,7 +20,7 @@ export const Footer = () => {
               />
               <div className="flex flex-col">
                 <span className="font-bold text-xl text-primary">{t('app.name')}</span>
-                <span className="text-xs text-muted-foreground">{t('app.tagline')}</span>
+                <span className="text-xs text-muted-foreground">{language === 'mr' ? 'उत्तम दागिने विक्रेता १९९८ पासून' : 'Fine Jewelry seller Since 1998'}</span>
               </div>
             </div>
             <p className="text-sm text-muted-foreground mt-2">{t('home.address')}</p>
@@ -80,9 +80,7 @@ export const Footer = () => {
           {/* Business Hours */}
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4">{language === 'mr' ? 'व्यवसाय वेळा' : 'Business Hours'}</h3>
-            <p className="text-sm text-muted-foreground">
-              {language === 'mr' ? 'सकाळी ९:३० - संध्या. ७:१५' : '9:30 AM - 7:15 PM'}
-            </p>
+            <p className="text-sm text-muted-foreground">9:30 AM - 7:15 PM</p>
 
             {/* Social Media Links */}
             <div className="mt-6">

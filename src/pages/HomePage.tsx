@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 const HomePage = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -27,10 +27,10 @@ const HomePage = () => {
               className="w-32 h-32 object-contain mb-4"
             />
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Fine Jewelry Shop
+              {language === 'mr' ? 'श्री अलंकार मध्ये आपले स्वागत आहे' : 'Welcome to Shree Alankar'}
             </h1>
             <p className="text-xl md:text-2xl max-w-3xl">
-              Gold & Silver Jewelry Shop Since 1998
+              {language === 'mr' ? 'सोने आणि चांदीचे दागिने दुकान १९९८ पासून' : 'Gold & Silver Jewelry Shop Since 1998'}
             </p>
             <div className="flex flex-col items-center space-y-2">
               <p className="text-lg text-gold-light">{t('home.address')}</p>
@@ -61,7 +61,7 @@ const HomePage = () => {
                 <h3 className="text-xl font-semibold mb-2">Quality Craftsmanship</h3>
                 <p className="text-muted-foreground">Exquisite jewelry crafted with precision and care for lasting beauty.</p>
               </div>
-              
+
               <div className="bg-card rounded-lg p-6 text-center shadow-md hover:shadow-lg transition-shadow">
                 <div className="rounded-full bg-primary/10 w-16 h-16 mx-auto flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
@@ -72,7 +72,7 @@ const HomePage = () => {
                 <h3 className="text-xl font-semibold mb-2">Live Market Rates</h3>
                 <p className="text-muted-foreground">Stay updated with current gold and silver rates for transparent pricing.</p>
               </div>
-              
+
               <div className="bg-card rounded-lg p-6 text-center shadow-md hover:shadow-lg transition-shadow">
                 <div className="rounded-full bg-primary/10 w-16 h-16 mx-auto flex items-center justify-center mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
