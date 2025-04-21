@@ -15,14 +15,22 @@ export const RateDisplay = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  // Helper function to format date as DD/MM/YYYY HH:mm
+  // Helper function to format date as DD/MM/YYYY hh:mm:ss AM/PM
   function formatDate(date: Date): string {
     const dd = String(date.getDate()).padStart(2, "0");
     const mm = String(date.getMonth() + 1).padStart(2, "0"); // Jan is 0
     const yyyy = date.getFullYear();
-    const hh = String(date.getHours()).padStart(2, '0');
-    const min = String(date.getMinutes()).padStart(2, '0');
-    return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+
+    let hh = date.getHours();
+    const min = String(date.getMinutes()).padStart(2, "0");
+    const ss = String(date.getSeconds()).padStart(2, "0");
+
+    const ampm = hh >= 12 ? "PM" : "AM";
+    hh = hh % 12;
+    hh = hh ? hh : 12; // the hour '0' should be '12'
+    const hhStr = String(hh).padStart(2, "0");
+
+    return `${dd}/${mm}/${yyyy} ${hhStr}:${min}:${ss} ${ampm}`;
   }
 
   // Fetch rates from Supabase
