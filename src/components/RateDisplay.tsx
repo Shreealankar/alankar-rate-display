@@ -15,12 +15,14 @@ export const RateDisplay = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
 
-  // Helper function to format date as DD/MM/YYYY
+  // Helper function to format date as DD/MM/YYYY HH:mm
   function formatDate(date: Date): string {
     const dd = String(date.getDate()).padStart(2, "0");
     const mm = String(date.getMonth() + 1).padStart(2, "0"); // Jan is 0
     const yyyy = date.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
   }
 
   // Fetch rates from Supabase
