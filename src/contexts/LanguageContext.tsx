@@ -105,7 +105,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.per10gm': 'प्रति १० ग्रॅम',
     'home.per1kg': 'प्रति १ किलो',
     'home.address': 'बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१',
-    'home.contact': 'संपर्क: ���९२१६१२१५५',
+    'home.contact': 'संपर्क: ९९२१६१२१५५',
     'home.lastUpdated': 'शेवटचे अपडेट',
     
     // About page
@@ -151,7 +151,7 @@ const translations: Record<Language, Record<string, string>> = {
     'features.craftsmanship.title': 'उच्च दर्जाची कारागिरी',
     'features.craftsmanship.description': 'काळजीपूर्वक बनविलेले सुंदर दागिने जे कायमस्वरूपी सुंदर दिसतात.',
     
-    'features.rates.title': 'थेट बाजार दर',
+    'features.rates.title': 'थेट बाज��र दर',
     'features.rates.description': 'पारदर्शक किंमत करिता सोने आणि चांदीचे सध्याचे दर जाणून घ्या.',
     
     'features.support.title': 'समर्पित ग्राहक सेवा',

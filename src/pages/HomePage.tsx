@@ -1,4 +1,3 @@
-
 import { useLanguage } from '@/contexts/LanguageContext';
 import { RateDisplay } from '@/components/RateDisplay';
 import { Header } from '@/components/layout/Header';

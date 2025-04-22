@@ -1,4 +1,3 @@
-
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WhatsAppForm } from '@/components/WhatsAppForm';
 import { Header } from '@/components/layout/Header';
@@ -56,19 +55,10 @@ const HelpPage = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        {/* Help Hero */}
-        <section className="bg-gradient-to-b from-black to-zinc-900 text-white py-12">
-          <div className="container px-4 text-center">
-            <h1 className="text-4xl font-bold mb-2">{t('help.title')}</h1>
-          </div>
-        </section>
-
         {/* Contact Information */}
         <section className="py-16 bg-background">
           <div className="container px-4">
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold mb-8 text-center">{t('help.contact')}</h2>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 <div className="bg-card shadow-md rounded-lg p-6 text-center">
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
