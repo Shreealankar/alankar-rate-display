@@ -8,7 +8,6 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
-// Translations for English and Marathi
 const translations: Record<Language, Record<string, string>> = {
   en: {
     // Common
@@ -73,6 +72,16 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.save': 'Save Changes',
     'dashboard.logout': 'Logout',
     'dashboard.success': 'Rates updated successfully',
+    
+    // Feature Section Translations
+    'features.craftsmanship.title': 'Quality Craftsmanship',
+    'features.craftsmanship.description': 'Exquisite jewelry crafted with precision and care for lasting beauty.',
+    
+    'features.rates.title': 'Live Market Rates',
+    'features.rates.description': 'Stay updated with current gold and silver rates for transparent pricing.',
+    
+    'features.support.title': 'Dedicated Support',
+    'features.support.description': 'Exceptional customer service and expert guidance for your jewelry needs.',
   },
   mr: {
     // Common
@@ -96,7 +105,7 @@ const translations: Record<Language, Record<string, string>> = {
     'home.per10gm': 'प्रति १० ग्रॅम',
     'home.per1kg': 'प्रति १ किलो',
     'home.address': 'बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१',
-    'home.contact': 'संपर्क: ९९२१६१२१५५',
+    'home.contact': 'संपर्क: ���९२१६१२१५५',
     'home.lastUpdated': 'शेवटचे अपडेट',
     
     // About page
@@ -137,6 +146,16 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.save': 'बदल साठवा',
     'dashboard.logout': 'लॉगआउट',
     'dashboard.success': 'दर यशस्वीरित्या अपडेट केले',
+    
+    // Feature Section Translations
+    'features.craftsmanship.title': 'उच्च दर्जाची कारागिरी',
+    'features.craftsmanship.description': 'काळजीपूर्वक बनविलेले सुंदर दागिने जे कायमस्वरूपी सुंदर दिसतात.',
+    
+    'features.rates.title': 'थेट बाजार दर',
+    'features.rates.description': 'पारदर्शक किंमत करिता सोने आणि चांदीचे सध्याचे दर जाणून घ्या.',
+    
+    'features.support.title': 'समर्पित ग्राहक सेवा',
+    'features.support.description': 'तुमच्या दागिने आवश्यकतांसाठी असाधारण ग्राहक सेवा आणि तज्ञांचे मार्गदर्शन.',
   }
 };
 

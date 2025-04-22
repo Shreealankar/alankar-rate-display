@@ -6,14 +6,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
 export const RateDisplay = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { toast } = useToast();
   const [goldRate, setGoldRate] = useState<number | null>(null);
   const [silverRate, setSilverRate] = useState<number | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>(formatDate(new Date()));
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const { language } = useLanguage();
 
   function formatDate(date: Date): string {
     const dd = String(date.getDate()).padStart(2, "0");
