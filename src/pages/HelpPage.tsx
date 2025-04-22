@@ -4,9 +4,53 @@ import { WhatsAppForm } from '@/components/WhatsAppForm';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { MessageSquare } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const HelpPage = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const faqs = [
+    {
+      en: {
+        question: "How often are gold and silver rates updated?",
+        answer: "Our rates are updated daily based on the market fluctuations. You can always check the latest rates on our homepage."
+      },
+      mr: {
+        question: "सोने आणि चांदीचे दर किती वेळा अपडेट केले जातात?",
+        answer: "आमचे दर बाजारातील चढउतारांनुसार दररोज अपडेट केले जातात. तुम्ही नेहमी होमपेजवर नवीनतम दर तपासू शकता."
+      }
+    },
+    {
+      en: {
+        question: "Do you offer custom jewelry design?",
+        answer: "Yes, we offer custom jewelry design services. Please visit our store or contact us to discuss your requirements."
+      },
+      mr: {
+        question: "तुम्ही कस्टम दागिने डिझाइन करता का?",
+        answer: "होय, आम्ही कस्टम दागिने डिझाइन सेवा देतो. कृपया तुमच्या आवश्यकता चर्चा करण्यासाठी आमच्या दुकानात भेट द्या किंवा आमच्याशी संपर्क साधा."
+      }
+    },
+    {
+      en: {
+        question: "What are your business hours?",
+        answer: "We are open Monday to Saturday from 10:00 AM to 8:00 PM, and on Sundays from 11:00 AM to 6:00 PM."
+      },
+      mr: {
+        question: "तुमची व्यवसाय वेळ काय आहे?",
+        answer: "आम्ही सोमवार ते शनिवार सकाळी १०:०० ते रात्री ८:०० पर्यंत, आणि रविवारी सकाळी ११:०० ते संध्याकाळी ६:०० पर्यंत खुले असतो."
+      }
+    },
+    {
+      en: {
+        question: "Do you provide jewelry valuation services?",
+        answer: "Yes, we provide jewelry valuation services. Please bring your items to our store during business hours."
+      },
+      mr: {
+        question: "तुम्ही दागिन्यांचे मूल्यांकन सेवा प्रदान करता का?",
+        answer: "होय, आम्ही दागिन्यांचे मूल्यांकन सेवा प्रदान करतो. कृपया व्यवसायाच्या वेळेत तुमच्या वस्तू आमच्या दुकानात आणा."
+      }
+    }
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -71,37 +115,20 @@ const HelpPage = () => {
         <section className="py-16 bg-accent/10">
           <div className="container px-4">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+              <h2 className="text-2xl font-bold mb-8 text-center">{t('help.faq')}</h2>
               
-              <div className="space-y-6">
-                <div className="bg-card shadow-md rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-2">How often are gold and silver rates updated?</h3>
-                  <p className="text-muted-foreground">
-                    Our rates are updated daily based on the market fluctuations. You can always check the latest rates on our homepage.
-                  </p>
-                </div>
-                
-                <div className="bg-card shadow-md rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-2">Do you offer custom jewelry design?</h3>
-                  <p className="text-muted-foreground">
-                    Yes, we offer custom jewelry design services. Please visit our store or contact us to discuss your requirements.
-                  </p>
-                </div>
-                
-                <div className="bg-card shadow-md rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-2">What are your business hours?</h3>
-                  <p className="text-muted-foreground">
-                    We are open Monday to Saturday from 10:00 AM to 8:00 PM, and on Sundays from 11:00 AM to 6:00 PM.
-                  </p>
-                </div>
-                
-                <div className="bg-card shadow-md rounded-lg p-6">
-                  <h3 className="text-lg font-semibold mb-2">Do you provide jewelry valuation services?</h3>
-                  <p className="text-muted-foreground">
-                    Yes, we provide jewelry valuation services. Please bring your items to our store during business hours.
-                  </p>
-                </div>
-              </div>
+              <Accordion type="single" collapsible className="space-y-4">
+                {faqs.map((faq, index) => (
+                  <AccordionItem key={index} value={`item-${index}`} className="bg-card shadow-md rounded-lg px-6">
+                    <AccordionTrigger className="text-lg font-semibold">
+                      {language === 'mr' ? faq.mr.question : faq.en.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">
+                      {language === 'mr' ? faq.mr.answer : faq.en.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </section>

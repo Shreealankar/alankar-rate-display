@@ -57,6 +57,7 @@ const translations: Record<Language, Record<string, string>> = {
     'help.mobile': 'Mobile Number',
     'help.message': 'Your Complaint',
     'help.submit': 'Submit via WhatsApp',
+    'help.faq': 'Frequently Asked Questions',
     
     // Login page
     'login.title': 'Owner Login',
@@ -120,6 +121,7 @@ const translations: Record<Language, Record<string, string>> = {
     'help.mobile': 'मोबाईल नंबर',
     'help.message': 'तुमची तक्रार',
     'help.submit': 'WhatsApp द्वारे पाठवा',
+    'help.faq': 'वारंवार विचारले जाणारे प्रश्न',
     
     // Login page
     'login.title': 'मालक लॉगिन',

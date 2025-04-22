@@ -1,4 +1,3 @@
-
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -14,11 +13,11 @@ export const RateDisplay = () => {
   const [lastUpdated, setLastUpdated] = useState<string>(formatDate(new Date()));
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const { language } = useLanguage();
 
-  // Helper function to format date as DD/MM/YYYY hh:mm:ss AM/PM
   function formatDate(date: Date): string {
     const dd = String(date.getDate()).padStart(2, "0");
-    const mm = String(date.getMonth() + 1).padStart(2, "0"); // Jan is 0
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
     const yyyy = date.getFullYear();
 
     let hh = date.getHours();
@@ -27,13 +26,12 @@ export const RateDisplay = () => {
 
     const ampm = hh >= 12 ? "PM" : "AM";
     hh = hh % 12;
-    hh = hh ? hh : 12; // the hour '0' should be '12'
+    hh = hh ? hh : 12;
     const hhStr = String(hh).padStart(2, "0");
 
     return `${dd}/${mm}/${yyyy} ${hhStr}:${min}:${ss} ${ampm}`;
   }
 
-  // Fetch rates from Supabase
   useEffect(() => {
     const fetchRates = async () => {
       try {
@@ -57,7 +55,6 @@ export const RateDisplay = () => {
 
         console.log('Fetched rates data:', ratesData);
 
-        // Process rates data
         if (ratesData && ratesData.length > 0) {
           const goldRateData = ratesData.find(rate => rate.metal_type === 'gold');
           const silverRateData = ratesData.find(rate => rate.metal_type === 'silver');
@@ -66,7 +63,6 @@ export const RateDisplay = () => {
             console.log('Setting gold rate:', goldRateData.rate_per_gram);
             setGoldRate(goldRateData.rate_per_gram);
           } else {
-            // Default fallback
             setGoldRate(62400);
           }
 
@@ -74,11 +70,9 @@ export const RateDisplay = () => {
             console.log('Setting silver rate:', silverRateData.rate_per_gram);
             setSilverRate(silverRateData.rate_per_gram);
           } else {
-            // Default fallback
             setSilverRate(6250);
           }
 
-          // Set last updated timestamp
           if (goldRateData || silverRateData) {
             const latestUpdate = [goldRateData, silverRateData]
               .filter(Boolean)
@@ -89,15 +83,12 @@ export const RateDisplay = () => {
             }
           }
         } else {
-          // No rates found, use defaults and initialize the rates in Supabase
           setGoldRate(62400);
           setSilverRate(6250);
 
           console.log('No rates found, initializing default rates');
 
-          // Try to initialize rates if they don't exist
           try {
-            // Initialize gold rate
             await supabase
               .from('rates')
               .insert({
@@ -106,7 +97,6 @@ export const RateDisplay = () => {
                 updated_at: new Date().toISOString()
               });
 
-            // Initialize silver rate
             await supabase
               .from('rates')
               .insert({
@@ -118,7 +108,6 @@ export const RateDisplay = () => {
             console.log('Default rates initialized successfully');
           } catch (initError) {
             console.error('Error initializing default rates:', initError);
-            // This is non-critical, so we don't show an error toast
           }
         }
       } catch (err) {
@@ -136,7 +125,6 @@ export const RateDisplay = () => {
 
     fetchRates();
 
-    // Set up real-time subscription to rates table
     const channel = supabase
       .channel('rates-changes')
       .on('postgres_changes',
@@ -151,7 +139,6 @@ export const RateDisplay = () => {
             title: "Rates Updated",
             description: "The rates have been updated.",
           });
-          // Refresh data when rates are updated
           fetchRates();
         }
       )
@@ -228,11 +215,10 @@ export const RateDisplay = () => {
           </div>
 
           <p className="text-sm text-muted-foreground text-center mt-4">
-            {t('home.lastUpdated')}: {lastUpdated}
+            {language === 'mr' ? 'शेवटचे अपडेट' : 'Last Updated'}: {lastUpdated}
           </p>
         </>
       )}
     </div>
   );
 };
-
