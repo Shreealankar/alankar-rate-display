@@ -1,9 +1,12 @@
+
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { MobileNumberDialog } from "@/components/MobileNumberDialog";
+import { generateRateChangeMessage } from "@/utils/notificationUtils";
 
 export const RateDisplay = () => {
   const { t, language } = useLanguage();
@@ -150,6 +153,9 @@ export const RateDisplay = () => {
 
   return (
     <div className="w-full max-w-3xl mx-auto">
+      {/* Mobile Number Dialog for first time visitors */}
+      <MobileNumberDialog />
+      
       <h2 className="text-2xl font-bold text-center mb-4">{t('home.rates')}</h2>
 
       {error ? (

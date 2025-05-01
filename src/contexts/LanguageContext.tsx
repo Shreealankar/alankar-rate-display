@@ -34,6 +34,15 @@ const translations: Record<Language, Record<string, string>> = {
     'home.address': 'Near Bank Of Maharashtra, Lohoner 423301',
     'home.contact': 'Contact: 9921612155',
     'home.lastUpdated': 'Last updated',
+    'home.rateError': 'Unable to fetch current rates',
+    'home.tryAgainLater': 'Please try again later',
+    
+    // Notification dialog
+    'notification.title': 'Get Rate Updates via SMS',
+    'notification.description': 'Enter your mobile number to receive notifications when gold and silver rates change.',
+    'notification.mobilePlaceholder': 'Enter your 10-digit mobile number',
+    'notification.submit': 'Submit',
+    'notification.skip': 'Skip',
     
     // About page
     'about.title': 'About Us',
@@ -73,6 +82,8 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.save': 'Save Changes',
     'dashboard.logout': 'Logout',
     'dashboard.success': 'Rates updated successfully',
+    'dashboard.notificationTitle': 'SMS Notification Settings',
+    'dashboard.notificationDescription': 'Add mobile numbers to receive rate update notifications',
     
     // Feature Section Translations
     'features.craftsmanship.title': 'Quality Craftsmanship',
@@ -108,6 +119,15 @@ const translations: Record<Language, Record<string, string>> = {
     'home.address': 'बँक ऑफ महाराष्ट्र जवळ, लोहोनेर ४२३३०१',
     'home.contact': 'संपर्क: ९९२१६१२१५५',
     'home.lastUpdated': 'शेवटचे अपडेट',
+    'home.rateError': 'सध्याचे दर आणण्यात अडचण',
+    'home.tryAgainLater': 'कृपया नंतर पुन्हा प्रयत्न करा',
+    
+    // Notification dialog
+    'notification.title': 'एसएमएस द्वारे दर अपडेट्स मिळवा',
+    'notification.description': 'सोने आणि चांदीचे दर बदलल्यावर सूचना प्राप्त करण्यासाठी आपला मोबाईल नंबर प्रविष्ट करा.',
+    'notification.mobilePlaceholder': 'आपला १० अंकी मोबाईल नंबर प्रविष्ट करा',
+    'notification.submit': 'सबमिट करा',
+    'notification.skip': 'वगळा',
     
     // About page
     'about.title': 'आमच्याबद्दल',
@@ -147,6 +167,8 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.save': 'बदल साठवा',
     'dashboard.logout': 'लॉगआउट',
     'dashboard.success': 'दर यशस्वीरित्या अपडेट केले',
+    'dashboard.notificationTitle': 'एसएमएस सूचना सेटिंग्ज',
+    'dashboard.notificationDescription': 'दर अपडेट सूचना प्राप्त करण्यासाठी मोबाईल नंबर जोडा',
     
     // Feature Section Translations
     'features.craftsmanship.title': 'उच्च दर्जाची कारागिरी',

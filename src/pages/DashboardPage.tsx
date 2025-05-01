@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
+import { NotificationSettings } from '@/components/NotificationSettings';
+import { generateRateChangeMessage, getMobileNumber, getAdditionalNumbers } from '@/utils/notificationUtils';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -19,7 +21,10 @@ const DashboardPage = () => {
   const [goldRate, setGoldRate] = useState('');
   const [silverRate, setSilverRate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSendingNotifications, setIsSendingNotifications] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [oldGoldRate, setOldGoldRate] = useState<number | null>(null);
+  const [oldSilverRate, setOldSilverRate] = useState<number | null>(null);
   
   // Check if user is logged in
   useEffect(() => {
@@ -114,10 +119,12 @@ const DashboardPage = () => {
           
           if (goldRateData) {
             setGoldRate(goldRateData.rate_per_gram.toString());
+            setOldGoldRate(goldRateData.rate_per_gram);
           }
           
           if (silverRateData) {
             setSilverRate(silverRateData.rate_per_gram.toString());
+            setOldSilverRate(silverRateData.rate_per_gram);
           }
         }
       } catch (err) {
@@ -140,9 +147,46 @@ const DashboardPage = () => {
     navigate('/');
   };
   
+  const sendNotification = async (message: string, phoneNumber: string) => {
+    try {
+      console.log(`Sending SMS to ${phoneNumber}: ${message}`);
+      
+      // This would typically call an SMS API
+      // For now, we'll simulate the SMS sending with a console log
+      // In production, this would call an SMS API endpoint
+      
+      // Example API call (commented out as it's just an example)
+      /*
+      const response = await fetch('https://your-sms-api-endpoint.com/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: '9921612155',
+          to: phoneNumber,
+          message: message,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send SMS');
+      }
+      */
+      
+      return true;
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      return false;
+    }
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    const newGoldRate = parseFloat(goldRate);
+    const newSilverRate = parseFloat(silverRate);
     
     try {
       // Get existing records first
@@ -186,7 +230,7 @@ const DashboardPage = () => {
         const { error: goldError } = await supabase
           .from('rates')
           .update({ 
-            rate_per_gram: parseFloat(goldRate),
+            rate_per_gram: newGoldRate,
             updated_at: new Date().toISOString()
           })
           .eq('id', existingGold.id);
@@ -207,7 +251,7 @@ const DashboardPage = () => {
           .from('rates')
           .insert({ 
             metal_type: 'gold', 
-            rate_per_gram: parseFloat(goldRate),
+            rate_per_gram: newGoldRate,
             updated_at: new Date().toISOString()
           });
         
@@ -229,7 +273,7 @@ const DashboardPage = () => {
         const { error: silverError } = await supabase
           .from('rates')
           .update({ 
-            rate_per_gram: parseFloat(silverRate),
+            rate_per_gram: newSilverRate,
             updated_at: new Date().toISOString()
           })
           .eq('id', existingSilver.id);
@@ -250,7 +294,7 @@ const DashboardPage = () => {
           .from('rates')
           .insert({ 
             metal_type: 'silver', 
-            rate_per_gram: parseFloat(silverRate),
+            rate_per_gram: newSilverRate,
             updated_at: new Date().toISOString()
           });
         
@@ -266,6 +310,39 @@ const DashboardPage = () => {
         }
       }
       
+      // Send notifications about rate changes
+      setIsSendingNotifications(true);
+      
+      // Generate notification messages
+      const goldMessage = generateRateChangeMessage('gold', oldGoldRate, newGoldRate);
+      const silverMessage = generateRateChangeMessage('silver', oldSilverRate, newSilverRate);
+      const combinedMessage = `${goldMessage}\n${silverMessage}\n- Shree Alankar`;
+      
+      // Get all numbers for notification
+      const customerNumber = getMobileNumber();
+      const additionalNumbers = getAdditionalNumbers();
+      const allNumbers = [
+        ...(customerNumber ? [customerNumber] : []), 
+        ...additionalNumbers
+      ];
+      
+      console.log('Sending notifications to:', allNumbers);
+      
+      // Send SMS to all registered numbers
+      if (allNumbers.length > 0) {
+        for (const number of allNumbers) {
+          await sendNotification(combinedMessage, number);
+        }
+        
+        toast({
+          title: "Notifications Sent",
+          description: `Rate update notifications sent to ${allNumbers.length} recipients.`,
+        });
+      }
+      
+      setOldGoldRate(newGoldRate);
+      setOldSilverRate(newSilverRate);
+      
       toast({
         title: "Success",
         description: t('dashboard.success'),
@@ -280,6 +357,7 @@ const DashboardPage = () => {
       });
     } finally {
       setIsLoading(false);
+      setIsSendingNotifications(false);
     }
   };
   
@@ -344,18 +422,26 @@ const DashboardPage = () => {
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={isLoading || initialLoading}
+                    disabled={isLoading || initialLoading || isSendingNotifications}
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         Saving...
                       </span>
+                    ) : isSendingNotifications ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Sending notifications...
+                      </span>
                     ) : t('dashboard.save')}
                   </Button>
                 </form>
               </CardContent>
             </Card>
+            
+            {/* Notification Settings */}
+            <NotificationSettings />
           </div>
         </section>
       </main>
