@@ -11,7 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 import { NotificationSettings } from '@/components/NotificationSettings';
-import { generateRateChangeMessage, getMobileNumber, getAdditionalNumbers } from '@/utils/notificationUtils';
+import { 
+  generateRateChangeMessage, 
+  getMobileNumber, 
+  getAdditionalNumbers, 
+  sendSMS 
+} from '@/utils/notificationUtils';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -145,40 +150,6 @@ const DashboardPage = () => {
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     navigate('/');
-  };
-  
-  const sendNotification = async (message: string, phoneNumber: string) => {
-    try {
-      console.log(`Sending SMS to ${phoneNumber}: ${message}`);
-      
-      // This would typically call an SMS API
-      // For now, we'll simulate the SMS sending with a console log
-      // In production, this would call an SMS API endpoint
-      
-      // Example API call (commented out as it's just an example)
-      /*
-      const response = await fetch('https://your-sms-api-endpoint.com/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: '9921612155',
-          to: phoneNumber,
-          message: message,
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to send SMS');
-      }
-      */
-      
-      return true;
-    } catch (error) {
-      console.error('Error sending notification:', error);
-      return false;
-    }
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -330,13 +301,21 @@ const DashboardPage = () => {
       
       // Send SMS to all registered numbers
       if (allNumbers.length > 0) {
+        let successCount = 0;
+        
         for (const number of allNumbers) {
-          await sendNotification(combinedMessage, number);
+          const success = await sendSMS(combinedMessage, number);
+          if (success) successCount++;
         }
         
         toast({
           title: "Notifications Sent",
-          description: `Rate update notifications sent to ${allNumbers.length} recipients.`,
+          description: `Rate update notifications sent to ${successCount} out of ${allNumbers.length} recipients.`,
+        });
+      } else {
+        toast({
+          title: "No Recipients",
+          description: "No mobile numbers registered for notifications.",
         });
       }
       

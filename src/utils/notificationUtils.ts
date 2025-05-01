@@ -50,3 +50,27 @@ export const getAdditionalNumbers = (): string[] => {
     return [];
   }
 };
+
+/**
+ * Sends an SMS notification to the provided phone number
+ */
+export const sendSMS = async (
+  message: string, 
+  phoneNumber: string, 
+  fromNumber: string = "9921612155"
+): Promise<boolean> => {
+  try {
+    // In a real implementation, this would call an SMS API
+    // For now, we'll simulate the SMS sending with a console log
+    console.log(`Sending SMS from ${fromNumber} to ${phoneNumber}: ${message}`);
+    
+    // Simulating API call success with a timeout
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Return true to indicate success
+    return true;
+  } catch (error) {
+    console.error('Error sending SMS notification:', error);
+    return false;
+  }
+};

@@ -18,9 +18,7 @@ export const NotificationSettings = () => {
   useEffect(() => {
     // Load saved numbers on component mount
     const savedNumbers = getAdditionalNumbers();
-    if (savedNumbers && savedNumbers.length) {
-      setNumbers(savedNumbers);
-    }
+    setNumbers(savedNumbers || []);
   }, []);
 
   const handleAddNumber = () => {
@@ -101,7 +99,7 @@ export const NotificationSettings = () => {
           </div>
           
           <div className="space-y-2">
-            {numbers.length > 0 ? (
+            {numbers && numbers.length > 0 ? (
               <div className="border rounded-md divide-y">
                 {numbers.map((number, index) => (
                   <div key={index} className="flex justify-between items-center p-3">
