@@ -44,7 +44,7 @@ export const getAdditionalNumbers = (): string[] => {
   const numbersStr = localStorage.getItem('additionalMobileNumbers');
   if (!numbersStr) return [];
   try {
-    return JSON.stringify(numbersStr);
+    return JSON.parse(numbersStr);
   } catch (e) {
     console.error('Error parsing additional numbers:', e);
     return [];
