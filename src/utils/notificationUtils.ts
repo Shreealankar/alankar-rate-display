@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Generates a message about rate changes
@@ -31,28 +32,92 @@ export const getMobileNumber = (): string | null => {
 };
 
 /**
- * Store additional numbers for notifications in localStorage
+ * Store additional numbers in Supabase
  */
-export const saveAdditionalNumbers = (numbers: string[]): void => {
-  localStorage.setItem('additionalMobileNumbers', JSON.stringify(numbers));
+export const saveAdditionalNumbers = async (numbers: string[]): Promise<boolean> => {
+  try {
+    // First, delete all existing numbers
+    const { error: deleteError } = await supabase
+      .from('notification_numbers')
+      .delete()
+      .neq('phone_number', '');
+    
+    if (deleteError) {
+      console.error('Error deleting existing numbers:', deleteError);
+      return false;
+    }
+    
+    // If there are no numbers to add, we're done
+    if (!numbers || numbers.length === 0) {
+      return true;
+    }
+    
+    // Prepare the rows for insertion
+    const numberRows = numbers.map(number => ({
+      phone_number: number,
+    }));
+    
+    // Insert the new numbers
+    const { error: insertError } = await supabase
+      .from('notification_numbers')
+      .insert(numberRows);
+    
+    if (insertError) {
+      console.error('Error saving additional numbers:', insertError);
+      return false;
+    }
+    
+    // Cache the numbers in localStorage for quick access
+    localStorage.setItem('additionalMobileNumbers', JSON.stringify(numbers));
+    return true;
+  } catch (e) {
+    console.error('Error processing additional numbers:', e);
+    return false;
+  }
 };
 
 /**
- * Get additional mobile numbers from localStorage
+ * Get additional mobile numbers from Supabase
  */
-export const getAdditionalNumbers = (): string[] => {
-  const numbersStr = localStorage.getItem('additionalMobileNumbers');
-  if (!numbersStr) return [];
+export const getAdditionalNumbers = async (): Promise<string[]> => {
   try {
-    return JSON.parse(numbersStr);
+    // Try to get from cache first for better performance
+    const cachedNumbers = localStorage.getItem('additionalMobileNumbers');
+    if (cachedNumbers) {
+      try {
+        const parsed = JSON.parse(cachedNumbers);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error('Error parsing cached numbers:', e);
+      }
+    }
+    
+    // Otherwise fetch from Supabase
+    const { data, error } = await supabase
+      .from('notification_numbers')
+      .select('phone_number');
+    
+    if (error) {
+      console.error('Error fetching additional numbers:', error);
+      return [];
+    }
+    
+    const numbers = data.map(row => row.phone_number);
+    
+    // Update cache
+    localStorage.setItem('additionalMobileNumbers', JSON.stringify(numbers));
+    
+    return numbers;
   } catch (e) {
-    console.error('Error parsing additional numbers:', e);
+    console.error('Error retrieving additional numbers:', e);
     return [];
   }
 };
 
 /**
- * Sends an SMS notification to the provided phone number
+ * Sends an SMS notification via Supabase edge function
  */
 export const sendSMS = async (
   message: string, 
@@ -60,14 +125,20 @@ export const sendSMS = async (
   fromNumber: string = "9921612155"
 ): Promise<boolean> => {
   try {
-    // In a real implementation, this would call an SMS API
-    // For now, we'll simulate the SMS sending with a console log
-    console.log(`Sending SMS from ${fromNumber} to ${phoneNumber}: ${message}`);
+    const { data, error } = await supabase.functions.invoke('send-sms', {
+      body: {
+        message,
+        phoneNumber,
+        fromNumber
+      }
+    });
     
-    // Simulating API call success with a timeout
-    await new Promise(resolve => setTimeout(resolve, 500));
+    if (error) {
+      console.error('Error calling send-sms function:', error);
+      return false;
+    }
     
-    // Return true to indicate success
+    console.log('SMS sent successfully:', data);
     return true;
   } catch (error) {
     console.error('Error sending SMS notification:', error);

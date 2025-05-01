@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -291,7 +290,7 @@ const DashboardPage = () => {
       
       // Get all numbers for notification
       const customerNumber = getMobileNumber();
-      const additionalNumbers = getAdditionalNumbers();
+      const additionalNumbers = await getAdditionalNumbers();
       const allNumbers = [
         ...(customerNumber ? [customerNumber] : []), 
         ...additionalNumbers
