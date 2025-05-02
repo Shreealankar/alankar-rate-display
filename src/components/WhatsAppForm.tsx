@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MessageSquare, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { saveMobileNumber } from '@/utils/notificationUtils';
+import { saveMobileNumber, formatPhoneNumber } from '@/utils/notificationUtils';
 
 export const WhatsAppForm = () => {
   const { t } = useLanguage();
@@ -29,13 +29,16 @@ export const WhatsAppForm = () => {
       return;
     }
     
+    // Format the phone number with +91 prefix
+    const formattedNumber = formatPhoneNumber(mobile);
+    
     // Format the message for WhatsApp
     const whatsappMessage = encodeURIComponent(
-      `Name: ${name}\nMobile: ${mobile}\nMessage: ${message}`
+      `Name: ${name}\nMobile: ${formattedNumber}\nMessage: ${message}`
     );
     
     // Save the number for future rate notifications if user opted in
-    saveMobileNumber(mobile);
+    saveMobileNumber(formattedNumber);
     
     // Open WhatsApp with the pre-filled message
     window.open(`https://wa.me/9921612155?text=${whatsappMessage}`, '_blank');
@@ -61,8 +64,9 @@ export const WhatsAppForm = () => {
       return;
     }
     
-    // Save the mobile number for rate updates
-    saveMobileNumber(mobile);
+    // Format and save the mobile number for rate updates
+    const formattedNumber = formatPhoneNumber(mobile);
+    saveMobileNumber(formattedNumber);
     
     toast({
       title: "Subscribed",
@@ -95,12 +99,12 @@ export const WhatsAppForm = () => {
           
           <div className="space-y-2">
             <label htmlFor="mobile" className="text-sm font-medium">
-              {t('help.mobile')}
+              {t('help.mobile')} (will be formatted with +91)
             </label>
             <Input
               id="mobile"
               type="tel"
-              placeholder={t('help.mobile')}
+              placeholder="10-digit mobile number"
               value={mobile}
               onChange={(e) => setMobile(e.target.value)}
               required

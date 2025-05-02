@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,9 +14,13 @@ import {
   generateRateChangeMessage, 
   getMobileNumber, 
   getAdditionalNumbers, 
-  sendWhatsAppNotification 
+  sendWhatsAppNotification,
+  formatPhoneNumber,
+  sendBulkWhatsAppNotifications
 } from '@/utils/notificationUtils';
 import { WhatsAppForm } from '@/components/WhatsAppForm';
+import { SubscriberManagement } from '@/components/SubscriberManagement';
+import { BulkMessageSender } from '@/components/BulkMessageSender';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -290,33 +293,18 @@ const DashboardPage = () => {
       const silverMessage = generateRateChangeMessage('silver', oldSilverRate, newSilverRate);
       const combinedMessage = `${goldMessage}\n${silverMessage}\n- Shree Alankar`;
       
-      // Get all numbers for notification
-      const customerNumber = getMobileNumber();
-      const additionalNumbers = await getAdditionalNumbers();
-      const allNumbers = [
-        ...(customerNumber ? [customerNumber] : []), 
-        ...additionalNumbers
-      ];
+      // Send bulk notifications to all subscribers
+      const sentCount = await sendBulkWhatsAppNotifications(combinedMessage);
       
-      console.log('Sending notifications to:', allNumbers);
-      
-      // Send WhatsApp notifications to all registered numbers
-      if (allNumbers.length > 0) {
-        let successCount = 0;
-        
-        for (const number of allNumbers) {
-          const success = sendWhatsAppNotification(combinedMessage, number);
-          if (success) successCount++;
-        }
-        
+      if (sentCount > 0) {
         toast({
           title: "Notifications Sent",
-          description: `Rate update notifications sent via WhatsApp to ${successCount} out of ${allNumbers.length} recipients.`,
+          description: `Rate update notifications sent to ${sentCount} subscribers.`,
         });
       } else {
         toast({
           title: "No Recipients",
-          description: "No mobile numbers registered for notifications.",
+          description: "No subscribers registered for notifications.",
         });
       }
       
@@ -358,7 +346,7 @@ const DashboardPage = () => {
         </section>
         
         {/* Rate Update Form */}
-        <section className="py-16 bg-background">
+        <section className="py-8 bg-background">
           <div className="container px-4">
             <Card className="max-w-md mx-auto">
               <CardHeader>
@@ -419,6 +407,12 @@ const DashboardPage = () => {
                 </form>
               </CardContent>
             </Card>
+            
+            {/* Bulk Message Sender */}
+            <BulkMessageSender />
+            
+            {/* Subscriber Management */}
+            <SubscriberManagement />
             
             {/* Notification Settings */}
             <NotificationSettings />

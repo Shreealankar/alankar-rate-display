@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Header } from '@/components/layout/Header';
@@ -8,25 +8,92 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2, Shield } from 'lucide-react';
 
 const LoginPage = () => {
   const { t } = useLanguage();
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [locked, setLocked] = useState(false);
+  const [lockTimer, setLockTimer] = useState(0);
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if account is locked on load
+  useEffect(() => {
+    const storedLockedUntil = localStorage.getItem('lockedUntil');
+    if (storedLockedUntil) {
+      const lockedUntil = parseInt(storedLockedUntil);
+      
+      if (lockedUntil > Date.now()) {
+        setLocked(true);
+        const remainingTime = Math.ceil((lockedUntil - Date.now()) / 1000);
+        setLockTimer(remainingTime);
+      } else {
+        // Lock period expired
+        localStorage.removeItem('lockedUntil');
+        setLocked(false);
+      }
+    }
+
+    // Restore attempt count
+    const storedAttempts = localStorage.getItem('loginAttempts');
+    if (storedAttempts) {
+      setLoginAttempts(parseInt(storedAttempts));
+    }
+  }, []);
+
+  // Timer countdown effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (locked && lockTimer > 0) {
+      interval = setInterval(() => {
+        setLockTimer(prevTimer => {
+          const newTimer = prevTimer - 1;
+          if (newTimer <= 0) {
+            setLocked(false);
+            localStorage.removeItem('lockedUntil');
+            clearInterval(interval);
+            return 0;
+          }
+          return newTimer;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [locked, lockTimer]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (locked) {
+      toast({
+        title: "Account Locked",
+        description: `Too many failed attempts. Try again in ${lockTimer} seconds.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     setError(false);
     
-    // Simple password check - in real app, this would be handled by Supabase authentication
+    // Simple password check 
     if (password === 'Shreealankar3230') {
       // Success - simulate loading
       setTimeout(() => {
-        // In a real app with Supabase, we'd store the session token
+        // Reset failed attempts on successful login
+        setLoginAttempts(0);
+        localStorage.setItem('loginAttempts', '0');
+        localStorage.removeItem('lockedUntil');
+        
+        // Store login status
         localStorage.setItem('isLoggedIn', 'true');
         setIsLoading(false);
         toast({
@@ -40,6 +107,33 @@ const LoginPage = () => {
       setTimeout(() => {
         setError(true);
         setIsLoading(false);
+        
+        // Increment and store failed attempts
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        localStorage.setItem('loginAttempts', newAttempts.toString());
+        
+        // Lock account after 5 failed attempts
+        if (newAttempts >= 5) {
+          const lockDuration = 60; // seconds
+          const lockedUntil = Date.now() + (lockDuration * 1000);
+          localStorage.setItem('lockedUntil', lockedUntil.toString());
+          
+          setLocked(true);
+          setLockTimer(lockDuration);
+          
+          toast({
+            title: "Account Locked",
+            description: `Too many failed attempts. Try again in ${lockDuration} seconds.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login Failed",
+            description: `Incorrect password. ${5 - newAttempts} attempts remaining.`,
+            variant: "destructive",
+          });
+        }
       }, 800);
     }
   };
@@ -66,17 +160,35 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className={error ? 'border-destructive' : ''}
+                    disabled={isLoading || locked}
                   />
                   {error && (
                     <p className="text-sm text-destructive">{t('login.error')}</p>
+                  )}
+                  {locked && (
+                    <p className="text-sm text-destructive">
+                      Account locked. Try again in {lockTimer} seconds.
+                    </p>
                   )}
                 </div>
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={isLoading}
+                  disabled={isLoading || locked}
                 >
-                  {isLoading ? 'Loading...' : t('login.button')}
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Verifying...
+                    </span>
+                  ) : locked ? (
+                    <span className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Locked ({lockTimer}s)
+                    </span>
+                  ) : (
+                    t('login.button')
+                  )}
                 </Button>
               </form>
             </CardContent>
