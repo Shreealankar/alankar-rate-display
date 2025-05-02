@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
-import { NotificationSettings } from '@/components/NotificationSettings';
 import { 
   generateRateChangeMessage, 
   getMobileNumber, 
@@ -18,7 +17,6 @@ import {
   formatPhoneNumber
 } from '@/utils/notificationUtils';
 import { WhatsAppForm } from '@/components/WhatsAppForm';
-import { SubscriberManagement } from '@/components/SubscriberManagement';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -390,12 +388,6 @@ const DashboardPage = () => {
                 </form>
               </CardContent>
             </Card>
-            
-            {/* Subscriber Management */}
-            <SubscriberManagement />
-            
-            {/* Notification Settings */}
-            <NotificationSettings />
             
             {/* WhatsApp Form */}
             <div className="mt-8">
