@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -67,8 +68,6 @@ export const saveAdditionalNumbers = async (numbers: string[]): Promise<boolean>
       return false;
     }
     
-    // Cache the numbers in localStorage for quick access
-    localStorage.setItem('additionalMobileNumbers', JSON.stringify(numbers));
     return true;
   } catch (e) {
     console.error('Error processing additional numbers:', e);
@@ -81,20 +80,7 @@ export const saveAdditionalNumbers = async (numbers: string[]): Promise<boolean>
  */
 export const getAdditionalNumbers = async (): Promise<string[]> => {
   try {
-    // Try to get from cache first for better performance
-    const cachedNumbers = localStorage.getItem('additionalMobileNumbers');
-    if (cachedNumbers) {
-      try {
-        const parsed = JSON.parse(cachedNumbers);
-        if (Array.isArray(parsed)) {
-          return parsed;
-        }
-      } catch (e) {
-        console.error('Error parsing cached numbers:', e);
-      }
-    }
-    
-    // Otherwise fetch from Supabase
+    // Fetch directly from Supabase
     const { data, error } = await supabase
       .from('notification_numbers')
       .select('phone_number');
@@ -105,10 +91,6 @@ export const getAdditionalNumbers = async (): Promise<string[]> => {
     }
     
     const numbers = data.map(row => row.phone_number);
-    
-    // Update cache
-    localStorage.setItem('additionalMobileNumbers', JSON.stringify(numbers));
-    
     return numbers;
   } catch (e) {
     console.error('Error retrieving additional numbers:', e);
@@ -135,6 +117,12 @@ export const sendSMS = async (
     
     if (error) {
       console.error('Error calling send-sms function:', error);
+      return false;
+    }
+    
+    // Check response from the function
+    if (!data || !data.success) {
+      console.error('SMS sending failed:', data?.error || 'Unknown error');
       return false;
     }
     

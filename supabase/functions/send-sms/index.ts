@@ -25,40 +25,39 @@ serve(async (req) => {
     // Log the request
     console.log(`Sending SMS from ${fromNumber} to ${phoneNumber}: ${message}`);
 
-    // In a real implementation, this is where you would integrate with an SMS service like Twilio
-    // Example:
-    /*
-    const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+    // This is where we'll integrate with a real SMS service API
+    // For this example, we'll use a basic HTTP request to an SMS gateway
+    // You would replace this URL with your actual SMS provider's API endpoint
+    const smsApiUrl = "https://api.textlocal.in/send/";
+    
+    // Get API key from environment variable
+    const apiKey = Deno.env.get("TEXTLOCAL_API_KEY");
+    
+    if (!apiKey) {
+      throw new Error("SMS API key not configured");
+    }
 
-    const response = await fetch(twilioUrl, {
+    // Prepare the payload for the SMS provider
+    const formData = new FormData();
+    formData.append("apikey", apiKey);
+    formData.append("numbers", phoneNumber.replace(/^0/, "91")); // Ensure phone number has country code
+    formData.append("sender", fromNumber);
+    formData.append("message", message);
+    
+    // Send the request to the SMS API
+    const smsResponse = await fetch(smsApiUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Basic ${btoa(`${twilioAccountSid}:${twilioAuthToken}`)}`,
-      },
-      body: new URLSearchParams({
-        From: fromNumber,
-        To: phoneNumber,
-        Body: message,
-      }),
+      body: formData,
     });
-
-    const responseData = await response.json();
-    */
     
-    // For now, we'll simulate a successful response
-    const responseData = {
-      status: "delivered",
-      sid: `sms_${Date.now()}`,
-      to: phoneNumber,
-      from: fromNumber,
-    };
-
-    // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+    if (!smsResponse.ok) {
+      const errorText = await smsResponse.text();
+      throw new Error(`SMS API error: ${smsResponse.status} - ${errorText}`);
+    }
     
+    const responseData = await smsResponse.json();
+    
+    // Return the response from the SMS provider
     return new Response(
       JSON.stringify({ 
         success: true, 
