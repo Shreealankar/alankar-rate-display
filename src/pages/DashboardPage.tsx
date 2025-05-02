@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,8 +15,9 @@ import {
   generateRateChangeMessage, 
   getMobileNumber, 
   getAdditionalNumbers, 
-  sendSMS 
+  sendWhatsAppNotification 
 } from '@/utils/notificationUtils';
+import { WhatsAppForm } from '@/components/WhatsAppForm';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -298,18 +300,18 @@ const DashboardPage = () => {
       
       console.log('Sending notifications to:', allNumbers);
       
-      // Send SMS to all registered numbers
+      // Send WhatsApp notifications to all registered numbers
       if (allNumbers.length > 0) {
         let successCount = 0;
         
         for (const number of allNumbers) {
-          const success = await sendSMS(combinedMessage, number);
+          const success = sendWhatsAppNotification(combinedMessage, number);
           if (success) successCount++;
         }
         
         toast({
           title: "Notifications Sent",
-          description: `Rate update notifications sent to ${successCount} out of ${allNumbers.length} recipients.`,
+          description: `Rate update notifications sent via WhatsApp to ${successCount} out of ${allNumbers.length} recipients.`,
         });
       } else {
         toast({
@@ -410,7 +412,7 @@ const DashboardPage = () => {
                     ) : isSendingNotifications ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Sending notifications...
+                        Sending WhatsApp notifications...
                       </span>
                     ) : t('dashboard.save')}
                   </Button>
@@ -420,6 +422,11 @@ const DashboardPage = () => {
             
             {/* Notification Settings */}
             <NotificationSettings />
+            
+            {/* WhatsApp Form */}
+            <div className="mt-8">
+              <WhatsAppForm />
+            </div>
           </div>
         </section>
       </main>

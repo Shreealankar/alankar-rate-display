@@ -5,10 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Send } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { saveMobileNumber } from '@/utils/notificationUtils';
 
 export const WhatsAppForm = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [message, setMessage] = useState('');
@@ -16,13 +19,31 @@ export const WhatsAppForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate mobile number
+    if (mobile.length < 10) {
+      toast({
+        title: "Invalid Number",
+        description: "Please enter a valid mobile number",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Format the message for WhatsApp
     const whatsappMessage = encodeURIComponent(
-      `Name: ${name}\nMobile: ${mobile}\nComplaint: ${message}`
+      `Name: ${name}\nMobile: ${mobile}\nMessage: ${message}`
     );
+    
+    // Save the number for future rate notifications if user opted in
+    saveMobileNumber(mobile);
     
     // Open WhatsApp with the pre-filled message
     window.open(`https://wa.me/9921612155?text=${whatsappMessage}`, '_blank');
+    
+    toast({
+      title: "Message Sent",
+      description: "Your message has been sent via WhatsApp",
+    });
     
     // Reset form fields
     setName('');
@@ -30,12 +51,31 @@ export const WhatsAppForm = () => {
     setMessage('');
   };
 
+  const handleRateUpdateSubscribe = () => {
+    if (mobile.length < 10) {
+      toast({
+        title: "Invalid Number",
+        description: "Please enter a valid mobile number",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Save the mobile number for rate updates
+    saveMobileNumber(mobile);
+    
+    toast({
+      title: "Subscribed",
+      description: "You've been subscribed to rate updates via WhatsApp",
+    });
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle>{t('help.complaint')}</CardTitle>
         <CardDescription>
-          Your complaint will be sent directly via WhatsApp.
+          Send your message directly via WhatsApp
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -81,12 +121,27 @@ export const WhatsAppForm = () => {
             />
           </div>
           
-          <Button type="submit" className="w-full" size="lg">
-            <MessageSquare className="mr-2 h-4 w-4" />
-            {t('help.submit')}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button type="submit" className="flex-1" size="lg">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              {t('help.submit')}
+            </Button>
+            
+            <Button 
+              type="button" 
+              className="flex-1" 
+              size="lg" 
+              variant="outline"
+              onClick={handleRateUpdateSubscribe}
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Subscribe to Updates
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>
   );
 };
+
+export default WhatsAppForm;

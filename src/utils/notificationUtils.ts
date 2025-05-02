@@ -99,37 +99,23 @@ export const getAdditionalNumbers = async (): Promise<string[]> => {
 };
 
 /**
- * Sends an SMS notification via Supabase edge function
+ * Sends a WhatsApp notification about rate changes
  */
-export const sendSMS = async (
+export const sendWhatsAppNotification = (
   message: string, 
   phoneNumber: string, 
   fromNumber: string = "9921612155"
-): Promise<boolean> => {
+): boolean => {
   try {
-    const { data, error } = await supabase.functions.invoke('send-sms', {
-      body: {
-        message,
-        phoneNumber,
-        fromNumber
-      }
-    });
+    // Format the message for WhatsApp
+    const whatsappMessage = encodeURIComponent(message);
     
-    if (error) {
-      console.error('Error calling send-sms function:', error);
-      return false;
-    }
+    // Open WhatsApp in a new tab
+    window.open(`https://wa.me/${phoneNumber}?text=${whatsappMessage}`, '_blank');
     
-    // Check response from the function
-    if (!data || !data.success) {
-      console.error('SMS sending failed:', data?.error || 'Unknown error');
-      return false;
-    }
-    
-    console.log('SMS sent successfully:', data);
     return true;
   } catch (error) {
-    console.error('Error sending SMS notification:', error);
+    console.error('Error sending WhatsApp notification:', error);
     return false;
   }
 };
