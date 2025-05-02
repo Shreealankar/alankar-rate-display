@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -215,44 +214,9 @@ export const sendWhatsAppNotification = (
 };
 
 /**
- * Send notifications to all subscribers at once
+ * Send notifications to all subscribers at once - disabled functionality
  */
 export const sendBulkWhatsAppNotifications = async (message: string): Promise<number> => {
-  try {
-    // Get customer number from localStorage
-    const customerNumber = getMobileNumber();
-    
-    // Get additional numbers from Supabase
-    const additionalNumbers = await getAdditionalNumbers();
-    
-    // Combine all numbers
-    const allNumbers = [
-      ...(customerNumber ? [customerNumber] : []), 
-      ...additionalNumbers
-    ];
-    
-    if (allNumbers.length === 0) {
-      return 0;
-    }
-    
-    // Create a single WhatsApp link with all numbers
-    const whatsappMessage = encodeURIComponent(message);
-    
-    // Send to each number individually (WhatsApp doesn't support bulk messages natively)
-    let successCount = 0;
-    
-    for (const number of allNumbers) {
-      const formattedNumber = formatPhoneNumber(number);
-      window.open(`https://wa.me/${formattedNumber}?text=${whatsappMessage}`, '_blank');
-      successCount++;
-      
-      // Add a small delay to avoid browser blocking multiple popups
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-    
-    return successCount;
-  } catch (error) {
-    console.error('Error sending bulk WhatsApp notifications:', error);
-    return 0;
-  }
+  console.log('Bulk messaging has been disabled');
+  return 0;
 };

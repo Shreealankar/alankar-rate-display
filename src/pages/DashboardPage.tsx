@@ -15,12 +15,10 @@ import {
   getMobileNumber, 
   getAdditionalNumbers, 
   sendWhatsAppNotification,
-  formatPhoneNumber,
-  sendBulkWhatsAppNotifications
+  formatPhoneNumber
 } from '@/utils/notificationUtils';
 import { WhatsAppForm } from '@/components/WhatsAppForm';
 import { SubscriberManagement } from '@/components/SubscriberManagement';
-import { BulkMessageSender } from '@/components/BulkMessageSender';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -285,28 +283,13 @@ const DashboardPage = () => {
         }
       }
       
-      // Send notifications about rate changes
-      setIsSendingNotifications(true);
+      // Update notification behavior to not send bulk messages
+      setIsSendingNotifications(false);
       
-      // Generate notification messages
+      // Generate notification messages but don't send them
       const goldMessage = generateRateChangeMessage('gold', oldGoldRate, newGoldRate);
       const silverMessage = generateRateChangeMessage('silver', oldSilverRate, newSilverRate);
-      const combinedMessage = `${goldMessage}\n${silverMessage}\n- Shree Alankar`;
-      
-      // Send bulk notifications to all subscribers
-      const sentCount = await sendBulkWhatsAppNotifications(combinedMessage);
-      
-      if (sentCount > 0) {
-        toast({
-          title: "Notifications Sent",
-          description: `Rate update notifications sent to ${sentCount} subscribers.`,
-        });
-      } else {
-        toast({
-          title: "No Recipients",
-          description: "No subscribers registered for notifications.",
-        });
-      }
+      console.log(`Rate update message (not sent): ${goldMessage}\n${silverMessage}\n- Shree Alankar`);
       
       setOldGoldRate(newGoldRate);
       setOldSilverRate(newSilverRate);
@@ -407,9 +390,6 @@ const DashboardPage = () => {
                 </form>
               </CardContent>
             </Card>
-            
-            {/* Bulk Message Sender */}
-            <BulkMessageSender />
             
             {/* Subscriber Management */}
             <SubscriberManagement />
