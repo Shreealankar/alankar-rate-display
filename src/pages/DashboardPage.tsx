@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -319,9 +320,16 @@ const DashboardPage = () => {
           <div className="container px-4">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
-              <Button variant="outline" onClick={handleLogout} className="mt-4 md:mt-0">
-                {t('dashboard.logout')}
-              </Button>
+              <div className="flex gap-4 mt-4 md:mt-0">
+                <Link to="/jewelry">
+                  <Button variant="outline" className="bg-zinc-800 hover:bg-zinc-700">
+                    Manage Jewelry Gallery
+                  </Button>
+                </Link>
+                <Button variant="outline" onClick={handleLogout}>
+                  {t('dashboard.logout')}
+                </Button>
+              </div>
             </div>
           </div>
         </section>

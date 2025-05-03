@@ -1,155 +1,134 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetTrigger,
-  SheetClose
-} from '@/components/ui/sheet';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Menu, Languages, Home, User, Book, HelpCircle } from 'lucide-react';
+import { ModeToggle } from '@/components/ModeToggle';
+import { LanguageToggle } from '@/components/LanguageToggle';
+import { Menu, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Logo } from '@/components/Logo';
 
 export const Header = () => {
-  const { language, setLanguage, t } = useLanguage();
-  const [isOpen, setIsOpen] = useState(false);
+  const { t } = useLanguage();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  const navLinks = [
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.about'), path: '/about' },
+    { name: t('nav.jewelry'), path: '/jewelry' },
+    { name: t('nav.help'), path: '/help' },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
+    <header
+      className={cn(
+        'sticky top-0 z-40 w-full transition-all duration-200',
+        isScrolled
+          ? 'bg-background/80 backdrop-blur-md border-b shadow-sm'
+          : 'bg-transparent'
+      )}
+    >
+      <div className="container flex h-16 items-center justify-between px-4">
+        <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <img 
-              src="/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png" 
-              alt="Shree Alankar Logo" 
-              className="h-10 w-10 object-contain"
-            />
-            <div className="flex flex-col">
-              <span className="font-bold text-xl text-primary">{t('app.name')}</span>
-              <span className="text-xs text-muted-foreground">{t('app.tagline')}</span>
-            </div>
+            <Logo className="h-8 w-8" />
+            <span className="font-bold text-xl hidden sm:inline-block">
+              {t('site.name')}
+            </span>
           </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={cn(
+                  'text-sm font-medium transition-colors hover:text-primary',
+                  location.pathname === link.path
+                    ? 'text-primary'
+                    : 'text-muted-foreground'
+                )}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
-          <Link to="/" className="text-sm font-medium transition-colors hover:text-primary">
-            {t('nav.home')}
-          </Link>
-          <Link to="/about" className="text-sm font-medium transition-colors hover:text-primary">
-            {t('nav.about')}
-          </Link>
-          <a 
-            href="https://sites.google.com/d/1OsSpycKJH855XnV9wX7PNR4Ls9UWGApe/p/1BlGeaRPtKXN4keJe3Jlz_1Xr9DmMYq9M/edit"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium transition-colors hover:text-primary"
-          >
-            {language === 'mr' ? 'दागिने डिझाईन' : 'Jewelry Design'}
-          </a>
-          <Link to="/terms" className="text-sm font-medium transition-colors hover:text-primary">
-            {t('nav.terms')}
-          </Link>
-          <Link to="/help" className="text-sm font-medium transition-colors hover:text-primary">
-            {t('nav.help')}
-          </Link>
-          <Link to="/login" className="text-sm font-medium transition-colors hover:text-primary">
-            {t('nav.login')}
-          </Link>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Languages className="h-5 w-5" />
-                <span className="sr-only">{t('language')}</span>
+        <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
+            <LanguageToggle />
+            <ModeToggle />
+            <Link to="/login">
+              <Button variant="outline" size="sm">
+                {t('nav.login')}
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setLanguage('en')}>
-                English {language === 'en' && '✓'}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setLanguage('mr')}>
-                मराठी {language === 'mr' && '✓'}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </nav>
+            </Link>
+          </div>
 
-        {/* Mobile Navigation */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild className="md:hidden">
-            <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right">
-            <nav className="flex flex-col gap-4 mt-8">
-              <SheetClose asChild>
-                <Link to="/" className="flex items-center gap-2 p-2 hover:bg-accent rounded-md">
-                  <Home className="h-5 w-5" />
-                  <span>{t('nav.home')}</span>
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
-                <Link to="/about" className="flex items-center gap-2 p-2 hover:bg-accent rounded-md">
-                  <Book className="h-5 w-5" />
-                  <span>{t('nav.about')}</span>
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
-                <a 
-                  href="https://sites.google.com/d/1OsSpycKJH855XnV9wX7PNR4Ls9UWGApe/p/1BlGeaRPtKXN4keJe3Jlz_1Xr9DmMYq9M/edit"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 p-2 hover:bg-accent rounded-md"
-                >
-                  <Book className="h-5 w-5" />
-                  <span>{language === 'mr' ? 'दागिने डिझाईन' : 'Jewelry Design'}</span>
-                </a>
-              </SheetClose>
-              <SheetClose asChild>
-                <Link to="/help" className="flex items-center gap-2 p-2 hover:bg-accent rounded-md">
-                  <HelpCircle className="h-5 w-5" />
-                  <span>{t('nav.help')}</span>
-                </Link>
-              </SheetClose>
-              <SheetClose asChild>
-                <Link to="/login" className="flex items-center gap-2 p-2 hover:bg-accent rounded-md">
-                  <User className="h-5 w-5" />
-                  <span>{t('nav.login')}</span>
-                </Link>
-              </SheetClose>
-              
-              <div className="border-t my-4" />
-
-              <div className="flex flex-col gap-2 p-2">
-                <span className="text-sm font-medium">{t('language')}</span>
-                <div className="flex gap-4">
-                  <button 
-                    className={`px-3 py-1 rounded-md ${language === 'en' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`} 
-                    onClick={() => setLanguage('en')}
-                  >
-                    English
-                  </button>
-                  <button 
-                    className={`px-3 py-1 rounded-md ${language === 'mr' ? 'bg-primary text-primary-foreground' : 'bg-secondary'}`}
-                    onClick={() => setLanguage('mr')}
-                  >
-                    मराठी
-                  </button>
-                </div>
-              </div>
-            </nav>
-          </SheetContent>
-        </Sheet>
+          {/* Mobile menu button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
+
+      {/* Mobile Navigation */}
+      {isMenuOpen && (
+        <div className="md:hidden border-t">
+          <nav className="container flex flex-col gap-4 px-4 py-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={cn(
+                  'text-sm font-medium transition-colors hover:text-primary py-2',
+                  location.pathname === link.path
+                    ? 'text-primary'
+                    : 'text-muted-foreground'
+                )}
+              >
+                {link.name}
+              </Link>
+            ))}
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="flex items-center gap-2">
+                <LanguageToggle />
+                <ModeToggle />
+              </div>
+              <Link to="/login">
+                <Button variant="outline" size="sm">
+                  {t('nav.login')}
+                </Button>
+              </Link>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
