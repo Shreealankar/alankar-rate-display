@@ -6,8 +6,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { JewelryForm } from './JewelryForm';
+import { ProductForm } from './ProductForm';
 import { JewelryItem } from './JewelryItem';
 import { Loader2, Plus } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface JewelryItemType {
   id: string;
@@ -20,31 +22,60 @@ interface JewelryItemType {
   updated_at: string;
 }
 
+interface ProductType {
+  id: string;
+  title: string;
+  category: 'necklace' | 'ring' | 'earring' | 'bracelet' | 'pendant' | 'other';
+  type: string; 
+  purity: string;
+  weight_grams: number;
+  description: string | null;
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export const JewelryGallery = () => {
   const [jewelryItems, setJewelryItems] = useState<JewelryItemType[]>([]);
+  const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
-  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showAddJewelryDialog, setShowAddJewelryDialog] = useState(false);
+  const [showAddProductDialog, setShowAddProductDialog] = useState(false);
+  const [activeTab, setActiveTab] = useState('jewelry');
   const { toast } = useToast();
 
-  // Fetch all jewelry items and check if user is owner
+  // Fetch all jewelry items, products, and check if user is owner
   useEffect(() => {
-    const fetchJewelryItems = async () => {
+    const fetchItems = async () => {
       try {
         setLoading(true);
         
         // Fetch jewelry items
-        const { data: items, error } = await supabase
+        const { data: items, error: jewelryError } = await supabase
           .from('jewelry_items')
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (error) {
-          throw error;
+        if (jewelryError) {
+          throw jewelryError;
         }
 
         // Type assertion to ensure the right type
         setJewelryItems(items as JewelryItemType[]);
+        
+        // Fetch products
+        const { data: productItems, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (productsError) {
+          throw productsError;
+        }
+        
+        // Type assertion for products
+        setProducts(productItems as ProductType[]);
         
         // Check if current user is an owner
         const { data: userData } = await supabase.auth.getUser();
@@ -59,10 +90,10 @@ export const JewelryGallery = () => {
           setIsOwner(profileData?.is_owner || false);
         }
       } catch (error: any) {
-        console.error('Error fetching jewelry items:', error);
+        console.error('Error fetching items:', error);
         toast({
           title: 'Error',
-          description: 'Failed to load jewelry items',
+          description: 'Failed to load items',
           variant: 'destructive',
         });
       } finally {
@@ -70,10 +101,10 @@ export const JewelryGallery = () => {
       }
     };
 
-    fetchJewelryItems();
+    fetchItems();
 
-    // Set up real-time subscription
-    const channel = supabase
+    // Set up real-time subscription for jewelry items
+    const jewelryChannel = supabase
       .channel('jewelry-changes')
       .on(
         'postgres_changes',
@@ -96,17 +127,51 @@ export const JewelryGallery = () => {
         }
       )
       .subscribe();
+      
+    // Set up real-time subscription for products
+    const productsChannel = supabase
+      .channel('products-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        (payload) => {
+          // Handle different events
+          if (payload.eventType === 'INSERT') {
+            setProducts((current) => [payload.new as ProductType, ...current]);
+          } else if (payload.eventType === 'UPDATE') {
+            setProducts((current) =>
+              current.map((item) =>
+                item.id === payload.new.id ? (payload.new as ProductType) : item
+              )
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setProducts((current) =>
+              current.filter((item) => item.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(jewelryChannel);
+      supabase.removeChannel(productsChannel);
     };
   }, [toast]);
 
-  const handleAddSuccess = () => {
-    setShowAddDialog(false);
+  const handleAddJewelrySuccess = () => {
+    setShowAddJewelryDialog(false);
     toast({
       title: 'Success',
       description: 'Jewelry item added successfully',
+    });
+  };
+  
+  const handleAddProductSuccess = () => {
+    setShowAddProductDialog(false);
+    toast({
+      title: 'Success',
+      description: 'Product added successfully',
     });
   };
 
@@ -115,40 +180,124 @@ export const JewelryGallery = () => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Jewelry Gallery</h2>
         {isOwner && (
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Add New Item
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Add New Jewelry Item</DialogTitle>
-              </DialogHeader>
-              <JewelryForm onSuccess={handleAddSuccess} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-3">
+            <Dialog open={showAddJewelryDialog} onOpenChange={setShowAddJewelryDialog}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Add Jewelry Item
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add New Jewelry Item</DialogTitle>
+                </DialogHeader>
+                <JewelryForm onSuccess={handleAddJewelrySuccess} />
+              </DialogContent>
+            </Dialog>
+            
+            <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2" variant="outline">
+                  <Plus className="h-4 w-4" />
+                  Add Product
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add New Product</DialogTitle>
+                </DialogHeader>
+                <ProductForm onSuccess={handleAddProductSuccess} />
+              </DialogContent>
+            </Dialog>
+          </div>
         )}
       </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      ) : jewelryItems.length === 0 ? (
-        <Card className="text-center py-12">
-          <CardContent>
-            <p className="text-muted-foreground">No jewelry items found</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {jewelryItems.map((item) => (
-            <JewelryItem key={item.id} item={item} isOwner={isOwner} />
-          ))}
-        </div>
-      )}
+      <Tabs defaultValue="jewelry" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList>
+          <TabsTrigger value="jewelry">Jewelry Items</TabsTrigger>
+          <TabsTrigger value="products">Products</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="jewelry">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : jewelryItems.length === 0 ? (
+            <Card className="text-center py-12">
+              <CardContent>
+                <p className="text-muted-foreground">No jewelry items found</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {jewelryItems.map((item) => (
+                <JewelryItem key={item.id} item={item} isOwner={isOwner} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="products">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : products.length === 0 ? (
+            <Card className="text-center py-12">
+              <CardContent>
+                <p className="text-muted-foreground">No products found</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.map((product) => (
+                <Card key={product.id} className="overflow-hidden">
+                  <div className="aspect-square relative overflow-hidden bg-muted">
+                    {product.image_url ? (
+                      <img 
+                        src={product.image_url} 
+                        alt={product.title}
+                        className="object-cover w-full h-full" 
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full w-full text-muted-foreground">
+                        No image
+                      </div>
+                    )}
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="line-clamp-1">{product.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-1 text-sm">
+                      <p>Category: <span className="font-medium">{product.category}</span></p>
+                      <p>Type: <span className="font-medium">{product.type}</span></p>
+                      <p>Purity: <span className="font-medium">{product.purity}</span></p>
+                      <p>Weight: <span className="font-medium">{product.weight_grams}g</span></p>
+                      {product.description && (
+                        <p className="line-clamp-2 text-muted-foreground mt-2">{product.description}</p>
+                      )}
+                    </div>
+                  </CardContent>
+                  {isOwner && (
+                    <CardFooter className="flex justify-end gap-2 border-t pt-4">
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
+                      <Button variant="destructive" size="sm">
+                        Delete
+                      </Button>
+                    </CardFooter>
+                  )}
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
