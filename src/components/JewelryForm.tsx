@@ -103,7 +103,7 @@ export const JewelryForm = ({ item, onSuccess }: JewelryFormProps) => {
     return data.publicUrl;
   };
 
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (formData: FormValues) => {
     try {
       setUploading(true);
       
@@ -118,7 +118,10 @@ export const JewelryForm = ({ item, onSuccess }: JewelryFormProps) => {
         const { error } = await supabase
           .from('jewelry_items')
           .update({
-            ...data,
+            name: formData.name,
+            weight_grams: formData.weight_grams,
+            type: formData.type,
+            purity: formData.purity,
             photo_url: photoUrl,
             updated_at: new Date().toISOString(),
           })
@@ -128,7 +131,10 @@ export const JewelryForm = ({ item, onSuccess }: JewelryFormProps) => {
       } else {
         // Create new item
         const { error } = await supabase.from('jewelry_items').insert({
-          ...data,
+          name: formData.name,
+          weight_grams: formData.weight_grams,
+          type: formData.type,
+          purity: formData.purity,
           photo_url: photoUrl,
         });
         

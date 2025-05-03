@@ -43,7 +43,8 @@ export const JewelryGallery = () => {
           throw error;
         }
 
-        setJewelryItems(items || []);
+        // Type assertion to ensure the right type
+        setJewelryItems(items as JewelryItemType[]);
         
         // Check if current user is an owner
         const { data: userData } = await supabase.auth.getUser();
