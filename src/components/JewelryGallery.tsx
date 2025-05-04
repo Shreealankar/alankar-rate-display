@@ -36,8 +36,8 @@ interface ProductType {
   id: string;
   title: string;
   category: 'necklace' | 'ring' | 'earring' | 'bracelet' | 'pendant' | 'other';
-  type: string; 
-  purity: string;
+  type: 'gold' | 'silver'; // Changed from string to specific union type
+  purity: '18k' | '20k' | '22k' | '24k'; // Changed from string to specific union type
   weight_grams: number;
   description: string | null;
   image_url: string | null;
