@@ -13,7 +13,7 @@ export const Logo: React.FC<LogoProps> = ({ className }) => {
         alt="Shree Alankar Logo" 
         className={className || "h-12 w-auto"}
       />
-      <span className="font-bold text-lg">Shree Alankar, Lohoner</span>
+      <span className="font-bold text-lg whitespace-nowrap">Shree Alankar, Lohoner</span>
     </div>
   );
 };

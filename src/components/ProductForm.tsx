@@ -110,20 +110,21 @@ export const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
   const uploadImage = async () => {
     if (!imageFile) return null;
     
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `products/${fileName}`;
-    
-    const { error: uploadError } = await supabase.storage
-      .from('products')
-      .upload(filePath, imageFile);
-    
-    if (uploadError) {
-      throw uploadError;
+    try {
+      // For now, we'll store the image as a base64 string instead of using Supabase Storage
+      // This avoids the need to create storage buckets
+      const reader = new FileReader();
+      return new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(imageFile);
+      });
+    } catch (error) {
+      console.error('Image upload error:', error);
+      throw new Error('Failed to process image');
     }
-    
-    const { data } = supabase.storage.from('products').getPublicUrl(filePath);
-    return data.publicUrl;
   };
 
   const onSubmit = async (formData: FormValues) => {

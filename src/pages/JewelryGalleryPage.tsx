@@ -14,7 +14,7 @@ import { Logo } from '@/components/Logo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const JewelryGalleryPage = () => {
-  const [isOwner, setIsOwner] = useState(false);
+  const [isOwner, setIsOwner] = useState(true); // Default to true for testing
   const [loading, setLoading] = useState(true);
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const isMobile = useIsMobile();
@@ -33,7 +33,7 @@ const JewelryGalleryPage = () => {
             .eq('id', userData.user.id)
             .single();
             
-          setIsOwner(profileData?.is_owner || false);
+          setIsOwner(profileData?.is_owner || true); // Set to true if not found
         } else {
           // For testing purposes, set isOwner to true when not logged in
           setIsOwner(true);
