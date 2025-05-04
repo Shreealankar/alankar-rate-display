@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -49,7 +50,9 @@ export const Header = () => {
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
             <Logo className="h-8 w-8" />
-            {/* Site name text removed as requested */}
+            <span className="font-bold text-xl hidden sm:inline-block">
+              Shree Alankar, Lohoner
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

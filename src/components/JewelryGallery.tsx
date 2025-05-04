@@ -8,8 +8,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { JewelryForm } from './JewelryForm';
 import { ProductForm } from './ProductForm';
 import { JewelryItem } from './JewelryItem';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface JewelryItemType {
   id: string;
@@ -43,6 +53,10 @@ export const JewelryGallery = () => {
   const [showAddJewelryDialog, setShowAddJewelryDialog] = useState(false);
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const [activeTab, setActiveTab] = useState('jewelry');
+  const [showEditProductDialog, setShowEditProductDialog] = useState(false);
+  const [showDeleteProductDialog, setShowDeleteProductDialog] = useState(false);
+  const [currentProduct, setCurrentProduct] = useState<ProductType | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
   // Fetch all jewelry items, products, and check if user is owner
@@ -174,6 +188,48 @@ export const JewelryGallery = () => {
       description: 'Product added successfully',
     });
   };
+  
+  const handleEditProductSuccess = () => {
+    setShowEditProductDialog(false);
+    setCurrentProduct(null);
+    toast({
+      title: 'Success',
+      description: 'Product updated successfully',
+    });
+  };
+  
+  const handleDeleteProduct = async () => {
+    if (!currentProduct) return;
+    
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', currentProduct.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: 'Success',
+        description: 'Product deleted successfully',
+      });
+      
+      // Remove product from state
+      setProducts((current) => current.filter(p => p.id !== currentProduct.id));
+      setShowDeleteProductDialog(false);
+      setCurrentProduct(null);
+    } catch (error: any) {
+      console.error('Error deleting product:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete product',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -284,10 +340,28 @@ export const JewelryGallery = () => {
                   </CardContent>
                   {isOwner && (
                     <CardFooter className="flex justify-end gap-2 border-t pt-4">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() => {
+                          setCurrentProduct(product);
+                          setShowEditProductDialog(true);
+                        }}
+                      >
+                        <Pencil className="h-4 w-4" />
                         Edit
                       </Button>
-                      <Button variant="destructive" size="sm">
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() => {
+                          setCurrentProduct(product);
+                          setShowDeleteProductDialog(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
                         Delete
                       </Button>
                     </CardFooter>
@@ -298,6 +372,45 @@ export const JewelryGallery = () => {
           )}
         </TabsContent>
       </Tabs>
+      
+      {/* Edit Product Dialog */}
+      <Dialog open={showEditProductDialog} onOpenChange={setShowEditProductDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+          </DialogHeader>
+          {currentProduct && (
+            <ProductForm product={currentProduct} onSuccess={handleEditProductSuccess} />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Product Confirmation Dialog */}
+      <AlertDialog open={showDeleteProductDialog} onOpenChange={setShowDeleteProductDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this product?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the product from your database.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteProduct}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground"
+            >
+              {isDeleting ? (
+                <span className="flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </span>
+              ) : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
