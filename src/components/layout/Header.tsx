@@ -8,12 +8,14 @@ import { LanguageToggle } from '@/components/LanguageToggle';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const Header = () => {
   const { t } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   // Handle scroll effect
   useEffect(() => {
@@ -47,12 +49,14 @@ export const Header = () => {
       )}
     >
       <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2">
-            <Logo className="h-8 w-8" />
-            <span className="font-bold text-xl hidden sm:inline-block">
-              Shree Alankar, Lohoner
-            </span>
+            <Logo className={cn("h-10 w-auto", isMobile ? "h-8" : "")} />
+            {!isMobile && (
+              <span className="font-bold text-xl hidden sm:inline-block">
+                Shree Alankar, Lohoner
+              </span>
+            )}
           </Link>
 
           {/* Desktop Navigation */}
