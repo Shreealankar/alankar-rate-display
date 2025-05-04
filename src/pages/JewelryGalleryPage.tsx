@@ -11,6 +11,7 @@ import { ProductForm } from '@/components/ProductForm';
 import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/Logo';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const JewelryGalleryPage = () => {
   const [isOwner, setIsOwner] = useState(false);
@@ -73,11 +74,13 @@ const JewelryGalleryPage = () => {
                   Add Product
                 </Button>
               </DialogTrigger>
-              <DialogContent className={isMobile ? "w-[95%] max-w-md" : "sm:max-w-md"}>
+              <DialogContent className={isMobile ? "w-[95%] max-w-md max-h-[90vh]" : "sm:max-w-md max-h-[90vh]"}>
                 <DialogHeader>
                   <DialogTitle>Add New Product</DialogTitle>
                 </DialogHeader>
-                <ProductForm onSuccess={handleAddProductSuccess} />
+                <ScrollArea className="max-h-[70vh] pr-4">
+                  <ProductForm onSuccess={handleAddProductSuccess} />
+                </ScrollArea>
               </DialogContent>
             </Dialog>
           )}

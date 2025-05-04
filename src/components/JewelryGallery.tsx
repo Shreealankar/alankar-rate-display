@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface JewelryItemType {
   id: string;
@@ -235,39 +235,7 @@ export const JewelryGallery = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Jewelry Gallery</h2>
-        {isOwner && (
-          <div className="flex gap-3">
-            <Dialog open={showAddJewelryDialog} onOpenChange={setShowAddJewelryDialog}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Jewelry Item
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Add New Jewelry Item</DialogTitle>
-                </DialogHeader>
-                <JewelryForm onSuccess={handleAddJewelrySuccess} />
-              </DialogContent>
-            </Dialog>
-            
-            <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2" variant="outline">
-                  <Plus className="h-4 w-4" />
-                  Add Product
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Add New Product</DialogTitle>
-                </DialogHeader>
-                <ProductForm onSuccess={handleAddProductSuccess} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
+        {/* Hide these buttons since they're now in the JewelryGalleryPage component */}
       </div>
 
       <Tabs defaultValue="jewelry" value={activeTab} onValueChange={setActiveTab} className="mb-6">
@@ -373,14 +341,16 @@ export const JewelryGallery = () => {
         </TabsContent>
       </Tabs>
       
-      {/* Edit Product Dialog */}
+      {/* Edit Product Dialog - Wrap with ScrollArea */}
       <Dialog open={showEditProductDialog} onOpenChange={setShowEditProductDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
           </DialogHeader>
           {currentProduct && (
-            <ProductForm product={currentProduct} onSuccess={handleEditProductSuccess} />
+            <ScrollArea className="max-h-[70vh] pr-4">
+              <ProductForm product={currentProduct} onSuccess={handleEditProductSuccess} />
+            </ScrollArea>
           )}
         </DialogContent>
       </Dialog>

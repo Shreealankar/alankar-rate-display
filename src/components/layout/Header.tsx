@@ -52,11 +52,6 @@ export const Header = () => {
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center gap-2">
             <Logo className={cn("h-10 w-auto", isMobile ? "h-8" : "")} />
-            {!isMobile && (
-              <span className="font-bold text-xl hidden sm:inline-block">
-                Shree Alankar, Lohoner
-              </span>
-            )}
           </Link>
 
           {/* Desktop Navigation */}
