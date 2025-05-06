@@ -70,7 +70,9 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          purity: string
           title: string
+          type: string
           updated_at: string
           weight_grams: number
         }
@@ -80,7 +82,9 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          purity?: string
           title: string
+          type?: string
           updated_at?: string
           weight_grams: number
         }
@@ -90,7 +94,9 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          purity?: string
           title?: string
+          type?: string
           updated_at?: string
           weight_grams?: number
         }
