@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -111,8 +110,7 @@ export const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
     if (!imageFile) return null;
     
     try {
-      // For now, we'll store the image as a base64 string instead of using Supabase Storage
-      // This avoids the need to create storage buckets
+      // Store the image as a base64 string
       const reader = new FileReader();
       return new Promise<string>((resolve, reject) => {
         reader.onload = () => {
@@ -153,7 +151,10 @@ export const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
           })
           .eq('id', product.id);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
       } else {
         // Create new product
         const { error } = await supabase.from('products').insert({
@@ -166,7 +167,10 @@ export const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
           image_url: imageUrl,
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
       }
       
       onSuccess();
@@ -178,7 +182,7 @@ export const ProductForm = ({ product, onSuccess }: ProductFormProps) => {
       console.error('Error saving product:', error);
       toast({
         title: 'Error',
-        description: 'Failed to save product',
+        description: 'Failed to save product: ' + (error.message || error.error_description || 'Unknown error'),
         variant: 'destructive',
       });
     } finally {

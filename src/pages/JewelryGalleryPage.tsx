@@ -14,41 +14,12 @@ import { Logo } from '@/components/Logo';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const JewelryGalleryPage = () => {
-  const [isOwner, setIsOwner] = useState(true); // Default to true for testing
-  const [loading, setLoading] = useState(true);
+  // Always set isOwner to true for easier testing - this ensures the Add Product button is always visible
+  const [isOwner, setIsOwner] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const isMobile = useIsMobile();
   const { toast } = useToast();
-
-  useEffect(() => {
-    const checkIfUserIsOwner = async () => {
-      try {
-        setLoading(true);
-        const { data: userData } = await supabase.auth.getUser();
-        
-        if (userData?.user) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('is_owner')
-            .eq('id', userData.user.id)
-            .single();
-            
-          setIsOwner(profileData?.is_owner || true); // Set to true if not found
-        } else {
-          // For testing purposes, set isOwner to true when not logged in
-          setIsOwner(true);
-        }
-      } catch (error) {
-        console.error('Error checking user role:', error);
-        // For testing purposes, set isOwner to true even on error
-        setIsOwner(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkIfUserIsOwner();
-  }, []);
 
   const handleAddProductSuccess = () => {
     setShowAddProductDialog(false);
@@ -66,24 +37,22 @@ const JewelryGalleryPage = () => {
           <div className="block md:hidden">
             <Logo className="h-10 w-auto" />
           </div>
-          {isOwner && (
-            <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2 ml-auto">
-                  <Plus className="h-4 w-4" />
-                  Add Product
-                </Button>
-              </DialogTrigger>
-              <DialogContent className={isMobile ? "w-[95%] max-w-md max-h-[90vh]" : "sm:max-w-md max-h-[90vh]"}>
-                <DialogHeader>
-                  <DialogTitle>Add New Product</DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="max-h-[70vh] pr-4">
-                  <ProductForm onSuccess={handleAddProductSuccess} />
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-          )}
+          <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center gap-2 ml-auto">
+                <Plus className="h-4 w-4" />
+                Add Product
+              </Button>
+            </DialogTrigger>
+            <DialogContent className={isMobile ? "w-[95%] max-w-md max-h-[90vh]" : "sm:max-w-md max-h-[90vh]"}>
+              <DialogHeader>
+                <DialogTitle>Add New Product</DialogTitle>
+              </DialogHeader>
+              <ScrollArea className="max-h-[70vh] pr-4">
+                <ProductForm onSuccess={handleAddProductSuccess} />
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
         </div>
         <JewelryGallery />
       </main>
