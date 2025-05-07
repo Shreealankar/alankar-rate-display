@@ -1,134 +1,176 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { ModeToggle } from '@/components/ModeToggle';
-import { LanguageToggle } from '@/components/LanguageToggle';
-import { Menu, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
+import { ModeToggle } from '@/components/ModeToggle';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/integrations/supabase/client';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export const Header = () => {
-  const { t } = useLanguage();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const isMobile = useIsMobile();
 
-  // Handle scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+    const getUser = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        setUser(data.session?.user || null);
+      } catch (error) {
+        console.error('Error getting user:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    getUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user || null);
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [location.pathname]);
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
-  const navLinks = [
-    { name: t('nav.home'), path: '/' },
-    { name: t('nav.about'), path: '/about' },
-    { name: t('nav.jewelry'), path: '/jewelry' },
-    { name: t('nav.help'), path: '/help' },
+  const navigation = [
+    { name: 'Home', href: '/' },
+    { name: 'About', href: '/about' },
+    { name: 'Jewelry Gallery', href: '/jewelry' },
+    { name: 'Help', href: '/help' },
   ];
 
-  return (
-    <header
-      className={cn(
-        'sticky top-0 z-40 w-full transition-all duration-200',
-        isScrolled
-          ? 'bg-background/80 backdrop-blur-md border-b shadow-sm'
-          : 'bg-transparent'
-      )}
-    >
-      <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="flex items-center gap-2">
-            <Logo className={cn("h-10 w-auto", isMobile ? "h-8" : "")} />
-          </Link>
+  const userInitials = user?.email
+    ? user.email.substring(0, 2).toUpperCase()
+    : '??';
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
+  return (
+    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link to="/" className="mr-6 flex items-center space-x-2">
+            <Logo className="h-6 w-auto" />
+          </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            {navigation.map((item) => (
               <Link
-                key={link.path}
-                to={link.path}
+                key={item.href}
+                to={item.href}
                 className={cn(
-                  'text-sm font-medium transition-colors hover:text-primary',
-                  location.pathname === link.path
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
+                  'transition-colors hover:text-foreground/80',
+                  location.pathname === item.href
+                    ? 'text-foreground'
+                    : 'text-foreground/60'
                 )}
               >
-                {link.name}
+                {item.name}
               </Link>
             ))}
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-2">
-            <LanguageToggle />
-            <ModeToggle />
-            <Link to="/login">
-              <Button variant="outline" size="sm">
-                {t('nav.login')}
-              </Button>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+            >
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Toggle Menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="pr-0">
+            <Link to="/" className="flex items-center">
+              <Logo className="h-6 w-auto" />
             </Link>
-          </div>
+            <div className="my-4 flex flex-col space-y-3">
+              {navigation.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={cn(
+                    'text-foreground/60 transition-colors hover:text-foreground',
+                    location.pathname === item.href && 'text-foreground'
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
 
-          {/* Mobile menu button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <nav className="flex items-center space-x-2">
+            {!loading && (
+              <>
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="relative h-9 w-9 rounded-full"
+                      >
+                        <Avatar className="h-9 w-9">
+                          <AvatarFallback>{userInitials}</AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <div className="flex items-center justify-start gap-2 p-2">
+                        <div className="flex flex-col space-y-1 leading-none">
+                          {user.email && (
+                            <p className="font-medium">{user.email}</p>
+                          )}
+                        </div>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/dashboard">Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onSelect={handleSignOut}
+                      >
+                        Log out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button asChild size={isMobile ? 'sm' : 'default'}>
+                    <Link to="/login">Login</Link>
+                  </Button>
+                )}
+              </>
+            )}
+            <ModeToggle />
+          </nav>
         </div>
       </div>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t">
-          <nav className="container flex flex-col gap-4 px-4 py-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={cn(
-                  'text-sm font-medium transition-colors hover:text-primary py-2',
-                  location.pathname === link.path
-                    ? 'text-primary'
-                    : 'text-muted-foreground'
-                )}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div className="flex items-center gap-2">
-                <LanguageToggle />
-                <ModeToggle />
-              </div>
-              <Link to="/login">
-                <Button variant="outline" size="sm">
-                  {t('nav.login')}
-                </Button>
-              </Link>
-            </div>
-          </nav>
-        </div>
-      )}
     </header>
   );
 };

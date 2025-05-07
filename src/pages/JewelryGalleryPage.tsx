@@ -29,14 +29,19 @@ const JewelryGalleryPage = () => {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session?.user) {
-          const { data: profileData } = await supabase
+          const { data: profileData, error } = await supabase
             .from('profiles')
             .select('is_owner')
             .eq('id', session.user.id)
             .single();
             
-          setIsOwner(profileData?.is_owner || false);
-          console.log("Is owner:", profileData?.is_owner);
+          if (error) {
+            console.error('Error fetching profile:', error);
+            setIsOwner(false);
+          } else {
+            setIsOwner(profileData?.is_owner || false);
+            console.log("Is owner:", profileData?.is_owner);
+          }
         } else {
           setIsOwner(false);
           console.log("No session, not an owner");
@@ -53,16 +58,23 @@ const JewelryGalleryPage = () => {
     
     // Set up auth state listener to update owner status when auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed event:", event);
+      
       if (session?.user) {
         try {
-          const { data: profileData } = await supabase
+          const { data: profileData, error } = await supabase
             .from('profiles')
             .select('is_owner')
             .eq('id', session.user.id)
             .single();
-            
-          setIsOwner(profileData?.is_owner || false);
-          console.log("Auth state changed - is owner:", profileData?.is_owner);
+          
+          if (error) {
+            console.error('Error fetching profile on auth change:', error);
+            setIsOwner(false);
+          } else {
+            setIsOwner(profileData?.is_owner || false);
+            console.log("Auth state changed - is owner:", profileData?.is_owner);
+          }
         } catch (error) {
           console.error('Error checking owner status on auth change:', error);
           setIsOwner(false);
