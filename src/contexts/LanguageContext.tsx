@@ -182,8 +182,10 @@ const translations: Record<Language, Record<string, string>> = {
   }
 };
 
+// Create the context with undefined as initial value
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+// Create the provider component properly as a function component
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('en');
 
@@ -192,13 +194,20 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     return translations[language][key] || key;
   };
 
+  const value = {
+    language,
+    setLanguage,
+    t
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
+// Create a custom hook to use the language context
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (context === undefined) {
