@@ -66,7 +66,7 @@ const JewelryGalleryPage = () => {
           <div className="block md:hidden">
             <Logo className="h-10 w-auto" />
           </div>
-          {isOwner && (
+          {isOwner && !loading && (
             <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
               <DialogTrigger asChild>
                 <Button className="flex items-center gap-2 ml-auto">

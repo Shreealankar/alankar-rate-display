@@ -72,6 +72,8 @@ export const JewelryGallery = () => {
             .single();
             
           setIsOwner(profileData?.is_owner || false);
+        } else {
+          setIsOwner(false);
         }
       } catch (error: any) {
         console.error('Error fetching items:', error);
