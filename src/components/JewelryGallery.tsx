@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ProductForm } from './ProductForm';
 import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import {
@@ -32,17 +32,20 @@ interface ProductType {
   updated_at: string;
 }
 
-export const JewelryGallery = () => {
+interface JewelryGalleryProps {
+  isOwner: boolean;
+}
+
+export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOwner, setIsOwner] = useState(false);
   const [showEditProductDialog, setShowEditProductDialog] = useState(false);
   const [showDeleteProductDialog, setShowDeleteProductDialog] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<ProductType | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
-  // Fetch products and check if user is owner
+  // Fetch products
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -60,21 +63,6 @@ export const JewelryGallery = () => {
         
         // Type assertion for products
         setProducts(productItems as ProductType[]);
-        
-        // Check if current user is an owner
-        const { data: userData } = await supabase.auth.getUser();
-        
-        if (userData?.user) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('is_owner')
-            .eq('id', userData.user.id)
-            .single();
-            
-          setIsOwner(profileData?.is_owner || false);
-        } else {
-          setIsOwner(false);
-        }
       } catch (error: any) {
         console.error('Error fetching items:', error);
         toast({
@@ -160,6 +148,8 @@ export const JewelryGallery = () => {
       setIsDeleting(false);
     }
   };
+
+  console.log("Rendering JewelryGallery with isOwner:", isOwner);
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -26,18 +26,20 @@ const JewelryGalleryPage = () => {
       try {
         setLoading(true);
         
-        const { data: userData } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (userData?.user) {
+        if (session?.user) {
           const { data: profileData } = await supabase
             .from('profiles')
             .select('is_owner')
-            .eq('id', userData.user.id)
+            .eq('id', session.user.id)
             .single();
             
           setIsOwner(profileData?.is_owner || false);
+          console.log("Is owner:", profileData?.is_owner);
         } else {
           setIsOwner(false);
+          console.log("No session, not an owner");
         }
       } catch (error) {
         console.error('Error checking owner status:', error);
@@ -48,6 +50,32 @@ const JewelryGalleryPage = () => {
     };
     
     checkIsOwner();
+    
+    // Set up auth state listener to update owner status when auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        try {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('is_owner')
+            .eq('id', session.user.id)
+            .single();
+            
+          setIsOwner(profileData?.is_owner || false);
+          console.log("Auth state changed - is owner:", profileData?.is_owner);
+        } catch (error) {
+          console.error('Error checking owner status on auth change:', error);
+          setIsOwner(false);
+        }
+      } else {
+        setIsOwner(false);
+        console.log("Auth state changed - no session, not an owner");
+      }
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleAddProductSuccess = () => {
@@ -85,7 +113,7 @@ const JewelryGalleryPage = () => {
             </Dialog>
           )}
         </div>
-        <JewelryGallery />
+        <JewelryGallery isOwner={isOwner} />
       </main>
       <Footer />
     </div>
