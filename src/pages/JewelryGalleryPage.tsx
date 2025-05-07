@@ -106,24 +106,26 @@ const JewelryGalleryPage = () => {
           <div className="block md:hidden">
             <Logo className="h-10 w-auto" />
           </div>
-          {isOwner && !loading && (
-            <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2 ml-auto">
-                  <Plus className="h-4 w-4" />
-                  Add Product
-                </Button>
-              </DialogTrigger>
-              <DialogContent className={isMobile ? "w-[95%] max-w-md max-h-[90vh]" : "sm:max-w-md max-h-[90vh]"}>
-                <DialogHeader>
-                  <DialogTitle>Add New Product</DialogTitle>
-                </DialogHeader>
-                <ScrollArea className="max-h-[70vh] pr-4">
-                  <ProductForm onSuccess={handleAddProductSuccess} />
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
-          )}
+          <div className="ml-auto">
+            {isOwner && !loading && (
+              <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Product
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className={isMobile ? "w-[95%] max-w-md max-h-[90vh]" : "sm:max-w-md max-h-[90vh]"}>
+                  <DialogHeader>
+                    <DialogTitle>Add New Product</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="max-h-[70vh] pr-4">
+                    <ProductForm onSuccess={handleAddProductSuccess} />
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
         <JewelryGallery isOwner={isOwner} />
       </main>

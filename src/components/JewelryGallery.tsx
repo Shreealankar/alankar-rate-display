@@ -45,6 +45,8 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
+  console.log("JewelryGallery rendered with isOwner:", isOwner); // Debug log
+
   // Fetch products
   useEffect(() => {
     const fetchItems = async () => {
@@ -148,8 +150,6 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
       setIsDeleting(false);
     }
   };
-
-  console.log("Rendering JewelryGallery with isOwner:", isOwner);
 
   return (
     <div className="container mx-auto px-4 py-8">
