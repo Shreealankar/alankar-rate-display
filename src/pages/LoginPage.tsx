@@ -7,8 +7,10 @@ import { Footer } from '@/components/layout/Footer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Shield } from 'lucide-react';
+import { JewelryGallery } from '@/components/JewelryGallery';
 
 const LoginPage = () => {
   const { t } = useLanguage();
@@ -18,6 +20,7 @@ const LoginPage = () => {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [locked, setLocked] = useState(false);
   const [lockTimer, setLockTimer] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -95,12 +98,12 @@ const LoginPage = () => {
         
         // Store login status
         localStorage.setItem('isLoggedIn', 'true');
+        setIsLoggedIn(true);
         setIsLoading(false);
         toast({
           title: "Login successful",
           description: "You are now logged in as the owner",
         });
-        navigate('/dashboard');
       }, 1000);
     } else {
       // Failed login
@@ -137,6 +140,90 @@ const LoginPage = () => {
       }, 800);
     }
   };
+
+  // Check if already logged in
+  useEffect(() => {
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    setIsLoggedIn(loggedIn);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    setIsLoggedIn(false);
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully",
+    });
+  };
+
+  if (isLoggedIn) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-1 py-8">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+              <Button onClick={handleLogout} variant="outline">
+                Logout
+              </Button>
+            </div>
+            
+            <Tabs defaultValue="products" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="products">Manage Products</TabsTrigger>
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="products" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Product Management</CardTitle>
+                    <CardDescription>
+                      Add, edit, and delete products in your jewelry gallery
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <JewelryGallery isOwner={true} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="dashboard" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Dashboard Overview</CardTitle>
+                    <CardDescription>
+                      View your business analytics and insights
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">Dashboard features coming soon...</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="settings" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Admin Settings</CardTitle>
+                    <CardDescription>
+                      Configure your admin preferences
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">Settings features coming soon...</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
