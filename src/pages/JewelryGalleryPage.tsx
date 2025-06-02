@@ -17,8 +17,11 @@ const JewelryGalleryPage = () => {
   const [isOwner, setIsOwner] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
+  const [user, setUser] = useState(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
+
+  console.log("JewelryGalleryPage - isOwner:", isOwner, "loading:", loading, "user:", user); // Debug log
 
   // Check if the current user is an owner
   useEffect(() => {
@@ -27,24 +30,32 @@ const JewelryGalleryPage = () => {
         setLoading(true);
         
         const { data: { session } } = await supabase.auth.getSession();
+        console.log("Current session:", session); // Debug log
         
         if (session?.user) {
+          setUser(session.user);
+          console.log("User found:", session.user.email); // Debug log
+          
           const { data: profileData, error } = await supabase
             .from('profiles')
             .select('is_owner')
             .eq('id', session.user.id)
             .single();
             
+          console.log("Profile data:", profileData, "error:", error); // Debug log
+            
           if (error) {
             console.error('Error fetching profile:', error);
             setIsOwner(false);
           } else {
-            setIsOwner(profileData?.is_owner || false);
-            console.log("Is owner:", profileData?.is_owner);
+            const ownerStatus = profileData?.is_owner || false;
+            setIsOwner(ownerStatus);
+            console.log("Owner status set to:", ownerStatus);
           }
         } else {
+          setUser(null);
           setIsOwner(false);
-          console.log("No session, not an owner");
+          console.log("No session found, not an owner");
         }
       } catch (error) {
         console.error('Error checking owner status:', error);
@@ -58,9 +69,10 @@ const JewelryGalleryPage = () => {
     
     // Set up auth state listener to update owner status when auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed event:", event);
+      console.log("Auth state changed:", event, session?.user?.email);
       
       if (session?.user) {
+        setUser(session.user);
         try {
           const { data: profileData, error } = await supabase
             .from('profiles')
@@ -68,20 +80,24 @@ const JewelryGalleryPage = () => {
             .eq('id', session.user.id)
             .single();
           
+          console.log("Auth change - Profile data:", profileData, "error:", error);
+          
           if (error) {
             console.error('Error fetching profile on auth change:', error);
             setIsOwner(false);
           } else {
-            setIsOwner(profileData?.is_owner || false);
-            console.log("Auth state changed - is owner:", profileData?.is_owner);
+            const ownerStatus = profileData?.is_owner || false;
+            setIsOwner(ownerStatus);
+            console.log("Auth change - Owner status set to:", ownerStatus);
           }
         } catch (error) {
           console.error('Error checking owner status on auth change:', error);
           setIsOwner(false);
         }
       } else {
+        setUser(null);
         setIsOwner(false);
-        console.log("Auth state changed - no session, not an owner");
+        console.log("Auth change - no session, not an owner");
       }
     });
     
@@ -107,7 +123,7 @@ const JewelryGalleryPage = () => {
             <Logo className="h-10 w-auto" />
           </div>
           <div className="ml-auto">
-            {isOwner && !loading && (
+            {!loading && user && isOwner && (
               <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
                 <DialogTrigger asChild>
                   <Button className="flex items-center gap-2">
@@ -125,9 +141,14 @@ const JewelryGalleryPage = () => {
                 </DialogContent>
               </Dialog>
             )}
+            {!loading && (!user || !isOwner) && (
+              <div className="text-sm text-muted-foreground">
+                {!user ? "Please login as owner to manage products" : "You need owner permissions to manage products"}
+              </div>
+            )}
           </div>
         </div>
-        <JewelryGallery isOwner={isOwner} />
+        <JewelryGallery isOwner={!loading && user && isOwner} />
       </main>
       <Footer />
     </div>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +44,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
 
-  console.log("JewelryGallery rendered with isOwner:", isOwner); // Debug log
+  console.log("JewelryGallery component - isOwner prop:", isOwner); // Debug log
 
   // Fetch products
   useEffect(() => {
@@ -155,6 +154,11 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Jewelry Gallery</h2>
+        {isOwner && (
+          <div className="text-sm text-green-600 font-medium">
+            Owner Mode - You can manage products
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -165,6 +169,11 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
         <Card className="text-center py-12">
           <CardContent>
             <p className="text-muted-foreground">No products found</p>
+            {isOwner && (
+              <p className="text-sm text-muted-foreground mt-2">
+                Use the "Add Product" button above to add your first product
+              </p>
+            )}
           </CardContent>
         </Card>
       ) : (
@@ -205,6 +214,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
                     size="sm"
                     className="flex items-center gap-1"
                     onClick={() => {
+                      console.log("Edit button clicked for product:", product.title); // Debug log
                       setCurrentProduct(product);
                       setShowEditProductDialog(true);
                     }}
@@ -217,6 +227,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
                     size="sm"
                     className="flex items-center gap-1"
                     onClick={() => {
+                      console.log("Delete button clicked for product:", product.title); // Debug log
                       setCurrentProduct(product);
                       setShowDeleteProductDialog(true);
                     }}
