@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Shield } from 'lucide-react';
 import { JewelryGallery } from '@/components/JewelryGallery';
+import { supabase } from '@/integrations/supabase/client';
 
 const LoginPage = () => {
   const { t } = useLanguage();
@@ -21,6 +21,10 @@ const LoginPage = () => {
   const [locked, setLocked] = useState(false);
   const [lockTimer, setLockTimer] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [goldRate, setGoldRate] = useState('');
+  const [silverRate, setSilverRate] = useState('');
+  const [isUpdatingRates, setIsUpdatingRates] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -71,6 +75,45 @@ const LoginPage = () => {
       if (interval) clearInterval(interval);
     };
   }, [locked, lockTimer]);
+
+  // Fetch current rates when logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      const fetchRates = async () => {
+        try {
+          setInitialLoading(true);
+          
+          const { data: ratesData, error } = await supabase
+            .from('rates')
+            .select('*');
+            
+          if (error) {
+            console.error('Error fetching rates:', error);
+            return;
+          }
+          
+          if (ratesData && ratesData.length > 0) {
+            const goldRateData = ratesData.find(rate => rate.metal_type === 'gold');
+            const silverRateData = ratesData.find(rate => rate.metal_type === 'silver');
+            
+            if (goldRateData) {
+              setGoldRate(goldRateData.rate_per_gram.toString());
+            }
+            
+            if (silverRateData) {
+              setSilverRate(silverRateData.rate_per_gram.toString());
+            }
+          }
+        } catch (err) {
+          console.error('Error fetching rates:', err);
+        } finally {
+          setInitialLoading(false);
+        }
+      };
+      
+      fetchRates();
+    }
+  }, [isLoggedIn]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,6 +199,148 @@ const LoginPage = () => {
     });
   };
 
+  const handleRateUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUpdatingRates(true);
+    
+    const newGoldRate = parseFloat(goldRate);
+    const newSilverRate = parseFloat(silverRate);
+    
+    try {
+      // Get existing records first
+      const { data: existingGold, error: goldQueryError } = await supabase
+        .from('rates')
+        .select('id')
+        .eq('metal_type', 'gold')
+        .maybeSingle();
+      
+      if (goldQueryError) {
+        console.error('Error querying gold rate:', goldQueryError);
+        toast({
+          title: "Error",
+          description: "Failed to query gold rate record.",
+          variant: "destructive",
+        });
+        setIsUpdatingRates(false);
+        return;
+      }
+      
+      const { data: existingSilver, error: silverQueryError } = await supabase
+        .from('rates')
+        .select('id')
+        .eq('metal_type', 'silver')
+        .maybeSingle();
+      
+      if (silverQueryError) {
+        console.error('Error querying silver rate:', silverQueryError);
+        toast({
+          title: "Error",
+          description: "Failed to query silver rate record.",
+          variant: "destructive",
+        });
+        setIsUpdatingRates(false);
+        return;
+      }
+      
+      // Update gold rate
+      if (existingGold?.id) {
+        const { error: goldError } = await supabase
+          .from('rates')
+          .update({ 
+            rate_per_gram: newGoldRate,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingGold.id);
+        
+        if (goldError) {
+          console.error('Error updating gold rate:', goldError);
+          toast({
+            title: "Error",
+            description: "Failed to update gold rate.",
+            variant: "destructive",
+          });
+          setIsUpdatingRates(false);
+          return;
+        }
+      } else {
+        const { error: goldError } = await supabase
+          .from('rates')
+          .insert({ 
+            metal_type: 'gold', 
+            rate_per_gram: newGoldRate,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (goldError) {
+          console.error('Error inserting gold rate:', goldError);
+          toast({
+            title: "Error",
+            description: "Failed to insert gold rate.",
+            variant: "destructive",
+          });
+          setIsUpdatingRates(false);
+          return;
+        }
+      }
+      
+      // Update silver rate
+      if (existingSilver?.id) {
+        const { error: silverError } = await supabase
+          .from('rates')
+          .update({ 
+            rate_per_gram: newSilverRate,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingSilver.id);
+        
+        if (silverError) {
+          console.error('Error updating silver rate:', silverError);
+          toast({
+            title: "Error",
+            description: "Failed to update silver rate.",
+            variant: "destructive",
+          });
+          setIsUpdatingRates(false);
+          return;
+        }
+      } else {
+        const { error: silverError } = await supabase
+          .from('rates')
+          .insert({ 
+            metal_type: 'silver', 
+            rate_per_gram: newSilverRate,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (silverError) {
+          console.error('Error inserting silver rate:', silverError);
+          toast({
+            title: "Error",
+            description: "Failed to insert silver rate.",
+            variant: "destructive",
+          });
+          setIsUpdatingRates(false);
+          return;
+        }
+      }
+      
+      toast({
+        title: "Success",
+        description: "Rates updated successfully",
+      });
+      
+    } catch (error) {
+      console.error('Error updating rates:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update rates. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingRates(false);
+    }
+  };
+
   if (isLoggedIn) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -169,12 +354,69 @@ const LoginPage = () => {
               </Button>
             </div>
             
-            <Tabs defaultValue="products" className="w-full">
+            <Tabs defaultValue="rates" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="rates">Update Rates</TabsTrigger>
                 <TabsTrigger value="products">Manage Products</TabsTrigger>
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="rates" className="mt-6">
+                <Card className="max-w-md mx-auto">
+                  <CardHeader>
+                    <CardTitle>Update Rates</CardTitle>
+                    <CardDescription>
+                      {initialLoading ? 'Loading current rates...' : 'Update the current gold and silver rates'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleRateUpdate} className="space-y-6">
+                      <div className="space-y-2">
+                        <label htmlFor="goldRate" className="text-sm font-medium">
+                          Gold Rate (per 10gm)
+                        </label>
+                        <Input
+                          id="goldRate"
+                          type="number"
+                          value={goldRate}
+                          onChange={(e) => setGoldRate(e.target.value)}
+                          required
+                          disabled={initialLoading}
+                          placeholder={initialLoading ? "Loading..." : "Enter gold rate"}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label htmlFor="silverRate" className="text-sm font-medium">
+                          Silver Rate (per 10gm)
+                        </label>
+                        <Input
+                          id="silverRate"
+                          type="number"
+                          value={silverRate}
+                          onChange={(e) => setSilverRate(e.target.value)}
+                          required
+                          disabled={initialLoading}
+                          placeholder={initialLoading ? "Loading..." : "Enter silver rate"}
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isUpdatingRates || initialLoading}
+                      >
+                        {isUpdatingRates ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Updating...
+                          </span>
+                        ) : 'Update Rates'}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
               
               <TabsContent value="products" className="mt-6">
                 <Card>
@@ -186,20 +428,6 @@ const LoginPage = () => {
                   </CardHeader>
                   <CardContent>
                     <JewelryGallery isOwner={true} />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="dashboard" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Dashboard Overview</CardTitle>
-                    <CardDescription>
-                      View your business analytics and insights
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Dashboard features coming soon...</p>
                   </CardContent>
                 </Card>
               </TabsContent>
