@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
-import { ModeToggle } from '@/components/ModeToggle';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -61,6 +60,7 @@ export const Header = () => {
     { name: 'About', href: '/about' },
     { name: 'Jewelry Gallery', href: '/jewelry' },
     { name: 'Help', href: '/help' },
+    { name: 'Owner Login', href: '/login' },
   ];
 
   const userInitials = user?.email
@@ -123,52 +123,47 @@ export const Header = () => {
           </SheetContent>
         </Sheet>
 
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <nav className="flex items-center space-x-2">
-            {!loading && (
-              <>
-                {user ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="relative h-9 w-9 rounded-full"
-                      >
-                        <Avatar className="h-9 w-9">
-                          <AvatarFallback>{userInitials}</AvatarFallback>
-                        </Avatar>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <div className="flex items-center justify-start gap-2 p-2">
-                        <div className="flex flex-col space-y-1 leading-none">
-                          {user.email && (
-                            <p className="font-medium">{user.email}</p>
-                          )}
-                        </div>
-                      </div>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link to="/dashboard">Dashboard</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onSelect={handleSignOut}
-                      >
-                        Log out
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Button asChild size={isMobile ? 'sm' : 'default'}>
-                    <Link to="/login">Login</Link>
+        <div className="flex flex-1 items-center justify-center md:justify-end">
+          <Link to="/" className="flex items-center md:hidden">
+            <Logo className="h-6 w-auto" />
+          </Link>
+          
+          <div className="hidden md:flex items-center space-x-2">
+            {!loading && user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-9 w-9 rounded-full"
+                  >
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback>{userInitials}</AvatarFallback>
+                    </Avatar>
                   </Button>
-                )}
-              </>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      {user.email && (
+                        <p className="font-medium">{user.email}</p>
+                      )}
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onSelect={handleSignOut}
+                  >
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-            <ModeToggle />
-          </nav>
+          </div>
         </div>
       </div>
     </header>

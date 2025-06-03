@@ -42,27 +42,6 @@ export type Database = {
         }
         Relationships: []
       }
-      notification_numbers: {
-        Row: {
-          created_at: string
-          id: string
-          phone_number: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          phone_number: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          phone_number?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       products: {
         Row: {
           category: Database["public"]["Enums"]["product_category"]
