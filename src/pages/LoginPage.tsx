@@ -8,8 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Shield } from 'lucide-react';
+import { Loader2, Shield, Plus } from 'lucide-react';
 import { JewelryGallery } from '@/components/JewelryGallery';
+import { ProductForm } from '@/components/ProductForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 
 const LoginPage = () => {
@@ -25,6 +28,7 @@ const LoginPage = () => {
   const [silverRate, setSilverRate] = useState('');
   const [isUpdatingRates, setIsUpdatingRates] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -341,6 +345,14 @@ const LoginPage = () => {
     }
   };
 
+  const handleAddProductSuccess = () => {
+    setShowAddProductDialog(false);
+    toast({
+      title: 'Success',
+      description: 'Product added successfully',
+    });
+  };
+
   if (isLoggedIn) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -421,10 +433,30 @@ const LoginPage = () => {
               <TabsContent value="products" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Product Management</CardTitle>
-                    <CardDescription>
-                      Add, edit, and delete products in your jewelry gallery
-                    </CardDescription>
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <CardTitle>Product Management</CardTitle>
+                        <CardDescription>
+                          Add, edit, and delete products in your jewelry gallery
+                        </CardDescription>
+                      </div>
+                      <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
+                        <DialogTrigger asChild>
+                          <Button className="flex items-center gap-2">
+                            <Plus className="h-4 w-4" />
+                            Add Product
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md max-h-[90vh]">
+                          <DialogHeader>
+                            <DialogTitle>Add New Product</DialogTitle>
+                          </DialogHeader>
+                          <ScrollArea className="max-h-[70vh] pr-4">
+                            <ProductForm onSuccess={handleAddProductSuccess} />
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <JewelryGallery isOwner={true} />
@@ -449,6 +481,18 @@ const LoginPage = () => {
           </div>
         </main>
         <Footer />
+
+        {/* Add Product Dialog */}
+        <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
+          <DialogContent className="sm:max-w-md max-h-[90vh]">
+            <DialogHeader>
+              <DialogTitle>Add New Product</DialogTitle>
+            </DialogHeader>
+            <ScrollArea className="max-h-[70vh] pr-4">
+              <ProductForm onSuccess={handleAddProductSuccess} />
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

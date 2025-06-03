@@ -1,5 +1,7 @@
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { RateDisplay } from '@/components/RateDisplay';
+import { FeaturedProducts } from '@/components/FeaturedProducts';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
@@ -58,6 +60,9 @@ const HomePage = () => {
             <RateDisplay />
           </div>
         </section>
+
+        {/* Featured Products Section */}
+        <FeaturedProducts />
 
         {/* Features Section */}
         <section className="py-16 bg-accent/10">
