@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ProductForm } from './ProductForm';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Trash2, Search, Filter } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface ProductType {
   id: string;
@@ -42,6 +46,15 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
   const [showDeleteProductDialog, setShowDeleteProductDialog] = useState(false);
   const [currentProduct, setCurrentProduct] = useState<ProductType | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [purityFilter, setPurityFilter] = useState<string>('all');
+  const [weightFilter, setWeightFilter] = useState<string>('all');
+  
   const { toast } = useToast();
 
   console.log("JewelryGallery component - isOwner prop:", isOwner); // Debug log
@@ -107,6 +120,46 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
       supabase.removeChannel(productsChannel);
     };
   }, [toast]);
+
+  // Filter products based on search and filters
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      // Search filter
+      const matchesSearch = searchTerm === '' || 
+        product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      // Category filter
+      const matchesCategory = categoryFilter === 'all' || product.category === categoryFilter;
+      
+      // Type filter
+      const matchesType = typeFilter === 'all' || product.type === typeFilter;
+      
+      // Purity filter
+      const matchesPurity = purityFilter === 'all' || product.purity === purityFilter;
+      
+      // Weight filter
+      const matchesWeight = weightFilter === 'all' || (() => {
+        const weight = product.weight_grams;
+        switch (weightFilter) {
+          case 'light': return weight < 5;
+          case 'medium': return weight >= 5 && weight < 20;
+          case 'heavy': return weight >= 20;
+          default: return true;
+        }
+      })();
+      
+      return matchesSearch && matchesCategory && matchesType && matchesPurity && matchesWeight;
+    });
+  }, [products, searchTerm, categoryFilter, typeFilter, purityFilter, weightFilter]);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setCategoryFilter('all');
+    setTypeFilter('all');
+    setPurityFilter('all');
+    setWeightFilter('all');
+  };
   
   const handleEditProductSuccess = () => {
     setShowEditProductDialog(false);
@@ -161,24 +214,147 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
         )}
       </div>
 
+      {/* Search and Filter Section */}
+      <div className="mb-6 space-y-4">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search products by title or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* Filters */}
+        <Collapsible open={showFilters} onOpenChange={setShowFilters}>
+          <div className="flex items-center justify-between">
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                Filters
+                {(categoryFilter !== 'all' || typeFilter !== 'all' || purityFilter !== 'all' || weightFilter !== 'all') && (
+                  <span className="bg-primary text-primary-foreground rounded-full px-2 py-1 text-xs">
+                    Active
+                  </span>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            {(searchTerm || categoryFilter !== 'all' || typeFilter !== 'all' || purityFilter !== 'all' || weightFilter !== 'all') && (
+              <Button variant="ghost" onClick={clearFilters} className="text-sm">
+                Clear All
+              </Button>
+            )}
+          </div>
+          
+          <CollapsibleContent className="space-y-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Category Filter */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Category</label>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="necklace">Necklace</SelectItem>
+                    <SelectItem value="ring">Ring</SelectItem>
+                    <SelectItem value="earring">Earring</SelectItem>
+                    <SelectItem value="bracelet">Bracelet</SelectItem>
+                    <SelectItem value="pendant">Pendant</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Type Filter */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Type</label>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="gold">Gold</SelectItem>
+                    <SelectItem value="silver">Silver</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Purity Filter */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Purity</label>
+                <Select value={purityFilter} onValueChange={setPurityFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Purities" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Purities</SelectItem>
+                    <SelectItem value="18k">18K</SelectItem>
+                    <SelectItem value="20k">20K</SelectItem>
+                    <SelectItem value="22k">22K</SelectItem>
+                    <SelectItem value="24k">24K</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Weight Filter */}
+              <div>
+                <label className="text-sm font-medium mb-2 block">Weight Range</label>
+                <Select value={weightFilter} onValueChange={setWeightFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Weights" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Weights</SelectItem>
+                    <SelectItem value="light">Light (Under 5g)</SelectItem>
+                    <SelectItem value="medium">Medium (5-20g)</SelectItem>
+                    <SelectItem value="heavy">Heavy (20g+)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
+      {/* Results count */}
+      <div className="mb-4 text-sm text-muted-foreground">
+        {loading ? 'Loading...' : `Showing ${filteredProducts.length} of ${products.length} products`}
+      </div>
+
       {loading ? (
         <div className="flex justify-center items-center py-12">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
-      ) : products.length === 0 ? (
+      ) : filteredProducts.length === 0 ? (
         <Card className="text-center py-12">
           <CardContent>
-            <p className="text-muted-foreground">No products found</p>
-            {isOwner && (
-              <p className="text-sm text-muted-foreground mt-2">
-                Use the "Add Product" button above to add your first product
-              </p>
+            {products.length === 0 ? (
+              <>
+                <p className="text-muted-foreground">No products found</p>
+                {isOwner && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Use the "Add Product" button above to add your first product
+                  </p>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="text-muted-foreground">No products match your current filters</p>
+                <Button variant="outline" onClick={clearFilters} className="mt-4">
+                  Clear Filters
+                </Button>
+              </>
             )}
           </CardContent>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden">
               <div className="aspect-square relative overflow-hidden bg-muted">
                 {product.image_url ? (
@@ -198,8 +374,8 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-1 text-sm">
-                  <p>Category: <span className="font-medium">{product.category}</span></p>
-                  <p>Type: <span className="font-medium">{product.type}</span></p>
+                  <p>Category: <span className="font-medium capitalize">{product.category}</span></p>
+                  <p>Type: <span className="font-medium capitalize">{product.type}</span></p>
                   <p>Purity: <span className="font-medium">{product.purity}</span></p>
                   <p>Weight: <span className="font-medium">{product.weight_grams}g</span></p>
                   {product.description && (
