@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -56,65 +57,33 @@ export const getMobileNumber = (): string | null => {
 };
 
 /**
- * Store additional numbers in Supabase
+ * Store additional numbers in localStorage (temporary solution)
  */
 export const saveAdditionalNumbers = async (numbers: string[]): Promise<boolean> => {
   try {
-    // First, delete all existing numbers
-    const { error: deleteError } = await supabase
-      .from('notification_numbers')
-      .delete()
-      .neq('phone_number', '');
+    // Format all numbers with +91 prefix
+    const formattedNumbers = numbers.map(number => formatPhoneNumber(number));
     
-    if (deleteError) {
-      console.error('Error deleting existing numbers:', deleteError);
-      return false;
-    }
-    
-    // If there are no numbers to add, we're done
-    if (!numbers || numbers.length === 0) {
-      return true;
-    }
-    
-    // Format all numbers with +91 prefix and prepare rows for insertion
-    const numberRows = numbers.map(number => ({
-      phone_number: formatPhoneNumber(number),
-    }));
-    
-    // Insert the new numbers
-    const { error: insertError } = await supabase
-      .from('notification_numbers')
-      .insert(numberRows);
-    
-    if (insertError) {
-      console.error('Error saving additional numbers:', insertError);
-      return false;
-    }
+    // Store in localStorage as JSON
+    localStorage.setItem('additionalNotificationNumbers', JSON.stringify(formattedNumbers));
     
     return true;
   } catch (e) {
-    console.error('Error processing additional numbers:', e);
+    console.error('Error saving additional numbers:', e);
     return false;
   }
 };
 
 /**
- * Get additional mobile numbers from Supabase
+ * Get additional mobile numbers from localStorage (temporary solution)
  */
 export const getAdditionalNumbers = async (): Promise<string[]> => {
   try {
-    // Fetch directly from Supabase
-    const { data, error } = await supabase
-      .from('notification_numbers')
-      .select('id, phone_number');
+    const stored = localStorage.getItem('additionalNotificationNumbers');
+    if (!stored) return [];
     
-    if (error) {
-      console.error('Error fetching additional numbers:', error);
-      return [];
-    }
-    
-    const numbers = data.map(row => row.phone_number);
-    return numbers;
+    const numbers = JSON.parse(stored);
+    return Array.isArray(numbers) ? numbers : [];
   } catch (e) {
     console.error('Error retrieving additional numbers:', e);
     return [];
@@ -122,20 +91,13 @@ export const getAdditionalNumbers = async (): Promise<string[]> => {
 };
 
 /**
- * Remove a subscriber by ID
+ * Remove a subscriber by phone number (temporary solution using localStorage)
  */
-export const removeSubscriber = async (id: string): Promise<boolean> => {
+export const removeSubscriber = async (phoneNumber: string): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .from('notification_numbers')
-      .delete()
-      .eq('id', id);
-    
-    if (error) {
-      console.error('Error removing subscriber:', error);
-      return false;
-    }
-    
+    const currentNumbers = await getAdditionalNumbers();
+    const updatedNumbers = currentNumbers.filter(num => num !== phoneNumber);
+    await saveAdditionalNumbers(updatedNumbers);
     return true;
   } catch (e) {
     console.error('Error removing subscriber:', e);
@@ -144,22 +106,18 @@ export const removeSubscriber = async (id: string): Promise<boolean> => {
 };
 
 /**
- * Update a subscriber's phone number
+ * Update a subscriber's phone number (temporary solution using localStorage)
  */
-export const updateSubscriber = async (id: string, phoneNumber: string): Promise<boolean> => {
+export const updateSubscriber = async (oldPhoneNumber: string, newPhoneNumber: string): Promise<boolean> => {
   try {
-    const formattedNumber = formatPhoneNumber(phoneNumber);
+    const currentNumbers = await getAdditionalNumbers();
+    const formattedNewNumber = formatPhoneNumber(newPhoneNumber);
     
-    const { error } = await supabase
-      .from('notification_numbers')
-      .update({ phone_number: formattedNumber })
-      .eq('id', id);
+    const updatedNumbers = currentNumbers.map(num => 
+      num === oldPhoneNumber ? formattedNewNumber : num
+    );
     
-    if (error) {
-      console.error('Error updating subscriber:', error);
-      return false;
-    }
-    
+    await saveAdditionalNumbers(updatedNumbers);
     return true;
   } catch (e) {
     console.error('Error updating subscriber:', e);
@@ -168,21 +126,17 @@ export const updateSubscriber = async (id: string, phoneNumber: string): Promise
 };
 
 /**
- * Get subscriber details including ID
+ * Get subscriber details (temporary solution using localStorage)
  */
 export const getSubscriberDetails = async (): Promise<Array<{id: string, phone_number: string}>> => {
   try {
-    // Fetch directly from Supabase
-    const { data, error } = await supabase
-      .from('notification_numbers')
-      .select('id, phone_number');
+    const numbers = await getAdditionalNumbers();
     
-    if (error) {
-      console.error('Error fetching subscriber details:', error);
-      return [];
-    }
-    
-    return data;
+    // Create mock subscriber objects with phone numbers as IDs
+    return numbers.map(number => ({
+      id: number, // Using phone number as ID for now
+      phone_number: number
+    }));
   } catch (e) {
     console.error('Error retrieving subscriber details:', e);
     return [];

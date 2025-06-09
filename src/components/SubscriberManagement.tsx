@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, X, Edit, Check } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getSubscriberDetails, removeSubscriber, updateSubscriber, formatPhoneNumber } from '@/utils/notificationUtils';
+import { getSubscriberDetails, removeSubscriber, updateSubscriber, formatPhoneNumber, getAdditionalNumbers, saveAdditionalNumbers } from '@/utils/notificationUtils';
 
 export const SubscriberManagement = () => {
   const { toast } = useToast();
@@ -49,9 +49,23 @@ export const SubscriberManagement = () => {
 
     setLoading(true);
     try {
-      // Simple addition of one number by reusing existing function
       const formattedNumber = formatPhoneNumber(newNumber);
-      const success = await updateSubscriber(crypto.randomUUID(), formattedNumber);
+      const currentNumbers = await getAdditionalNumbers();
+      
+      // Check for duplicates
+      if (currentNumbers.includes(formattedNumber)) {
+        toast({
+          title: "Duplicate Number",
+          description: "This number is already in your notification list",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+      
+      // Add the new number
+      const updatedNumbers = [...currentNumbers, formattedNumber];
+      const success = await saveAdditionalNumbers(updatedNumbers);
       
       if (success) {
         toast({
@@ -79,10 +93,10 @@ export const SubscriberManagement = () => {
     }
   };
 
-  const handleRemoveSubscriber = async (id: string) => {
+  const handleRemoveSubscriber = async (phoneNumber: string) => {
     setLoading(true);
     try {
-      const success = await removeSubscriber(id);
+      const success = await removeSubscriber(phoneNumber);
       
       if (success) {
         toast({
@@ -119,7 +133,7 @@ export const SubscriberManagement = () => {
     setEditNumber('');
   };
 
-  const handleUpdateSubscriber = async (id: string) => {
+  const handleUpdateSubscriber = async (oldPhoneNumber: string) => {
     if (!editNumber.trim() || editNumber.length < 10) {
       toast({
         title: "Invalid Number",
@@ -131,7 +145,7 @@ export const SubscriberManagement = () => {
 
     setLoading(true);
     try {
-      const success = await updateSubscriber(id, editNumber);
+      const success = await updateSubscriber(oldPhoneNumber, editNumber);
       
       if (success) {
         toast({
@@ -165,7 +179,7 @@ export const SubscriberManagement = () => {
       <CardHeader>
         <CardTitle>Manage Subscribers</CardTitle>
         <CardDescription>
-          Add, remove, or edit subscribers for rate update notifications
+          Add, remove, or edit subscribers for rate update notifications (using localStorage)
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -226,7 +240,7 @@ export const SubscriberManagement = () => {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => handleUpdateSubscriber(subscriber.id)}
+                              onClick={() => handleUpdateSubscriber(subscriber.phone_number)}
                               disabled={loading}
                             >
                               <Check className="h-4 w-4" />
@@ -253,7 +267,7 @@ export const SubscriberManagement = () => {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => handleRemoveSubscriber(subscriber.id)}
+                              onClick={() => handleRemoveSubscriber(subscriber.phone_number)}
                               disabled={loading}
                             >
                               <X className="h-4 w-4" />
