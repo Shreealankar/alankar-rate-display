@@ -31,7 +31,7 @@ const TermsPage = () => {
               
               <div className="md:w-1/2 flex justify-center">
                 <img 
-                  src="/lovable-uploads/726ba192-f434-4ff0-8deb-c3e3ace6f5aa.png" 
+                  src="/lovable-uploads/3f8f1fdc-9e82-4a9f-8c32-95ca7161e97e.png" 
                   alt="QR Code" 
                   className="max-w-xs"
                 />
@@ -46,4 +46,3 @@ const TermsPage = () => {
 };
 
 export default TermsPage;
-
