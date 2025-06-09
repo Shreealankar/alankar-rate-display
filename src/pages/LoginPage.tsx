@@ -24,8 +24,6 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loginAttempts, setLoginAttempts] = useState(0);
-  const [locked, setLocked] = useState(false);
-  const [lockTimer, setLockTimer] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [goldRate, setGoldRate] = useState('');
   const [silverRate, setSilverRate] = useState('');
@@ -34,17 +32,14 @@ const LoginPage = () => {
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [lastAttemptTime, setLastAttemptTime] = useState(0);
   const [sessionTimeout, setSessionTimeout] = useState(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Enhanced security constants
+  // Security constants
   const MASTER_PASSWORD = 'Shreealankar3230@Secure2024!';
-  const MAX_ATTEMPTS = 3;
+  const MAX_ATTEMPTS = 5; // Increased from 3
   const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
-  const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-  const MAX_REQUESTS_PER_WINDOW = 5;
 
   // Password strength validation
   const validatePasswordStrength = (pwd: string) => {
@@ -60,26 +55,6 @@ const LoginPage = () => {
     if (!hasNumbers) return 'Password must contain numbers';
     if (!hasSpecialChar) return 'Password must contain special characters';
     return null;
-  };
-
-  // Rate limiting check
-  const checkRateLimit = () => {
-    const now = Date.now();
-    const attempts = JSON.parse(localStorage.getItem('recentAttempts') || '[]');
-    const recentAttempts = attempts.filter((time: number) => now - time < RATE_LIMIT_WINDOW);
-    
-    if (recentAttempts.length >= MAX_REQUESTS_PER_WINDOW) {
-      return false;
-    }
-    
-    recentAttempts.push(now);
-    localStorage.setItem('recentAttempts', JSON.stringify(recentAttempts));
-    return true;
-  };
-
-  // Calculate exponential backoff
-  const calculateLockDuration = (attempts: number) => {
-    return Math.min(60 * Math.pow(2, attempts - MAX_ATTEMPTS), 3600); // Max 1 hour
   };
 
   // Session management
@@ -104,22 +79,8 @@ const LoginPage = () => {
     }
   };
 
-  // Check if account is locked on load
+  // Check login attempts on load
   useEffect(() => {
-    const storedLockedUntil = localStorage.getItem('lockedUntil');
-    if (storedLockedUntil) {
-      const lockedUntil = parseInt(storedLockedUntil);
-      
-      if (lockedUntil > Date.now()) {
-        setLocked(true);
-        const remainingTime = Math.ceil((lockedUntil - Date.now()) / 1000);
-        setLockTimer(remainingTime);
-      } else {
-        localStorage.removeItem('lockedUntil');
-        setLocked(false);
-      }
-    }
-
     const storedAttempts = localStorage.getItem('loginAttempts');
     if (storedAttempts) {
       setLoginAttempts(parseInt(storedAttempts));
@@ -158,30 +119,6 @@ const LoginPage = () => {
       }
     };
   }, []);
-
-  // Timer countdown effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (locked && lockTimer > 0) {
-      interval = setInterval(() => {
-        setLockTimer(prevTimer => {
-          const newTimer = prevTimer - 1;
-          if (newTimer <= 0) {
-            setLocked(false);
-            localStorage.removeItem('lockedUntil');
-            clearInterval(interval);
-            return 0;
-          }
-          return newTimer;
-        });
-      }, 1000);
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [locked, lockTimer]);
 
   // Fetch current rates when logged in
   useEffect(() => {
@@ -225,25 +162,6 @@ const LoginPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (locked) {
-      toast({
-        title: "Account Locked",
-        description: `Too many failed attempts. Try again in ${Math.floor(lockTimer / 60)}:${String(lockTimer % 60).padStart(2, '0')}.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Rate limiting check
-    if (!checkRateLimit()) {
-      toast({
-        title: "Rate Limited",
-        description: "Too many requests. Please wait before trying again.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     setIsLoading(true);
     setError(false);
     setErrorMessage('');
@@ -263,8 +181,6 @@ const LoginPage = () => {
         // Success
         setLoginAttempts(0);
         localStorage.setItem('loginAttempts', '0');
-        localStorage.removeItem('lockedUntil');
-        localStorage.removeItem('recentAttempts');
         
         localStorage.setItem('isLoggedIn', 'true');
         setIsLoggedIn(true);
@@ -284,29 +200,14 @@ const LoginPage = () => {
         setLoginAttempts(newAttempts);
         localStorage.setItem('loginAttempts', newAttempts.toString());
         
-        if (newAttempts >= MAX_ATTEMPTS) {
-          const lockDuration = calculateLockDuration(newAttempts);
-          const lockedUntil = Date.now() + (lockDuration * 1000);
-          localStorage.setItem('lockedUntil', lockedUntil.toString());
-          
-          setLocked(true);
-          setLockTimer(lockDuration);
-          
-          toast({
-            title: "Account Locked",
-            description: `Account locked for ${Math.floor(lockDuration / 60)} minutes due to security policy.`,
-            variant: "destructive",
-          });
-        } else {
-          setErrorMessage(`Invalid credentials. ${MAX_ATTEMPTS - newAttempts} attempts remaining.`);
-          toast({
-            title: "Authentication Failed",
-            description: `Invalid credentials. ${MAX_ATTEMPTS - newAttempts} attempts remaining.`,
-            variant: "destructive",
-          });
-        }
+        setErrorMessage(`Invalid credentials. ${MAX_ATTEMPTS - newAttempts} attempts remaining.`);
+        toast({
+          title: "Authentication Failed",
+          description: `Invalid credentials. ${MAX_ATTEMPTS - newAttempts} attempts remaining.`,
+          variant: "destructive",
+        });
       }
-    }, 1500); // Longer delay for security
+    }, 1000); // Reduced from 1500ms
   };
 
   const handleLogout = () => {
@@ -762,14 +663,11 @@ const LoginPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {(loginAttempts > 0 || locked) && (
-                <Alert className="mb-4" variant={locked ? "destructive" : "default"}>
+              {loginAttempts > 0 && (
+                <Alert className="mb-4">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    {locked 
-                      ? `Account locked for security. Retry in ${formatTime(lockTimer)}`
-                      : `${loginAttempts} failed attempt${loginAttempts > 1 ? 's' : ''}. ${MAX_ATTEMPTS - loginAttempts} remaining.`
-                    }
+                    {loginAttempts} failed attempt{loginAttempts > 1 ? 's' : ''}. {MAX_ATTEMPTS - loginAttempts} remaining.
                   </AlertDescription>
                 </Alert>
               )}
@@ -784,7 +682,7 @@ const LoginPage = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className={error ? 'border-destructive' : ''}
-                      disabled={isLoading || locked}
+                      disabled={isLoading}
                     />
                     <Button
                       type="button"
@@ -792,7 +690,7 @@ const LoginPage = () => {
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3"
                       onClick={() => setShowPassword(!showPassword)}
-                      disabled={isLoading || locked}
+                      disabled={isLoading}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
@@ -808,17 +706,12 @@ const LoginPage = () => {
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={isLoading || locked || !password.trim()}
+                  disabled={isLoading || !password.trim()}
                 >
                   {isLoading ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Authenticating...
-                    </span>
-                  ) : locked ? (
-                    <span className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
-                      Locked ({formatTime(lockTimer)})
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
@@ -831,7 +724,7 @@ const LoginPage = () => {
             </CardContent>
             <CardFooter className="flex flex-col space-y-2">
               <p className="text-xs text-muted-foreground text-center">
-                Enhanced security • Rate limiting • Session management
+                Enhanced security • Session management
               </p>
               <p className="text-xs text-muted-foreground text-center">
                 Owner access only • All attempts are logged
