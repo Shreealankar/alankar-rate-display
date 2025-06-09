@@ -141,11 +141,6 @@ const JewelryGalleryPage = () => {
                 </DialogContent>
               </Dialog>
             )}
-            {!loading && (!user || !isOwner) && (
-              <div className="text-sm text-muted-foreground">
-                {!user ? "Please login as owner to manage products" : "You need owner permissions to manage products"}
-              </div>
-            )}
           </div>
         </div>
         <JewelryGallery isOwner={!loading && user && isOwner} />
