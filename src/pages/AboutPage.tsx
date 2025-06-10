@@ -49,34 +49,34 @@ const AboutPage = () => {
           <div className="container px-4">
             <div className="max-w-3xl mx-auto bg-card rounded-lg shadow-lg overflow-hidden">
               <div className="p-8">
-                <h2 className="text-2xl font-bold mb-6 text-center">Store Information</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center">{t('store.title')}</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-xl font-semibold mb-4">Address</h3>
+                    <h3 className="text-xl font-semibold mb-4">{t('store.address')}</h3>
                     <p className="text-muted-foreground">
-                      Shree Alankar,<br />
-                      Near Bank Of Maharashtra,<br />
-                      Lohoner 423301
+                      {t('store.addressLine1')}<br />
+                      {t('store.addressLine2')}<br />
+                      {t('store.addressLine3')}
                     </p>
                     
-                    <h3 className="text-xl font-semibold mb-4 mt-6">Contact</h3>
+                    <h3 className="text-xl font-semibold mb-4 mt-6">{t('store.contact')}</h3>
                     <p className="text-muted-foreground">
-                      Phone: 9921612155<br />
-                      WhatsApp: 9921612155
+                      {t('store.phone')}<br />
+                      {t('store.whatsapp')}
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="text-xl font-semibold mb-4">Business Hours</h3>
+                    <h3 className="text-xl font-semibold mb-4">{t('store.hours')}</h3>
                     <ul className="space-y-2 text-muted-foreground">
                       <li className="flex justify-between">
-                        <span>Monday - Saturday</span>
-                        <span>10:00 AM - 8:00 PM</span>
+                        <span>{t('store.mondayToSaturday')}</span>
+                        <span>{t('store.hoursWeekday')}</span>
                       </li>
                       <li className="flex justify-between">
-                        <span>Sunday</span>
-                        <span>11:00 AM - 8:00 PM</span>
+                        <span>{t('store.sunday')}</span>
+                        <span>{t('store.hoursSunday')}</span>
                       </li>
                     </ul>
                   </div>

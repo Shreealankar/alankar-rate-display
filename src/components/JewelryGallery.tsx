@@ -21,6 +21,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ProductType {
   id: string;
@@ -40,6 +41,7 @@ interface JewelryGalleryProps {
 }
 
 export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
+  const { t } = useLanguage();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditProductDialog, setShowEditProductDialog] = useState(false);
@@ -206,10 +208,10 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">Jewelry Gallery</h2>
+        <h2 className="text-3xl font-bold">{t('gallery.title')}</h2>
         {isOwner && (
           <div className="text-sm text-green-600 font-medium">
-            Owner Mode - You can manage products
+            {t('gallery.ownerMode')}
           </div>
         )}
       </div>
@@ -220,7 +222,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Search products by title or description..."
+            placeholder={t('gallery.search')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -233,7 +235,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
-                Filters
+                {t('gallery.filters')}
                 {(categoryFilter !== 'all' || typeFilter !== 'all' || purityFilter !== 'all' || weightFilter !== 'all') && (
                   <span className="bg-primary text-primary-foreground rounded-full px-2 py-1 text-xs">
                     Active
@@ -243,7 +245,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
             </CollapsibleTrigger>
             {(searchTerm || categoryFilter !== 'all' || typeFilter !== 'all' || purityFilter !== 'all' || weightFilter !== 'all') && (
               <Button variant="ghost" onClick={clearFilters} className="text-sm">
-                Clear All
+                {t('gallery.clearAll')}
               </Button>
             )}
           </div>
@@ -252,47 +254,47 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Category Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Category</label>
+                <label className="text-sm font-medium mb-2 block">{t('gallery.category')}</label>
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Categories" />
+                    <SelectValue placeholder={t('gallery.allCategories')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="necklace">Necklace</SelectItem>
-                    <SelectItem value="ring">Ring</SelectItem>
-                    <SelectItem value="earring">Earring</SelectItem>
-                    <SelectItem value="bracelet">Bracelet</SelectItem>
-                    <SelectItem value="pendant">Pendant</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="all">{t('gallery.allCategories')}</SelectItem>
+                    <SelectItem value="necklace">{t('gallery.necklace')}</SelectItem>
+                    <SelectItem value="ring">{t('gallery.ring')}</SelectItem>
+                    <SelectItem value="earring">{t('gallery.earring')}</SelectItem>
+                    <SelectItem value="bracelet">{t('gallery.bracelet')}</SelectItem>
+                    <SelectItem value="pendant">{t('gallery.pendant')}</SelectItem>
+                    <SelectItem value="other">{t('gallery.other')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Type Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Type</label>
+                <label className="text-sm font-medium mb-2 block">{t('gallery.type')}</label>
                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Types" />
+                    <SelectValue placeholder={t('gallery.allTypes')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="gold">Gold</SelectItem>
-                    <SelectItem value="silver">Silver</SelectItem>
+                    <SelectItem value="all">{t('gallery.allTypes')}</SelectItem>
+                    <SelectItem value="gold">{t('gallery.gold')}</SelectItem>
+                    <SelectItem value="silver">{t('gallery.silver')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Purity Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Purity</label>
+                <label className="text-sm font-medium mb-2 block">{t('gallery.purity')}</label>
                 <Select value={purityFilter} onValueChange={setPurityFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Purities" />
+                    <SelectValue placeholder={t('gallery.allPurities')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Purities</SelectItem>
+                    <SelectItem value="all">{t('gallery.allPurities')}</SelectItem>
                     <SelectItem value="18k">18K</SelectItem>
                     <SelectItem value="20k">20K</SelectItem>
                     <SelectItem value="22k">22K</SelectItem>
@@ -303,16 +305,16 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
 
               {/* Weight Filter */}
               <div>
-                <label className="text-sm font-medium mb-2 block">Weight Range</label>
+                <label className="text-sm font-medium mb-2 block">{t('gallery.weightRange')}</label>
                 <Select value={weightFilter} onValueChange={setWeightFilter}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All Weights" />
+                    <SelectValue placeholder={t('gallery.allWeights')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Weights</SelectItem>
-                    <SelectItem value="light">Light (Under 5g)</SelectItem>
-                    <SelectItem value="medium">Medium (5-20g)</SelectItem>
-                    <SelectItem value="heavy">Heavy (20g+)</SelectItem>
+                    <SelectItem value="all">{t('gallery.allWeights')}</SelectItem>
+                    <SelectItem value="light">{t('gallery.light')}</SelectItem>
+                    <SelectItem value="medium">{t('gallery.medium')}</SelectItem>
+                    <SelectItem value="heavy">{t('gallery.heavy')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -323,7 +325,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
 
       {/* Results count */}
       <div className="mb-4 text-sm text-muted-foreground">
-        {loading ? 'Loading...' : `Showing ${filteredProducts.length} of ${products.length} products`}
+        {loading ? t('gallery.loading') : `${t('gallery.showing')} ${filteredProducts.length} ${t('gallery.of')} ${products.length} ${t('gallery.products')}`}
       </div>
 
       {loading ? (
@@ -335,18 +337,18 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
           <CardContent>
             {products.length === 0 ? (
               <>
-                <p className="text-muted-foreground">No products found</p>
+                <p className="text-muted-foreground">{t('gallery.noProducts')}</p>
                 {isOwner && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    Use the "Add Product" button above to add your first product
+                    {t('gallery.addFirstProduct')}
                   </p>
                 )}
               </>
             ) : (
               <>
-                <p className="text-muted-foreground">No products match your current filters</p>
+                <p className="text-muted-foreground">{t('gallery.noMatch')}</p>
                 <Button variant="outline" onClick={clearFilters} className="mt-4">
-                  Clear Filters
+                  {t('gallery.clearFilters')}
                 </Button>
               </>
             )}
@@ -365,7 +367,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full w-full text-muted-foreground">
-                    No image
+                    {t('gallery.noImage')}
                   </div>
                 )}
               </div>
@@ -374,10 +376,10 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-1 text-sm">
-                  <p>Category: <span className="font-medium capitalize">{product.category}</span></p>
-                  <p>Type: <span className="font-medium capitalize">{product.type}</span></p>
-                  <p>Purity: <span className="font-medium">{product.purity}</span></p>
-                  <p>Weight: <span className="font-medium">{product.weight_grams}g</span></p>
+                  <p>{t('gallery.categoryLabel')} <span className="font-medium capitalize">{t(`gallery.${product.category}`)}</span></p>
+                  <p>{t('gallery.typeLabel')} <span className="font-medium capitalize">{t(`gallery.${product.type}`)}</span></p>
+                  <p>{t('gallery.purityLabel')} <span className="font-medium">{product.purity}</span></p>
+                  <p>{t('gallery.weightLabel')} <span className="font-medium">{product.weight_grams}g</span></p>
                   {product.description && (
                     <p className="line-clamp-2 text-muted-foreground mt-2">{product.description}</p>
                   )}
@@ -396,7 +398,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
                     }}
                   >
                     <Pencil className="h-4 w-4" />
-                    Edit
+                    {t('gallery.edit')}
                   </Button>
                   <Button 
                     variant="destructive" 
@@ -409,7 +411,7 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
                     }}
                   >
                     <Trash2 className="h-4 w-4" />
-                    Delete
+                    {t('gallery.delete')}
                   </Button>
                 </CardFooter>
               )}
