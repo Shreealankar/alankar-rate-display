@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -15,12 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Header = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const getUser = async () => {
@@ -56,11 +59,11 @@ export const Header = () => {
   };
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
+    { name: t('nav.home'), href: '/' },
+    { name: t('nav.about'), href: '/about' },
     { name: 'Jewelry Gallery', href: '/jewelry' },
-    { name: 'Help', href: '/help' },
-    { name: 'Owner Login', href: '/login' },
+    { name: t('nav.help'), href: '/help' },
+    { name: t('nav.login'), href: '/login' },
   ];
 
   const userInitials = user?.email
@@ -119,6 +122,9 @@ export const Header = () => {
                   {item.name}
                 </Link>
               ))}
+              <div className="pt-4 border-t">
+                <LanguageToggle />
+              </div>
             </div>
           </SheetContent>
         </Sheet>
@@ -129,6 +135,7 @@ export const Header = () => {
           </Link>
           
           <div className="hidden md:flex items-center space-x-2">
+            <LanguageToggle />
             {!loading && user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
