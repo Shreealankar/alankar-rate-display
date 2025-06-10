@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { MessageSquare, Instagram, Youtube } from 'lucide-react';
+import { MessageSquare, Instagram, Youtube, MapPin } from 'lucide-react';
 
 export const Footer = () => {
   const { t, language } = useLanguage();
@@ -36,6 +36,19 @@ export const Footer = () => {
               >
                 <MessageSquare className="h-4 w-4" />
                 <span>{language === 'mr' ? 'व्हाट्सएप' : 'WhatsApp'}</span>
+              </a>
+            </div>
+
+            {/* Location */}
+            <div className="mt-4">
+              <a 
+                href="https://maps.app.goo.gl/ZGcHTUjuVhG6ubKg6" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-primary hover:text-primary/80"
+              >
+                <MapPin className="h-4 w-4" />
+                <span>{language === 'mr' ? 'आमचे ठिकाण' : 'Our Location'}</span>
               </a>
             </div>
           </div>
