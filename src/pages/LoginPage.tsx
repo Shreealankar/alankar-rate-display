@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -37,7 +38,7 @@ const LoginPage = () => {
   const { toast } = useToast();
 
   // Security constants
-  const MASTER_PASSWORD = 'Shreealankar3230@Secure2024!';
+  const MASTER_PASSWORD = 'Shreealankar@3230';
   const MAX_ATTEMPTS = 5; // Increased from 3
   const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
