@@ -19,10 +19,9 @@ export const generateRateChangeMessage = (
 };
 
 /**
- * Store customer mobile number in localStorage
+ * Store customer mobile number in localStorage (keeping for backward compatibility)
  */
 export const saveMobileNumber = (mobileNumber: string): void => {
-  // Ensure number has +91 prefix
   const formattedNumber = formatPhoneNumber(mobileNumber);
   localStorage.setItem('customerMobileNumber', formattedNumber);
 };
@@ -31,25 +30,21 @@ export const saveMobileNumber = (mobileNumber: string): void => {
  * Ensure phone number has +91 prefix
  */
 export const formatPhoneNumber = (phoneNumber: string): string => {
-  // Remove any existing country code or non-numeric characters
   let cleanNumber = phoneNumber.replace(/\D/g, '');
   
-  // Remove 91 from beginning if present
   if (cleanNumber.startsWith('91')) {
     cleanNumber = cleanNumber.substring(2);
   }
   
-  // Ensure the number is 10 digits
   if (cleanNumber.length !== 10) {
-    return phoneNumber; // Return original if not valid
+    return phoneNumber;
   }
   
-  // Add +91 prefix
   return `+91${cleanNumber}`;
 };
 
 /**
- * Get stored customer mobile number from localStorage
+ * Get stored customer mobile number from localStorage (keeping for backward compatibility)
  */
 export const getMobileNumber = (): string | null => {
   const number = localStorage.getItem('customerMobileNumber');
@@ -57,109 +52,160 @@ export const getMobileNumber = (): string | null => {
 };
 
 /**
- * Store additional numbers in localStorage (temporary solution)
+ * Add a new subscriber to the database
  */
-export const saveAdditionalNumbers = async (numbers: string[]): Promise<boolean> => {
+export const addSubscriber = async (phoneNumber: string): Promise<boolean> => {
   try {
-    // Format all numbers with +91 prefix
-    const formattedNumbers = numbers.map(number => formatPhoneNumber(number));
+    const formattedNumber = formatPhoneNumber(phoneNumber);
     
-    // Store in localStorage as JSON
-    localStorage.setItem('additionalNotificationNumbers', JSON.stringify(formattedNumbers));
+    const { error } = await supabase
+      .from('subscribers')
+      .insert({ 
+        phone_number: formattedNumber,
+        is_active: true 
+      });
+    
+    if (error) {
+      console.error('Error adding subscriber:', error);
+      return false;
+    }
     
     return true;
-  } catch (e) {
-    console.error('Error saving additional numbers:', e);
+  } catch (error) {
+    console.error('Error adding subscriber:', error);
     return false;
   }
 };
 
 /**
- * Get additional mobile numbers from localStorage (temporary solution)
- */
-export const getAdditionalNumbers = async (): Promise<string[]> => {
-  try {
-    const stored = localStorage.getItem('additionalNotificationNumbers');
-    if (!stored) return [];
-    
-    const numbers = JSON.parse(stored);
-    return Array.isArray(numbers) ? numbers : [];
-  } catch (e) {
-    console.error('Error retrieving additional numbers:', e);
-    return [];
-  }
-};
-
-/**
- * Remove a subscriber by phone number (temporary solution using localStorage)
- */
-export const removeSubscriber = async (phoneNumber: string): Promise<boolean> => {
-  try {
-    const currentNumbers = await getAdditionalNumbers();
-    const updatedNumbers = currentNumbers.filter(num => num !== phoneNumber);
-    await saveAdditionalNumbers(updatedNumbers);
-    return true;
-  } catch (e) {
-    console.error('Error removing subscriber:', e);
-    return false;
-  }
-};
-
-/**
- * Update a subscriber's phone number (temporary solution using localStorage)
- */
-export const updateSubscriber = async (oldPhoneNumber: string, newPhoneNumber: string): Promise<boolean> => {
-  try {
-    const currentNumbers = await getAdditionalNumbers();
-    const formattedNewNumber = formatPhoneNumber(newPhoneNumber);
-    
-    const updatedNumbers = currentNumbers.map(num => 
-      num === oldPhoneNumber ? formattedNewNumber : num
-    );
-    
-    await saveAdditionalNumbers(updatedNumbers);
-    return true;
-  } catch (e) {
-    console.error('Error updating subscriber:', e);
-    return false;
-  }
-};
-
-/**
- * Get subscriber details (temporary solution using localStorage)
+ * Get all active subscribers from the database
  */
 export const getSubscriberDetails = async (): Promise<Array<{id: string, phone_number: string}>> => {
   try {
-    const numbers = await getAdditionalNumbers();
+    const { data, error } = await supabase
+      .from('subscribers')
+      .select('id, phone_number')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
     
-    // Create mock subscriber objects with phone numbers as IDs
-    return numbers.map(number => ({
-      id: number, // Using phone number as ID for now
-      phone_number: number
-    }));
-  } catch (e) {
-    console.error('Error retrieving subscriber details:', e);
+    if (error) {
+      console.error('Error fetching subscribers:', error);
+      return [];
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching subscribers:', error);
     return [];
   }
 };
 
 /**
- * Sends a WhatsApp notification about rate changes
+ * Remove a subscriber from the database
  */
-export const sendWhatsAppNotification = (
+export const removeSubscriber = async (phoneNumber: string): Promise<boolean> => {
+  try {
+    const { error } = await supabase
+      .from('subscribers')
+      .delete()
+      .eq('phone_number', phoneNumber);
+    
+    if (error) {
+      console.error('Error removing subscriber:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error removing subscriber:', error);
+    return false;
+  }
+};
+
+/**
+ * Update a subscriber's phone number in the database
+ */
+export const updateSubscriber = async (oldPhoneNumber: string, newPhoneNumber: string): Promise<boolean> => {
+  try {
+    const formattedNewNumber = formatPhoneNumber(newPhoneNumber);
+    
+    const { error } = await supabase
+      .from('subscribers')
+      .update({ 
+        phone_number: formattedNewNumber,
+        updated_at: new Date().toISOString()
+      })
+      .eq('phone_number', oldPhoneNumber);
+    
+    if (error) {
+      console.error('Error updating subscriber:', error);
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error updating subscriber:', error);
+    return false;
+  }
+};
+
+/**
+ * Get additional mobile numbers (deprecated - kept for backward compatibility)
+ */
+export const getAdditionalNumbers = async (): Promise<string[]> => {
+  try {
+    const subscribers = await getSubscriberDetails();
+    return subscribers.map(sub => sub.phone_number);
+  } catch (error) {
+    console.error('Error getting additional numbers:', error);
+    return [];
+  }
+};
+
+/**
+ * Save additional numbers (deprecated - kept for backward compatibility)
+ */
+export const saveAdditionalNumbers = async (numbers: string[]): Promise<boolean> => {
+  // This function is kept for backward compatibility but should use addSubscriber instead
+  try {
+    const currentSubscribers = await getSubscriberDetails();
+    const currentNumbers = currentSubscribers.map(sub => sub.phone_number);
+    
+    // Add new numbers
+    for (const number of numbers) {
+      const formattedNumber = formatPhoneNumber(number);
+      if (!currentNumbers.includes(formattedNumber)) {
+        await addSubscriber(formattedNumber);
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error saving additional numbers:', error);
+    return false;
+  }
+};
+
+/**
+ * Send WhatsApp notification via API
+ */
+export const sendWhatsAppNotification = async (
   message: string, 
   phoneNumber: string
-): boolean => {
+): Promise<boolean> => {
   try {
-    // Format the message for WhatsApp
-    const whatsappMessage = encodeURIComponent(message);
-    
-    // Format the phone number
-    const formattedNumber = formatPhoneNumber(phoneNumber);
-    
-    // Open WhatsApp in a new tab
-    window.open(`https://wa.me/${formattedNumber}?text=${whatsappMessage}`, '_blank');
-    
+    const response = await supabase.functions.invoke('send-notification', {
+      body: {
+        message,
+        phoneNumber: formatPhoneNumber(phoneNumber)
+      }
+    });
+
+    if (response.error) {
+      console.error('Error sending notification:', response.error);
+      return false;
+    }
+
     return true;
   } catch (error) {
     console.error('Error sending WhatsApp notification:', error);
@@ -168,9 +214,54 @@ export const sendWhatsAppNotification = (
 };
 
 /**
- * Send notifications to all subscribers at once - disabled functionality
+ * Send bulk notifications to all active subscribers
  */
 export const sendBulkWhatsAppNotifications = async (message: string): Promise<number> => {
-  console.log('Bulk messaging has been disabled');
-  return 0;
+  try {
+    const response = await supabase.functions.invoke('send-bulk-notifications', {
+      body: { message }
+    });
+
+    if (response.error) {
+      console.error('Error sending bulk notifications:', response.error);
+      return 0;
+    }
+
+    return response.data?.count || 0;
+  } catch (error) {
+    console.error('Error sending bulk notifications:', error);
+    return 0;
+  }
+};
+
+/**
+ * Send rate update notifications to all subscribers
+ */
+export const sendRateUpdateNotifications = async (
+  goldRate?: number,
+  silverRate?: number,
+  oldGoldRate?: number,
+  oldSilverRate?: number
+): Promise<number> => {
+  try {
+    let messages: string[] = [];
+    
+    if (goldRate !== undefined) {
+      messages.push(generateRateChangeMessage('gold', oldGoldRate || null, goldRate));
+    }
+    
+    if (silverRate !== undefined) {
+      messages.push(generateRateChangeMessage('silver', oldSilverRate || null, silverRate));
+    }
+    
+    if (messages.length === 0) {
+      return 0;
+    }
+    
+    const combinedMessage = messages.join('\n\n');
+    return await sendBulkWhatsAppNotifications(combinedMessage);
+  } catch (error) {
+    console.error('Error sending rate update notifications:', error);
+    return 0;
+  }
 };

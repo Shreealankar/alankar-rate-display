@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, UserPlus, X, Edit, Check } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getSubscriberDetails, removeSubscriber, updateSubscriber, formatPhoneNumber, getAdditionalNumbers, saveAdditionalNumbers } from '@/utils/notificationUtils';
+import { getSubscriberDetails, removeSubscriber, updateSubscriber, formatPhoneNumber, addSubscriber } from '@/utils/notificationUtils';
 
 export const SubscriberManagement = () => {
   const { toast } = useToast();
@@ -50,10 +50,10 @@ export const SubscriberManagement = () => {
     setLoading(true);
     try {
       const formattedNumber = formatPhoneNumber(newNumber);
-      const currentNumbers = await getAdditionalNumbers();
       
       // Check for duplicates
-      if (currentNumbers.includes(formattedNumber)) {
+      const existingSubscriber = subscribers.find(sub => sub.phone_number === formattedNumber);
+      if (existingSubscriber) {
         toast({
           title: "Duplicate Number",
           description: "This number is already in your notification list",
@@ -63,9 +63,7 @@ export const SubscriberManagement = () => {
         return;
       }
       
-      // Add the new number
-      const updatedNumbers = [...currentNumbers, formattedNumber];
-      const success = await saveAdditionalNumbers(updatedNumbers);
+      const success = await addSubscriber(formattedNumber);
       
       if (success) {
         toast({
@@ -73,7 +71,7 @@ export const SubscriberManagement = () => {
           description: "Subscriber added successfully",
         });
         setNewNumber('');
-        loadSubscribers(); // Reload the list
+        loadSubscribers();
       } else {
         toast({
           title: "Error",
@@ -103,7 +101,7 @@ export const SubscriberManagement = () => {
           title: "Success",
           description: "Subscriber removed successfully",
         });
-        loadSubscribers(); // Reload the list
+        loadSubscribers();
       } else {
         toast({
           title: "Error",
@@ -154,7 +152,7 @@ export const SubscriberManagement = () => {
         });
         setEditingId(null);
         setEditNumber('');
-        loadSubscribers(); // Reload the list
+        loadSubscribers();
       } else {
         toast({
           title: "Error",
@@ -179,7 +177,7 @@ export const SubscriberManagement = () => {
       <CardHeader>
         <CardTitle>Manage Subscribers</CardTitle>
         <CardDescription>
-          Add, remove, or edit subscribers for rate update notifications (using localStorage)
+          Add, remove, or edit subscribers for rate update notifications (stored in database)
         </CardDescription>
       </CardHeader>
       <CardContent>

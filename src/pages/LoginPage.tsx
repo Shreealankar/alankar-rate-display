@@ -268,6 +268,22 @@ const LoginPage = () => {
     const newSilverRate = parseFloat(silverRate);
     
     try {
+      // Store old rates for notification message
+      let oldGoldRate: number | undefined;
+      let oldSilverRate: number | undefined;
+      
+      // Get current rates first
+      const { data: currentRates } = await supabase
+        .from('rates')
+        .select('metal_type, rate_per_gram');
+        
+      if (currentRates) {
+        const currentGold = currentRates.find(rate => rate.metal_type === 'gold');
+        const currentSilver = currentRates.find(rate => rate.metal_type === 'silver');
+        oldGoldRate = currentGold?.rate_per_gram;
+        oldSilverRate = currentSilver?.rate_per_gram;
+      }
+
       const { data: existingGold, error: goldQueryError } = await supabase
         .from('rates')
         .select('id')
@@ -382,10 +398,28 @@ const LoginPage = () => {
         }
       }
       
-      toast({
-        title: "Success",
-        description: "Rates updated successfully",
-      });
+      // Send notifications to all subscribers
+      const { sendRateUpdateNotifications } = await import('@/utils/notificationUtils');
+      
+      try {
+        const notificationCount = await sendRateUpdateNotifications(
+          newGoldRate,
+          newSilverRate,
+          oldGoldRate,
+          oldSilverRate
+        );
+        
+        toast({
+          title: "Success",
+          description: `Rates updated successfully. Notifications sent to ${notificationCount} subscribers.`,
+        });
+      } catch (notificationError) {
+        console.error('Error sending notifications:', notificationError);
+        toast({
+          title: "Rates Updated",
+          description: "Rates updated successfully, but there was an issue sending notifications.",
+        });
+      }
       
     } catch (error) {
       console.error('Error updating rates:', error);
