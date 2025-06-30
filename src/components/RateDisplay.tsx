@@ -163,6 +163,7 @@ export const RateDisplay = () => {
           title="Shree Alankar - Today's Gold & Silver Rates"
           description={`${t('home.gold')}: ₹${goldRate?.toLocaleString() || '62,400'} ${t('home.per10gm')}\n${t('home.silver')}: ₹${silverRate?.toLocaleString() || '6,250'} ${t('home.per10gm')}\n\n${language === 'mr' ? 'शेवटचे अपडेट' : 'Last Updated'}: ${lastUpdated}`}
           variant="default"
+          isRateShare={true}
         />
       </div>
 
