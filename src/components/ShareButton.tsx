@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Share, Facebook, Instagram, Twitter, WhatsApp } from 'lucide-react';
+import { Share, Facebook, Instagram, Twitter, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ShareButtonProps {
@@ -112,7 +112,7 @@ export const ShareButton = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuItem onClick={() => handleShare('whatsapp')} className="flex items-center gap-2">
-          <WhatsApp className="h-4 w-4" />
+          <MessageCircle className="h-4 w-4" />
           WhatsApp
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleShare('facebook')} className="flex items-center gap-2">
