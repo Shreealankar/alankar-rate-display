@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { MobileNumberDialog } from "@/components/MobileNumberDialog";
+import { ShareButton } from "@/components/ShareButton";
 import { generateRateChangeMessage } from "@/utils/notificationUtils";
 
 export const RateDisplay = () => {
@@ -156,7 +157,14 @@ export const RateDisplay = () => {
       {/* Mobile Number Dialog for first time visitors */}
       <MobileNumberDialog />
       
-      <h2 className="text-2xl font-bold text-center mb-4">{t('home.rates')}</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">{t('home.rates')}</h2>
+        <ShareButton
+          title="Shree Alankar - Today's Gold & Silver Rates"
+          description={`${t('home.gold')}: ₹${goldRate?.toLocaleString() || '62,400'} ${t('home.per10gm')}\n${t('home.silver')}: ₹${silverRate?.toLocaleString() || '6,250'} ${t('home.per10gm')}\n\n${language === 'mr' ? 'शेवटचे अपडेट' : 'Last Updated'}: ${lastUpdated}`}
+          variant="default"
+        />
+      </div>
 
       {error ? (
         <div className="text-center p-6 bg-destructive/10 rounded-lg border border-destructive">
