@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Share, Facebook, Instagram, Twitter, MessageCircle } from 'lucide-react';
+import { Share, Facebook, Instagram, Twitter, MessageCircle, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ShareButtonProps {
@@ -45,133 +45,147 @@ export const ShareButton = ({
   const shareText = `${title}\n\n${description}${locationInfo}${websiteInfo}${socialLinks}`;
   const encodedText = encodeURIComponent(shareText);
   
-  // Always use the main website URL instead of current page URL
-  const finalShareUrl = websiteUrl;
-  const encodedUrl = encodeURIComponent(finalShareUrl);
+  // Always use the main website URL
+  const shareUrl = websiteUrl;
+  const encodedUrl = encodeURIComponent(shareUrl);
+
+  const openPopup = (url: string) => {
+    try {
+      // Try to open popup with specific dimensions and features
+      const popup = window.open(
+        url, 
+        'share-popup', 
+        'width=600,height=500,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,directories=no,status=no'
+      );
+      
+      // Check if popup was blocked
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        throw new Error('Popup blocked');
+      }
+      
+      // Focus the popup window
+      popup.focus();
+      setIsOpen(false);
+      
+    } catch (error) {
+      console.log('Popup failed, falling back to copy:', error);
+      // Fallback to copying content
+      copyToClipboard();
+    }
+  };
 
   const handleShare = async (platform: string) => {
     try {
-      let platformShareUrl = '';
+      let platformUrl = '';
       
       switch (platform) {
         case 'whatsapp':
-          // For WhatsApp, include image URL in the message if available
           const whatsappText = imageUrl && !isRateShare 
             ? `${shareText}\n\n📸 Image: ${imageUrl}`
             : shareText;
           const encodedWhatsAppText = encodeURIComponent(whatsappText);
-          platformShareUrl = `https://wa.me/?text=${encodedWhatsAppText}`;
+          platformUrl = `https://wa.me/?text=${encodedWhatsAppText}`;
+          openPopup(platformUrl);
           break;
+          
         case 'facebook':
-          platformShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+          platformUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+          openPopup(platformUrl);
           break;
+          
         case 'twitter':
-          platformShareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+          platformUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+          openPopup(platformUrl);
           break;
+          
         case 'instagram':
-          // Instagram doesn't support direct URL sharing, so we'll copy to clipboard
+          // Instagram doesn't support direct URL sharing
           await copyToClipboard();
           toast({
-            title: 'Copied to clipboard',
-            description: 'Share this content on Instagram by pasting the copied text. Don\'t forget to include the image!',
+            title: 'Copied for Instagram',
+            description: 'Content copied to clipboard. Paste it in your Instagram post and add the image manually.',
           });
-          setIsOpen(false);
-          return;
+          break;
+          
         case 'copy':
           await copyToClipboard();
-          return;
+          break;
+          
         case 'native':
-          if (navigator.share) {
-            try {
-              const shareData: any = {
-                title,
-                text: shareText,
-                url: finalShareUrl,
-              };
-              
-              // Add image to share data if available (some browsers support this)
-              if (imageUrl && !isRateShare) {
-                try {
-                  const response = await fetch(imageUrl);
-                  const blob = await response.blob();
-                  const file = new File([blob], 'product-image.jpg', { type: blob.type });
-                  shareData.files = [file];
-                } catch (error) {
-                  console.log('Could not add image to native share:', error);
-                }
-              }
-              
-              await navigator.share(shareData);
-              setIsOpen(false);
-              return;
-            } catch (error) {
-              console.log('Native sharing failed, falling back to copy:', error);
-              await copyToClipboard();
-              return;
-            }
-          }
+          await handleNativeShare();
+          break;
+          
+        default:
           await copyToClipboard();
-          return;
-      }
-
-      if (platformShareUrl) {
-        // Open in new window to prevent page reload
-        const newWindow = window.open(platformShareUrl, '_blank', 'width=600,height=400,noopener,noreferrer');
-        if (!newWindow) {
-          toast({
-            title: 'Popup blocked',
-            description: 'Please allow popups for sharing to work properly',
-            variant: 'destructive',
-          });
-        }
-        setIsOpen(false);
       }
     } catch (error) {
       console.error('Error during sharing:', error);
       toast({
         title: 'Sharing failed',
-        description: 'There was an error while sharing. Please try again.',
+        description: 'Unable to share. Content has been copied to clipboard instead.',
         variant: 'destructive',
       });
+      await copyToClipboard();
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        const shareData: ShareData = {
+          title,
+          text: shareText,
+          url: shareUrl,
+        };
+        
+        await navigator.share(shareData);
+        setIsOpen(false);
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.log('Native sharing failed:', error);
+          await copyToClipboard();
+        }
+      }
+    } else {
+      await copyToClipboard();
     }
   };
 
   const copyToClipboard = async () => {
+    const textToCopy = imageUrl && !isRateShare 
+      ? `${shareText}\n\n📸 Image: ${imageUrl}`
+      : shareText;
+      
     try {
-      const textToCopy = imageUrl && !isRateShare 
-        ? `${shareText}\n\n📸 Image: ${imageUrl}`
-        : shareText;
-      await navigator.clipboard.writeText(textToCopy);
-      toast({
-        title: 'Copied to clipboard',
-        description: 'Share content has been copied to your clipboard',
-      });
-      setIsOpen(false);
-    } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
-      // Fallback for older browsers
-      try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(textToCopy);
+      } else {
+        // Fallback for older browsers or non-secure contexts
         const textArea = document.createElement('textarea');
-        textArea.value = imageUrl && !isRateShare 
-          ? `${shareText}\n\n📸 Image: ${imageUrl}`
-          : shareText;
+        textArea.value = textToCopy;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
         document.body.appendChild(textArea);
+        textArea.focus();
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        toast({
-          title: 'Copied to clipboard',
-          description: 'Share content has been copied to your clipboard',
-        });
-        setIsOpen(false);
-      } catch (fallbackError) {
-        console.error('Fallback copy also failed:', fallbackError);
-        toast({
-          title: 'Copy failed',
-          description: 'Failed to copy to clipboard. Please try sharing manually.',
-          variant: 'destructive',
-        });
       }
+      
+      toast({
+        title: 'Copied to clipboard',
+        description: 'Share content has been copied successfully.',
+      });
+      setIsOpen(false);
+      
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      toast({
+        title: 'Copy failed',
+        description: 'Unable to copy to clipboard. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -207,7 +221,7 @@ export const ShareButton = ({
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => handleShare('copy')} className="flex items-center gap-2">
-          <Share className="h-4 w-4" />
+          <Copy className="h-4 w-4" />
           Copy Link
         </DropdownMenuItem>
       </DropdownMenuContent>
