@@ -23,7 +23,7 @@ interface ShareButtonProps {
 export const ShareButton = ({ 
   title, 
   description, 
-  url = window.location.href, 
+  url, 
   imageUrl,
   variant = 'outline',
   size = 'sm',
@@ -44,10 +44,13 @@ export const ShareButton = ({
   
   const shareText = `${title}\n\n${description}${locationInfo}${websiteInfo}${socialLinks}`;
   const encodedText = encodeURIComponent(shareText);
-  const encodedUrl = encodeURIComponent(url);
+  
+  // Always use the main website URL instead of current page URL
+  const shareUrl = websiteUrl;
+  const encodedUrl = encodeURIComponent(shareUrl);
 
   const handleShare = async (platform: string) => {
-    let shareUrl = '';
+    let platformShareUrl = '';
     
     switch (platform) {
       case 'whatsapp':
@@ -56,13 +59,13 @@ export const ShareButton = ({
           ? `${shareText}\n\n📸 Image: ${imageUrl}`
           : shareText;
         const encodedWhatsAppText = encodeURIComponent(whatsappText);
-        shareUrl = `https://wa.me/?text=${encodedWhatsAppText}`;
+        platformShareUrl = `https://wa.me/?text=${encodedWhatsAppText}`;
         break;
       case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(websiteUrl)}&quote=${encodedText}`;
+        platformShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
         break;
       case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodeURIComponent(websiteUrl)}`;
+        platformShareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
         break;
       case 'instagram':
         // Instagram doesn't support direct URL sharing, so we'll copy to clipboard
@@ -82,7 +85,7 @@ export const ShareButton = ({
             const shareData = {
               title,
               text: shareText,
-              url: websiteUrl,
+              url: shareUrl,
             };
             
             // Add image to share data if available (some browsers support this)
@@ -108,9 +111,9 @@ export const ShareButton = ({
         return;
     }
 
-    if (shareUrl) {
+    if (platformShareUrl) {
       // Prevent page reload by using event.preventDefault() and window.open
-      window.open(shareUrl, '_blank', 'width=600,height=400');
+      window.open(platformShareUrl, '_blank', 'width=600,height=400');
       setIsOpen(false);
     }
   };
