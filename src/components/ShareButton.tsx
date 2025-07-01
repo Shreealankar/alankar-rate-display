@@ -23,7 +23,7 @@ interface ShareButtonProps {
 export const ShareButton = ({ 
   title, 
   description, 
-  url, 
+  url,
   imageUrl,
   variant = 'outline',
   size = 'sm',
@@ -46,75 +46,93 @@ export const ShareButton = ({
   const encodedText = encodeURIComponent(shareText);
   
   // Always use the main website URL instead of current page URL
-  const shareUrl = websiteUrl;
-  const encodedUrl = encodeURIComponent(shareUrl);
+  const finalShareUrl = websiteUrl;
+  const encodedUrl = encodeURIComponent(finalShareUrl);
 
   const handleShare = async (platform: string) => {
-    let platformShareUrl = '';
-    
-    switch (platform) {
-      case 'whatsapp':
-        // For WhatsApp, include image URL in the message if available
-        const whatsappText = imageUrl && !isRateShare 
-          ? `${shareText}\n\n📸 Image: ${imageUrl}`
-          : shareText;
-        const encodedWhatsAppText = encodeURIComponent(whatsappText);
-        platformShareUrl = `https://wa.me/?text=${encodedWhatsAppText}`;
-        break;
-      case 'facebook':
-        platformShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
-        break;
-      case 'twitter':
-        platformShareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
-        break;
-      case 'instagram':
-        // Instagram doesn't support direct URL sharing, so we'll copy to clipboard
-        await copyToClipboard();
-        toast({
-          title: 'Copied to clipboard',
-          description: 'Share this content on Instagram by pasting the copied text. Don\'t forget to include the image!',
-        });
-        setIsOpen(false);
-        return;
-      case 'copy':
-        await copyToClipboard();
-        return;
-      case 'native':
-        if (navigator.share) {
-          try {
-            const shareData = {
-              title,
-              text: shareText,
-              url: shareUrl,
-            };
-            
-            // Add image to share data if available (some browsers support this)
-            if (imageUrl && !isRateShare) {
-              try {
-                const response = await fetch(imageUrl);
-                const blob = await response.blob();
-                const file = new File([blob], 'product-image.jpg', { type: blob.type });
-                (shareData as any).files = [file];
-              } catch (error) {
-                console.log('Could not add image to native share');
+    try {
+      let platformShareUrl = '';
+      
+      switch (platform) {
+        case 'whatsapp':
+          // For WhatsApp, include image URL in the message if available
+          const whatsappText = imageUrl && !isRateShare 
+            ? `${shareText}\n\n📸 Image: ${imageUrl}`
+            : shareText;
+          const encodedWhatsAppText = encodeURIComponent(whatsappText);
+          platformShareUrl = `https://wa.me/?text=${encodedWhatsAppText}`;
+          break;
+        case 'facebook':
+          platformShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+          break;
+        case 'twitter':
+          platformShareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+          break;
+        case 'instagram':
+          // Instagram doesn't support direct URL sharing, so we'll copy to clipboard
+          await copyToClipboard();
+          toast({
+            title: 'Copied to clipboard',
+            description: 'Share this content on Instagram by pasting the copied text. Don\'t forget to include the image!',
+          });
+          setIsOpen(false);
+          return;
+        case 'copy':
+          await copyToClipboard();
+          return;
+        case 'native':
+          if (navigator.share) {
+            try {
+              const shareData: any = {
+                title,
+                text: shareText,
+                url: finalShareUrl,
+              };
+              
+              // Add image to share data if available (some browsers support this)
+              if (imageUrl && !isRateShare) {
+                try {
+                  const response = await fetch(imageUrl);
+                  const blob = await response.blob();
+                  const file = new File([blob], 'product-image.jpg', { type: blob.type });
+                  shareData.files = [file];
+                } catch (error) {
+                  console.log('Could not add image to native share:', error);
+                }
               }
+              
+              await navigator.share(shareData);
+              setIsOpen(false);
+              return;
+            } catch (error) {
+              console.log('Native sharing failed, falling back to copy:', error);
+              await copyToClipboard();
+              return;
             }
-            
-            await navigator.share(shareData);
-            setIsOpen(false);
-            return;
-          } catch (error) {
-            console.log('Native sharing failed, falling back to copy');
           }
-        }
-        await copyToClipboard();
-        return;
-    }
+          await copyToClipboard();
+          return;
+      }
 
-    if (platformShareUrl) {
-      // Prevent page reload by using event.preventDefault() and window.open
-      window.open(platformShareUrl, '_blank', 'width=600,height=400');
-      setIsOpen(false);
+      if (platformShareUrl) {
+        // Open in new window to prevent page reload
+        const newWindow = window.open(platformShareUrl, '_blank', 'width=600,height=400,noopener,noreferrer');
+        if (!newWindow) {
+          toast({
+            title: 'Popup blocked',
+            description: 'Please allow popups for sharing to work properly',
+            variant: 'destructive',
+          });
+        }
+        setIsOpen(false);
+      }
+    } catch (error) {
+      console.error('Error during sharing:', error);
+      toast({
+        title: 'Sharing failed',
+        description: 'There was an error while sharing. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -131,11 +149,29 @@ export const ShareButton = ({
       setIsOpen(false);
     } catch (error) {
       console.error('Failed to copy to clipboard:', error);
-      toast({
-        title: 'Copy failed',
-        description: 'Failed to copy to clipboard',
-        variant: 'destructive',
-      });
+      // Fallback for older browsers
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = imageUrl && !isRateShare 
+          ? `${shareText}\n\n📸 Image: ${imageUrl}`
+          : shareText;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        toast({
+          title: 'Copied to clipboard',
+          description: 'Share content has been copied to your clipboard',
+        });
+        setIsOpen(false);
+      } catch (fallbackError) {
+        console.error('Fallback copy also failed:', fallbackError);
+        toast({
+          title: 'Copy failed',
+          description: 'Failed to copy to clipboard. Please try sharing manually.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
