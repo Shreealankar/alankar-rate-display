@@ -43,113 +43,9 @@ export const ShareButton = ({
   const websiteInfo = `\n🌐 Visit: ${websiteUrl}`;
   
   const shareText = `${title}\n\n${description}${locationInfo}${websiteInfo}${socialLinks}`;
-  const encodedText = encodeURIComponent(shareText);
   
   // Always use the main website URL
   const shareUrl = websiteUrl;
-  const encodedUrl = encodeURIComponent(shareUrl);
-
-  const openPopup = (url: string) => {
-    try {
-      // Try to open popup with specific dimensions and features
-      const popup = window.open(
-        url, 
-        'share-popup', 
-        'width=600,height=500,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,directories=no,status=no'
-      );
-      
-      // Check if popup was blocked
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        throw new Error('Popup blocked');
-      }
-      
-      // Focus the popup window
-      popup.focus();
-      setIsOpen(false);
-      
-    } catch (error) {
-      console.log('Popup failed, falling back to copy:', error);
-      // Fallback to copying content
-      copyToClipboard();
-    }
-  };
-
-  const handleShare = async (platform: string) => {
-    try {
-      let platformUrl = '';
-      
-      switch (platform) {
-        case 'whatsapp':
-          const whatsappText = imageUrl && !isRateShare 
-            ? `${shareText}\n\n📸 Image: ${imageUrl}`
-            : shareText;
-          const encodedWhatsAppText = encodeURIComponent(whatsappText);
-          platformUrl = `https://wa.me/?text=${encodedWhatsAppText}`;
-          openPopup(platformUrl);
-          break;
-          
-        case 'facebook':
-          platformUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
-          openPopup(platformUrl);
-          break;
-          
-        case 'twitter':
-          platformUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
-          openPopup(platformUrl);
-          break;
-          
-        case 'instagram':
-          // Instagram doesn't support direct URL sharing
-          await copyToClipboard();
-          toast({
-            title: 'Copied for Instagram',
-            description: 'Content copied to clipboard. Paste it in your Instagram post and add the image manually.',
-          });
-          break;
-          
-        case 'copy':
-          await copyToClipboard();
-          break;
-          
-        case 'native':
-          await handleNativeShare();
-          break;
-          
-        default:
-          await copyToClipboard();
-      }
-    } catch (error) {
-      console.error('Error during sharing:', error);
-      toast({
-        title: 'Sharing failed',
-        description: 'Unable to share. Content has been copied to clipboard instead.',
-        variant: 'destructive',
-      });
-      await copyToClipboard();
-    }
-  };
-
-  const handleNativeShare = async () => {
-    if (navigator.share) {
-      try {
-        const shareData: ShareData = {
-          title,
-          text: shareText,
-          url: shareUrl,
-        };
-        
-        await navigator.share(shareData);
-        setIsOpen(false);
-      } catch (error: any) {
-        if (error.name !== 'AbortError') {
-          console.log('Native sharing failed:', error);
-          await copyToClipboard();
-        }
-      }
-    } else {
-      await copyToClipboard();
-    }
-  };
 
   const copyToClipboard = async () => {
     const textToCopy = imageUrl && !isRateShare 
@@ -186,6 +82,99 @@ export const ShareButton = ({
         description: 'Unable to copy to clipboard. Please try again.',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (!navigator.share) {
+      await copyToClipboard();
+      return;
+    }
+
+    try {
+      const shareData: ShareData = {
+        title,
+        text: shareText,
+        url: shareUrl,
+      };
+      
+      await navigator.share(shareData);
+      setIsOpen(false);
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.log('Native sharing failed, copying to clipboard instead');
+        await copyToClipboard();
+      }
+    }
+  };
+
+  const handleShare = async (platform: string) => {
+    try {
+      switch (platform) {
+        case 'whatsapp':
+          const whatsappText = imageUrl && !isRateShare 
+            ? `${shareText}\n\n📸 Image: ${imageUrl}`
+            : shareText;
+          const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+          
+          // Try to open WhatsApp, fallback to copy
+          try {
+            window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+          } catch {
+            await copyToClipboard();
+          }
+          break;
+          
+        case 'facebook':
+          const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+          
+          try {
+            window.open(facebookUrl, '_blank', 'noopener,noreferrer');
+          } catch {
+            await copyToClipboard();
+          }
+          break;
+          
+        case 'twitter':
+          const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+          
+          try {
+            window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+          } catch {
+            await copyToClipboard();
+          }
+          break;
+          
+        case 'instagram':
+          // Instagram doesn't support direct URL sharing
+          await copyToClipboard();
+          toast({
+            title: 'Copied for Instagram',
+            description: 'Content copied to clipboard. Paste it in your Instagram post and add the image manually.',
+          });
+          break;
+          
+        case 'copy':
+          await copyToClipboard();
+          break;
+          
+        case 'native':
+          await handleNativeShare();
+          break;
+          
+        default:
+          await copyToClipboard();
+      }
+      
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error during sharing:', error);
+      toast({
+        title: 'Sharing failed',
+        description: 'Unable to share. Content has been copied to clipboard instead.',
+        variant: 'destructive',
+      });
+      await copyToClipboard();
     }
   };
 
