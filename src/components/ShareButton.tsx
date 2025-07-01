@@ -34,8 +34,8 @@ export const ShareButton = ({
 
   // Website and social media links
   const websiteUrl = 'https://shreealankar.lovable.app';
-  const instagramUrl = 'https://instagram.com/shreealankar';
-  const youtubeUrl = 'https://youtube.com/@shreealankar';
+  const instagramUrl = 'https://www.instagram.com/shreealankar2112/?igsh=bjRpNDVueDU3N2xw#';
+  const youtubeUrl = 'http://www.youtube.com/@Shreealankar2112';
   
   // Enhanced share text with social media links and location for rates
   const socialLinks = `\n\n📱 Follow us:\nInstagram: ${instagramUrl}\nYouTube: ${youtubeUrl}`;
@@ -109,6 +109,7 @@ export const ShareButton = ({
     }
 
     if (shareUrl) {
+      // Prevent page reload by using event.preventDefault() and window.open
       window.open(shareUrl, '_blank', 'width=600,height=400');
       setIsOpen(false);
     }
