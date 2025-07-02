@@ -1,10 +1,8 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { JewelryForm } from './JewelryForm';
-import { ShareButton } from './ShareButton';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Pencil, Trash2 } from 'lucide-react';
@@ -90,14 +88,7 @@ export const JewelryItem = ({ item, isOwner }: JewelryItemProps) => {
         )}
       </div>
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <CardTitle>{item.name}</CardTitle>
-          <ShareButton
-            title={`${item.name} - Shree Alankar`}
-            description={`Type: ${item.type} | Purity: ${item.purity} | Weight: ${item.weight_grams}g`}
-            imageUrl={item.photo_url || undefined}
-          />
-        </div>
+        <CardTitle>{item.name}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="grid grid-cols-2 gap-2">

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,8 +31,8 @@ export const ShareButton = ({
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Website and social media links
-  const websiteUrl = 'https://shreealankar.lovable.app';
+  // Updated website URL
+  const websiteUrl = 'https://alankar-rate-display.lovable.app';
   const instagramUrl = 'https://www.instagram.com/shreealankar2112/?igsh=bjRpNDVueDU3N2xw#';
   const youtubeUrl = 'http://www.youtube.com/@Shreealankar2112';
   
@@ -117,7 +116,6 @@ export const ShareButton = ({
             : shareText;
           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
           
-          // Try to open WhatsApp, fallback to copy
           try {
             window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
           } catch {
