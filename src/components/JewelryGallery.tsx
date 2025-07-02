@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,7 +5,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ProductForm } from './ProductForm';
-import { ShareButton } from './ShareButton';
 import { Loader2, Pencil, Trash2, Search, Filter } from 'lucide-react';
 import {
   AlertDialog,
@@ -375,11 +373,6 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <CardTitle className="line-clamp-1">{product.title}</CardTitle>
-                  <ShareButton
-                    title={`${product.title} - Shree Alankar`}
-                    description={`${t('gallery.categoryLabel')} ${t(`gallery.${product.category}`)} | ${t('gallery.typeLabel')} ${t(`gallery.${product.type}`)} | ${t('gallery.purityLabel')} ${product.purity} | ${t('gallery.weightLabel')} ${product.weight_grams}g${product.description ? ` | ${product.description}` : ''}`}
-                    imageUrl={product.image_url || undefined}
-                  />
                 </div>
               </CardHeader>
               <CardContent>
