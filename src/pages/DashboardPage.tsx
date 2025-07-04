@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -7,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
@@ -18,6 +18,7 @@ import {
   formatPhoneNumber
 } from '@/utils/notificationUtils';
 import { WhatsAppForm } from '@/components/WhatsAppForm';
+import { CarouselManager } from '@/components/CarouselManager';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -334,73 +335,86 @@ const DashboardPage = () => {
           </div>
         </section>
         
-        {/* Rate Update Form */}
+        {/* Dashboard Content */}
         <section className="py-8 bg-background">
           <div className="container px-4">
-            <Card className="max-w-md mx-auto">
-              <CardHeader>
-                <CardTitle>{t('dashboard.update')}</CardTitle>
-                <CardDescription>
-                  {initialLoading ? 'Loading current rates...' : 'Update the current gold and silver rates'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <label htmlFor="goldRate" className="text-sm font-medium">
-                      {t('dashboard.goldRate')}
-                    </label>
-                    <Input
-                      id="goldRate"
-                      type="number"
-                      value={goldRate}
-                      onChange={(e) => setGoldRate(e.target.value)}
-                      required
-                      disabled={initialLoading}
-                      placeholder={initialLoading ? "Loading..." : "Enter gold rate"}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label htmlFor="silverRate" className="text-sm font-medium">
-                      {t('dashboard.silverRate')} ({t('home.per10gm')})
-                    </label>
-                    <Input
-                      id="silverRate"
-                      type="number"
-                      value={silverRate}
-                      onChange={(e) => setSilverRate(e.target.value)}
-                      required
-                      disabled={initialLoading}
-                      placeholder={initialLoading ? "Loading..." : "Enter silver rate"}
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isLoading || initialLoading || isSendingNotifications}
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Saving...
-                      </span>
-                    ) : isSendingNotifications ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Sending WhatsApp notifications...
-                      </span>
-                    ) : t('dashboard.save')}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-            
-            {/* WhatsApp Form */}
-            <div className="mt-8">
-              <WhatsAppForm />
-            </div>
+            <Tabs defaultValue="rates" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="rates">Update Rates</TabsTrigger>
+                <TabsTrigger value="carousel">Manage Carousel</TabsTrigger>
+                <TabsTrigger value="notifications">WhatsApp</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="rates" className="space-y-6">
+                <Card className="max-w-md mx-auto">
+                  <CardHeader>
+                    <CardTitle>{t('dashboard.update')}</CardTitle>
+                    <CardDescription>
+                      {initialLoading ? 'Loading current rates...' : 'Update the current gold and silver rates'}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      <div className="space-y-2">
+                        <label htmlFor="goldRate" className="text-sm font-medium">
+                          {t('dashboard.goldRate')}
+                        </label>
+                        <Input
+                          id="goldRate"
+                          type="number"
+                          value={goldRate}
+                          onChange={(e) => setGoldRate(e.target.value)}
+                          required
+                          disabled={initialLoading}
+                          placeholder={initialLoading ? "Loading..." : "Enter gold rate"}
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label htmlFor="silverRate" className="text-sm font-medium">
+                          {t('dashboard.silverRate')} ({t('home.per10gm')})
+                        </label>
+                        <Input
+                          id="silverRate"
+                          type="number"
+                          value={silverRate}
+                          onChange={(e) => setSilverRate(e.target.value)}
+                          required
+                          disabled={initialLoading}
+                          placeholder={initialLoading ? "Loading..." : "Enter silver rate"}
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={isLoading || initialLoading || isSendingNotifications}
+                      >
+                        {isLoading ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Saving...
+                          </span>
+                        ) : isSendingNotifications ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Sending WhatsApp notifications...
+                          </span>
+                        ) : t('dashboard.save')}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="carousel">
+                <CarouselManager />
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <WhatsAppForm />
+              </TabsContent>
+            </Tabs>
           </div>
         </section>
       </main>

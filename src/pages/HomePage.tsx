@@ -4,6 +4,7 @@ import { RateDisplay } from '@/components/RateDisplay';
 import { FeaturedProducts } from '@/components/FeaturedProducts';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { HomeCarousel } from '@/components/HomeCarousel';
 
 const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -53,6 +54,9 @@ const HomePage = () => {
             </div>
           </div>
         </section>
+
+        {/* Image Carousel Section */}
+        <HomeCarousel />
 
         {/* Rate Display Section */}
         <section className="py-16 bg-gradient-to-b from-background to-accent/10">
