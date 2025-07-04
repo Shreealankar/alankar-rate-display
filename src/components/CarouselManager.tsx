@@ -11,17 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import type { Tables } from '@/integrations/supabase/types';
 
-interface CarouselImage {
-  id: string;
-  title: string;
-  description: string | null;
-  image_url: string;
-  display_order: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+type CarouselImage = Tables<'carousel_images'>;
 
 export const CarouselManager = () => {
   const { toast } = useToast();
@@ -48,7 +40,7 @@ export const CarouselManager = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('carousel_images' as any)
+        .from('carousel_images')
         .select('*')
         .order('display_order', { ascending: true });
 
@@ -146,7 +138,7 @@ export const CarouselManager = () => {
 
       if (isEdit && currentImage) {
         const { error } = await supabase
-          .from('carousel_images' as any)
+          .from('carousel_images')
           .update({
             ...imageData,
             updated_at: new Date().toISOString()
@@ -165,7 +157,7 @@ export const CarouselManager = () => {
         const maxOrder = images.length > 0 ? Math.max(...images.map(img => img.display_order)) : 0;
         
         const { error } = await supabase
-          .from('carousel_images' as any)
+          .from('carousel_images')
           .insert({
             ...imageData,
             display_order: maxOrder + 1,
@@ -200,7 +192,7 @@ export const CarouselManager = () => {
     try {
       setIsDeleting(true);
       const { error } = await supabase
-        .from('carousel_images' as any)
+        .from('carousel_images')
         .delete()
         .eq('id', currentImage.id);
 
@@ -229,7 +221,7 @@ export const CarouselManager = () => {
   const toggleActive = async (image: CarouselImage) => {
     try {
       const { error } = await supabase
-        .from('carousel_images' as any)
+        .from('carousel_images')
         .update({ 
           is_active: !image.is_active,
           updated_at: new Date().toISOString()

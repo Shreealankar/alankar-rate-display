@@ -4,15 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card, CardContent } from '@/components/ui/card';
+import type { Tables } from '@/integrations/supabase/types';
 
-interface CarouselImage {
-  id: string;
-  title: string;
-  description: string | null;
-  image_url: string;
-  display_order: number;
-  is_active: boolean;
-}
+type CarouselImage = Tables<'carousel_images'>;
 
 export const HomeCarousel = () => {
   const [images, setImages] = useState<CarouselImage[]>([]);
@@ -25,7 +19,7 @@ export const HomeCarousel = () => {
   const fetchActiveImages = async () => {
     try {
       const { data, error } = await supabase
-        .from('carousel_images' as any)
+        .from('carousel_images')
         .select('*')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
