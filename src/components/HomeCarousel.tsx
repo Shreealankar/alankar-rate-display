@@ -25,7 +25,7 @@ export const HomeCarousel = () => {
   const fetchActiveImages = async () => {
     try {
       const { data, error } = await supabase
-        .from('carousel_images')
+        .from('carousel_images' as any)
         .select('*')
         .eq('is_active', true)
         .order('display_order', { ascending: true });
