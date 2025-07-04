@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,6 +13,7 @@ import { Loader2, Shield, Plus, Eye, EyeOff, AlertTriangle } from 'lucide-react'
 import { JewelryGallery } from '@/components/JewelryGallery';
 import { ProductForm } from '@/components/ProductForm';
 import { SubscriberManagement } from '@/components/SubscriberManagement';
+import { CarouselManager } from '@/components/CarouselManager';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
@@ -467,8 +469,9 @@ const LoginPage = () => {
             </div>
             
             <Tabs defaultValue="rates" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="rates">Update Rates</TabsTrigger>
+                <TabsTrigger value="carousel">Manage Carousel</TabsTrigger>
                 <TabsTrigger value="products">Manage Products</TabsTrigger>
                 <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
                 <TabsTrigger value="security">Security</TabsTrigger>
@@ -530,6 +533,10 @@ const LoginPage = () => {
                     </form>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="carousel" className="mt-6">
+                <CarouselManager />
               </TabsContent>
               
               <TabsContent value="products" className="mt-6">
