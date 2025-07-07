@@ -5,9 +5,20 @@ import { FeaturedProducts } from '@/components/FeaturedProducts';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { HomeCarousel } from '@/components/HomeCarousel';
+import { LoadingAnimation } from '@/components/LoadingAnimation';
+import { useState } from 'react';
 
 const HomePage = () => {
   const { t, language, setLanguage } = useLanguage();
+  const [showLoading, setShowLoading] = useState(true);
+
+  const handleAnimationComplete = () => {
+    setShowLoading(false);
+  };
+
+  if (showLoading) {
+    return <LoadingAnimation onComplete={handleAnimationComplete} />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -27,6 +38,7 @@ const HomePage = () => {
             </select>
           </div>
         </div>
+
         {/* Hero Section */}
         <section className="relative bg-gradient-to-b from-black to-zinc-900 text-white">
           <div 
