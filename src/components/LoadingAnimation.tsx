@@ -62,19 +62,26 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }
         {/* Loading indicator */}
         <div className="mt-8">
           <div className="w-16 h-1 bg-primary/30 rounded-full mx-auto overflow-hidden">
-            <div className="h-full bg-primary rounded-full animate-pulse" style={{ 
-              animation: 'loading-bar 3s ease-out forwards'
-            }}></div>
+            <div 
+              className="h-full bg-primary rounded-full"
+              style={{ 
+                animation: 'loading-bar 3s ease-out forwards',
+                width: '0%'
+              }}
+            ></div>
           </div>
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes loading-bar {
-          0% { width: 0%; }
-          100% { width: 100%; }
-        }
-      `}</style>
+      {/* Inline CSS for the loading bar animation */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes loading-bar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+          }
+        `
+      }} />
     </div>
   );
 };
