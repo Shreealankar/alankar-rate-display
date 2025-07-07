@@ -11,11 +11,11 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // Animation sequence
+    // Animation sequence - extended to 4 seconds
     const timer1 = setTimeout(() => setShowLogo(true), 200);
     const timer2 = setTimeout(() => setShowText(true), 800);
-    const timer3 = setTimeout(() => setFadeOut(true), 2500);
-    const timer4 = setTimeout(() => onComplete(), 3000);
+    const timer3 = setTimeout(() => setFadeOut(true), 3500);
+    const timer4 = setTimeout(() => onComplete(), 4000);
 
     return () => {
       clearTimeout(timer1);
@@ -65,7 +65,7 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }
             <div 
               className="h-full bg-primary rounded-full"
               style={{ 
-                animation: 'loading-bar 3s ease-out forwards',
+                animation: 'loading-bar 4s ease-out forwards',
                 width: '0%'
               }}
             ></div>
