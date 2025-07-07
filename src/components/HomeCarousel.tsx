@@ -6,6 +6,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
+import Autoplay from 'embla-carousel-autoplay';
 
 type CarouselImage = Tables<'carousel_images'>;
 
@@ -87,7 +88,20 @@ export const HomeCarousel = () => {
     <section className="py-8 bg-background">
       <div className="container px-4">
         <h2 className="text-2xl font-bold text-center mb-6">Our Gallery</h2>
-        <Carousel className="w-full max-w-4xl mx-auto">
+        <Carousel 
+          className="w-full max-w-4xl mx-auto"
+          plugins={[
+            Autoplay({
+              delay: 4000,
+              stopOnInteraction: true,
+              stopOnMouseEnter: true,
+            }),
+          ]}
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+        >
           <CarouselContent>
             {images.map((image) => (
               <CarouselItem key={image.id}>
