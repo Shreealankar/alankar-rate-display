@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,26 +9,23 @@ import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '@/contexts/LanguageContext';
-
 export const Header = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { t, language } = useLanguage();
-
+  const {
+    t,
+    language
+  } = useLanguage();
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data } = await supabase.auth.getSession();
+        const {
+          data
+        } = await supabase.auth.getSession();
         setUser(data.session?.user || null);
       } catch (error) {
         console.error('Error getting user:', error);
@@ -37,20 +33,16 @@ export const Header = () => {
         setLoading(false);
       }
     };
-
     getUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setUser(session?.user || null);
-      }
-    );
-
+    const {
+      data: authListener
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user || null);
+    });
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
-
   const handleSignOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -58,27 +50,29 @@ export const Header = () => {
       console.error('Error signing out:', error);
     }
   };
-
-  const navigation = [
-    { name: t('nav.home'), href: '/' },
-    { name: t('nav.about'), href: '/about' },
-    { name: 'Jewelry Gallery', href: '/jewelry' },
-    { name: t('nav.help'), href: '/help' },
-    { name: t('nav.login'), href: '/login' },
-  ];
-
-  const userInitials = user?.email
-    ? user.email.substring(0, 2).toUpperCase()
-    : '??';
-
+  const navigation = [{
+    name: t('nav.home'),
+    href: '/'
+  }, {
+    name: t('nav.about'),
+    href: '/about'
+  }, {
+    name: 'Jewelry Gallery',
+    href: '/jewelry'
+  }, {
+    name: t('nav.help'),
+    href: '/help'
+  }, {
+    name: t('nav.login'),
+    href: '/login'
+  }];
+  const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : '??';
   const handleWhatsAppClick = () => {
     const phoneNumber = '+919876543210'; // Replace with your actual WhatsApp business number
     const message = encodeURIComponent('Hello! I would like to know more about your jewelry collection.');
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
-
-  return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+  return <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <div className="flex items-center gap-4">
@@ -87,41 +81,19 @@ export const Header = () => {
             </Link>
             
             {/* WhatsApp Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleWhatsAppClick}
-              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
-            >
-              <MessageCircle className="h-4 w-4" />
-              <span className="hidden lg:inline">WhatsApp</span>
-            </Button>
+            
           </div>
           
           <nav className="ml-6 flex items-center space-x-6 text-sm font-medium">
-            {navigation.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={cn(
-                  'transition-colors hover:text-foreground/80',
-                  location.pathname === item.href
-                    ? 'text-foreground'
-                    : 'text-foreground/60'
-                )}
-              >
+            {navigation.map(item => <Link key={item.href} to={item.href} className={cn('transition-colors hover:text-foreground/80', location.pathname === item.href ? 'text-foreground' : 'text-foreground/60')}>
                 {item.name}
-              </Link>
-            ))}
+              </Link>)}
           </nav>
         </div>
 
         <Sheet>
           <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
-            >
+            <Button variant="ghost" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden">
               <Menu className="h-6 w-6" />
               <span className="sr-only">Toggle Menu</span>
             </Button>
@@ -133,30 +105,16 @@ export const Header = () => {
             
             {/* WhatsApp Button for Mobile */}
             <div className="mt-4 mb-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleWhatsAppClick}
-                className="w-full flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
-              >
+              <Button variant="outline" size="sm" onClick={handleWhatsAppClick} className="w-full flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600">
                 <MessageCircle className="h-4 w-4" />
                 WhatsApp
               </Button>
             </div>
             
             <div className="my-4 flex flex-col space-y-3">
-              {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className={cn(
-                    'text-foreground/60 transition-colors hover:text-foreground',
-                    location.pathname === item.href && 'text-foreground'
-                  )}
-                >
+              {navigation.map(item => <Link key={item.href} to={item.href} className={cn('text-foreground/60 transition-colors hover:text-foreground', location.pathname === item.href && 'text-foreground')}>
                   {item.name}
-                </Link>
-              ))}
+                </Link>)}
               <div className="pt-4 border-t">
                 <LanguageToggle />
               </div>
@@ -173,12 +131,7 @@ export const Header = () => {
             <LanguageToggle />
             
             {/* Customer Support Chatbot Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="flex items-center gap-2"
-            >
+            <Button variant="outline" size="sm" asChild className="flex items-center gap-2">
               <Link to="/help#chatbot">
                 <MessageSquare className="h-4 w-4" />
                 <span className="hidden lg:inline">
@@ -187,13 +140,9 @@ export const Header = () => {
               </Link>
             </Button>
             
-            {!loading && user && (
-              <DropdownMenu>
+            {!loading && user && <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-9 w-9 rounded-full"
-                  >
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
                       <AvatarFallback>{userInitials}</AvatarFallback>
                     </Avatar>
@@ -202,9 +151,7 @@ export const Header = () => {
                 <DropdownMenuContent align="end">
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      {user.email && (
-                        <p className="font-medium">{user.email}</p>
-                      )}
+                      {user.email && <p className="font-medium">{user.email}</p>}
                     </div>
                   </div>
                   <DropdownMenuSeparator />
@@ -212,18 +159,13 @@ export const Header = () => {
                     <Link to="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onSelect={handleSignOut}
-                  >
+                  <DropdownMenuItem className="cursor-pointer" onSelect={handleSignOut}>
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+              </DropdownMenu>}
           </div>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
