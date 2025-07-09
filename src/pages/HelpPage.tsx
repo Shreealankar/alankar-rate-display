@@ -1,3 +1,4 @@
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WhatsAppForm } from '@/components/WhatsAppForm';
 import { Header } from '@/components/layout/Header';
@@ -73,14 +74,22 @@ const HelpPage = () => {
               </p>
               
               {!showChatbot ? (
-                <Button 
-                  onClick={() => setShowChatbot(true)}
-                  size="lg"
-                  className="mb-8"
-                >
-                  <MessageSquare className="mr-2 h-5 w-5" />
-                  {language === 'mr' ? 'चॅटबॉट सुरू करा' : 'Start Chatbot'}
-                </Button>
+                <div>
+                  <Button 
+                    onClick={() => setShowChatbot(true)}
+                    size="lg"
+                    className="mb-4"
+                  >
+                    <MessageSquare className="mr-2 h-5 w-5" />
+                    {language === 'mr' ? 'चॅटबॉट सुरू करा' : 'Start Chatbot'}
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'mr' 
+                      ? 'नोट : चॅटबॉट सुरू करण्यासाठी 2-5 सेकंद लागतात.'
+                      : 'Note : For Starting Chatbot Required 2-5 Sec.'
+                    }
+                  </p>
+                </div>
               ) : (
                 <div className="bg-card shadow-lg rounded-lg overflow-hidden">
                   <div className="p-4 bg-primary text-primary-foreground flex justify-between items-center">
