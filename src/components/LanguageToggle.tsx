@@ -16,7 +16,7 @@ export function LanguageToggle() {
 
   const languages = [
     { code: "en", label: "English", short: "EN" },
-    { code: "mr", label: "मराठी", short: "मर" }, // Marathi
+    { code: "mr", label: "मराठी", short: "म" }, // Marathi
   ];
 
   const currentLanguage = languages.find(lang => lang.code === language);
