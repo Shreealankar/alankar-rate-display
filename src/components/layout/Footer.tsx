@@ -87,6 +87,16 @@ export const Footer = () => {
                   {t('nav.help')}
                 </Link>
               </li>
+              <li>
+                <a 
+                  href="https://shreealankarchatbot.lovable.app" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-primary"
+                >
+                  {language === 'mr' ? 'ग्राहक सहायता चॅटबॉट' : 'Customer Support Chatbot'}
+                </a>
+              </li>
             </ul>
           </div>
           
