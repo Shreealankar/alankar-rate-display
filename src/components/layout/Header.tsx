@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
+import { Menu, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +23,7 @@ export const Header = () => {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     const getUser = async () => {
@@ -136,6 +136,22 @@ export const Header = () => {
           
           <div className="hidden md:flex items-center space-x-2">
             <LanguageToggle />
+            
+            {/* Customer Support Chatbot Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              asChild
+              className="flex items-center gap-2"
+            >
+              <Link to="/help#chatbot">
+                <MessageSquare className="h-4 w-4" />
+                <span className="hidden lg:inline">
+                  {language === 'mr' ? 'चॅटबॉट' : 'Chatbot'}
+                </span>
+              </Link>
+            </Button>
+            
             {!loading && user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

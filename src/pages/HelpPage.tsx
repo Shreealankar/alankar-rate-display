@@ -5,11 +5,20 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const HelpPage = () => {
   const { t, language } = useLanguage();
   const [showChatbot, setShowChatbot] = useState(false);
+  const location = useLocation();
+
+  // Auto-show chatbot if accessed via navigation link
+  useEffect(() => {
+    if (location.hash === '#chatbot') {
+      setShowChatbot(true);
+    }
+  }, [location.hash]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -62,7 +71,7 @@ const HelpPage = () => {
         </section>
 
         {/* Customer Support Chatbot */}
-        <section className="py-16 bg-accent/10">
+        <section id="chatbot" className="py-16 bg-accent/10">
           <div className="container px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-2xl font-bold mb-8">{language === 'mr' ? 'ग्राहक सहायता चॅटबॉट' : 'Customer Support Chatbot'}</h2>
