@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, MessageSquare } from 'lucide-react';
+import { Menu, MessageSquare, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/integrations/supabase/client';
@@ -70,14 +71,34 @@ export const Header = () => {
     ? user.email.substring(0, 2).toUpperCase()
     : '??';
 
+  const handleWhatsAppClick = () => {
+    const phoneNumber = '+919876543210'; // Replace with your actual WhatsApp business number
+    const message = encodeURIComponent('Hello! I would like to know more about your jewelry collection.');
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
-          <Link to="/" className="mr-6 flex items-center space-x-2">
-            <Logo className="h-6 w-auto" />
-          </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+          <div className="flex items-center gap-4">
+            <Link to="/" className="flex items-center space-x-2">
+              <Logo className="h-6 w-auto" />
+            </Link>
+            
+            {/* WhatsApp Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleWhatsAppClick}
+              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span className="hidden lg:inline">WhatsApp</span>
+            </Button>
+          </div>
+          
+          <nav className="ml-6 flex items-center space-x-6 text-sm font-medium">
             {navigation.map((item) => (
               <Link
                 key={item.href}
@@ -109,6 +130,20 @@ export const Header = () => {
             <Link to="/" className="flex items-center">
               <Logo className="h-6 w-auto" />
             </Link>
+            
+            {/* WhatsApp Button for Mobile */}
+            <div className="mt-4 mb-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleWhatsAppClick}
+                className="w-full flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+              >
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp
+              </Button>
+            </div>
+            
             <div className="my-4 flex flex-col space-y-3">
               {navigation.map((item) => (
                 <Link
