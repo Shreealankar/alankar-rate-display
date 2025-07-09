@@ -8,26 +8,30 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Globe } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 export function LanguageToggle() {
   const { language, setLanguage, t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   const languages = [
-    { code: "en", label: "English" },
-    { code: "mr", label: "मराठी" }, // Marathi
+    { code: "en", label: "English", short: "EN" },
+    { code: "mr", label: "मराठी", short: "मर" }, // Marathi
   ];
+
+  const currentLanguage = languages.find(lang => lang.code === language);
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
-          size="icon"
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1"
           aria-label={t("language")}
         >
-          <Globe className="h-4 w-4" />
+          <span className="font-medium">{currentLanguage?.short}</span>
+          <ChevronDown className="h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
