@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -14,16 +15,15 @@ export const MobileNumberDialog = () => {
   const { t } = useLanguage();
 
   useEffect(() => {
-    // Check if the user has already provided their mobile number
-    const savedNumber = getMobileNumber();
-    if (!savedNumber) {
-      // Only show dialog for first time visitors
-      const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
-      if (!hasVisitedBefore) {
-        setOpen(true);
-        localStorage.setItem('hasVisitedBefore', 'true');
-      }
-    }
+    // Disabled automatic popup - users can manually trigger this if needed
+    // const savedNumber = getMobileNumber();
+    // if (!savedNumber) {
+    //   const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
+    //   if (!hasVisitedBefore) {
+    //     setOpen(true);
+    //     localStorage.setItem('hasVisitedBefore', 'true');
+    //   }
+    // }
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
