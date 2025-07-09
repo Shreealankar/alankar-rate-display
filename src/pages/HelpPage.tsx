@@ -3,11 +3,12 @@ import { WhatsAppForm } from '@/components/WhatsAppForm';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { MessageSquare } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 const HelpPage = () => {
   const { t, language } = useLanguage();
-
+  const [showChatbot, setShowChatbot] = useState(false);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -70,16 +71,41 @@ const HelpPage = () => {
                   : 'Get instant help with our AI chatbot. Ask your questions and get 24/7 assistance.'
                 }
               </p>
-              <div className="bg-card shadow-lg rounded-lg overflow-hidden">
-                <iframe
-                  src="https://shreealankarchatbot.lovable.app"
-                  width="100%"
-                  height="600"
-                  frameBorder="0"
-                  title="Customer Support Chatbot"
-                  className="w-full"
-                />
-              </div>
+              
+              {!showChatbot ? (
+                <Button 
+                  onClick={() => setShowChatbot(true)}
+                  size="lg"
+                  className="mb-8"
+                >
+                  <MessageSquare className="mr-2 h-5 w-5" />
+                  {language === 'mr' ? 'चॅटबॉट सुरू करा' : 'Start Chatbot'}
+                </Button>
+              ) : (
+                <div className="bg-card shadow-lg rounded-lg overflow-hidden">
+                  <div className="p-4 bg-primary text-primary-foreground flex justify-between items-center">
+                    <h3 className="font-semibold">
+                      {language === 'mr' ? 'ग्राहक सहायता चॅटबॉट' : 'Customer Support Chatbot'}
+                    </h3>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setShowChatbot(false)}
+                      className="text-primary-foreground hover:bg-primary-foreground/20"
+                    >
+                      ✕
+                    </Button>
+                  </div>
+                  <iframe
+                    src="https://shreealankarchatbot.lovable.app"
+                    width="100%"
+                    height="600"
+                    frameBorder="0"
+                    title="Customer Support Chatbot"
+                    className="w-full"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </section>
