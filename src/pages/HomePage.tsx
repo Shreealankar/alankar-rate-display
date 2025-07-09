@@ -1,4 +1,3 @@
-
 import { useLanguage } from '@/contexts/LanguageContext';
 import { RateDisplay } from '@/components/RateDisplay';
 import { FeaturedProducts } from '@/components/FeaturedProducts';
@@ -7,53 +6,37 @@ import { Footer } from '@/components/layout/Footer';
 import { HomeCarousel } from '@/components/HomeCarousel';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { useState } from 'react';
-
 const HomePage = () => {
-  const { t, language, setLanguage } = useLanguage();
+  const {
+    t,
+    language,
+    setLanguage
+  } = useLanguage();
   const [showLoading, setShowLoading] = useState(true);
-
   const handleAnimationComplete = () => {
     setShowLoading(false);
   };
-
   if (showLoading) {
     return <LoadingAnimation onComplete={handleAnimationComplete} />;
   }
-
-  return (
-    <div className="flex flex-col min-h-screen">
+  return <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
         {/* Language Switcher - Top right */}
         <div className="relative">
           <div className="absolute right-4 top-4 z-10">
-            <select
-              className="border rounded px-2 py-1 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-              value={language}
-              onChange={e => setLanguage(e.target.value as 'en' | 'mr')}
-              aria-label={t('language')}
-            >
-              <option value="en">English</option>
-              <option value="mr">मराठी</option>
-            </select>
+            
           </div>
         </div>
 
         {/* Hero Section */}
         <section className="relative bg-gradient-to-b from-black to-zinc-900 text-white">
-          <div 
-            className="absolute inset-0 bg-cover bg-center opacity-30"
-            style={{ 
-              backgroundImage: 'url("https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1287&q=80")',
-              backgroundPosition: 'center 30%'
-            }}
-          />
+          <div className="absolute inset-0 bg-cover bg-center opacity-30" style={{
+          backgroundImage: 'url("https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1287&q=80")',
+          backgroundPosition: 'center 30%'
+        }} />
           <div className="container relative py-24 px-4 flex flex-col items-center justify-center text-center space-y-8">
-            <img 
-              src="/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png" 
-              alt="Shree Alankar Logo" 
-              className="w-32 h-32 object-contain mb-4"
-            />
+            <img src="/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png" alt="Shree Alankar Logo" className="w-32 h-32 object-contain mb-4" />
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               {language === 'mr' ? 'श्री अलंकार मध्ये आपले स्वागत आहे' : 'Welcome to Shree Alankar'}
             </h1>
@@ -133,8 +116,6 @@ const HomePage = () => {
         </section>
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default HomePage;
