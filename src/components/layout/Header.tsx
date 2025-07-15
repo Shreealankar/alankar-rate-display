@@ -108,10 +108,7 @@ export const Header = () => {
             
             {/* WhatsApp Button for Mobile */}
             <div className="mt-4 mb-2">
-              <Button variant="outline" size="sm" onClick={handleWhatsAppClick} className="w-full flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600">
-                <MessageCircle className="h-4 w-4" />
-                WhatsApp
-              </Button>
+              
             </div>
             
             <div className="my-4 flex flex-col space-y-3">
