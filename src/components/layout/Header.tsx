@@ -63,6 +63,9 @@ export const Header = () => {
     name: t('nav.help'),
     href: '/help'
   }, {
+    name: 'Terms & Conditions',
+    href: '/terms'
+  }, {
     name: t('nav.login'),
     href: '/login'
   }];
