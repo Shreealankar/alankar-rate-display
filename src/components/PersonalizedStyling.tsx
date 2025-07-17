@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Sparkles, User, Calendar, Heart, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface StyleProfile {
   name: string;
@@ -28,6 +29,7 @@ interface StyleRecommendation {
     description: string;
     reason: string;
     price: string;
+    image: string;
   }[];
 }
 
@@ -45,6 +47,7 @@ export const PersonalizedStyling = () => {
   const [recommendations, setRecommendations] = useState<StyleRecommendation[]>([]);
   const [processing, setProcessing] = useState(false);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleInputChange = (field: keyof StyleProfile, value: string) => {
     setProfile(prev => ({ ...prev, [field]: value }));
@@ -53,8 +56,8 @@ export const PersonalizedStyling = () => {
   const generateRecommendations = async () => {
     if (!profile.name || !profile.occasion || !profile.style) {
       toast({
-        title: 'Error',
-        description: 'Please fill in the required fields',
+        title: t('ai.error'),
+        description: t('ai.fillRequired'),
         variant: 'destructive',
       });
       return;
@@ -66,22 +69,24 @@ export const PersonalizedStyling = () => {
       // Simulate AI processing delay
       await new Promise(resolve => setTimeout(resolve, 2500));
       
-      // Generate mock recommendations based on profile
+      // Generate Indian jewelry recommendations based on profile
       const mockRecommendations: StyleRecommendation[] = [
         {
-          category: 'Necklaces',
+          category: 'Traditional Necklaces',
           items: [
             {
-              name: 'Delicate Gold Chain',
-              description: '18K gold chain with small pendant',
-              reason: 'Perfect for your minimalist style and daily wear',
-              price: '₹15,000 - ₹25,000'
+              name: 'Kundan Meenakari Necklace',
+              description: 'Handcrafted gold necklace with kundan stones and colorful meenakari work',
+              reason: 'Perfect for weddings and festive occasions, matches traditional Indian style',
+              price: '₹45,000 - ₹85,000',
+              image: '/lovable-uploads/177cb67f-d365-4177-b967-ece97a39e31e.png'
             },
             {
-              name: 'Pearl Choker',
-              description: 'Classic pearl choker with gold clasp',
-              reason: 'Elegant choice for formal occasions',
-              price: '₹8,000 - ₹12,000'
+              name: 'Temple Jewelry Set',
+              description: 'South Indian temple style necklace with intricate designs',
+              reason: 'Ideal for religious ceremonies and cultural events',
+              price: '₹35,000 - ₹60,000',
+              image: '/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png'
             }
           ]
         },
@@ -89,33 +94,37 @@ export const PersonalizedStyling = () => {
           category: 'Earrings',
           items: [
             {
-              name: 'Stud Earrings',
-              description: 'Diamond stud earrings in gold',
-              reason: 'Versatile and suitable for your lifestyle',
-              price: '₹20,000 - ₹35,000'
+              name: 'Chandelier Earrings',
+              description: 'Heavy gold chandelier earrings with precious stones',
+              reason: 'Statement piece perfect for special occasions and your bold style',
+              price: '₹25,000 - ₹40,000',
+              image: '/lovable-uploads/3f8f1fdc-9e82-4a9f-8c32-95ca7161e97e.png'
             },
             {
-              name: 'Hoop Earrings',
-              description: 'Medium-sized gold hoops',
-              reason: 'Adds elegance without being too bold',
-              price: '₹10,000 - ₹18,000'
+              name: 'Jhumka Earrings',
+              description: 'Classic Indian jhumka with pearls and gold work',
+              reason: 'Versatile design suitable for both casual and formal wear',
+              price: '₹15,000 - ₹25,000',
+              image: '/lovable-uploads/726ba192-f434-4ff0-8deb-c3e3ace6f5aa.png'
             }
           ]
         },
         {
-          category: 'Rings',
+          category: 'Bangles & Bracelets',
           items: [
             {
-              name: 'Solitaire Ring',
-              description: 'Classic solitaire diamond ring',
-              reason: 'Timeless piece that matches your style',
-              price: '₹50,000 - ₹100,000'
+              name: 'Antique Gold Bangles',
+              description: 'Traditional antique finish gold bangles set',
+              reason: 'Classic Indian jewelry piece that complements your traditional style',
+              price: '₹20,000 - ₹35,000',
+              image: '/lovable-uploads/177cb67f-d365-4177-b967-ece97a39e31e.png'
             },
             {
-              name: 'Stackable Rings',
-              description: 'Set of thin gold bands',
-              reason: 'Perfect for mixing and matching',
-              price: '₹5,000 - ₹8,000 each'
+              name: 'Kada Bracelet',
+              description: 'Thick gold kada with engraved patterns',
+              reason: 'Perfect for daily wear and professional settings',
+              price: '₹12,000 - ₹18,000',
+              image: '/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png'
             }
           ]
         }
@@ -124,14 +133,14 @@ export const PersonalizedStyling = () => {
       setRecommendations(mockRecommendations);
       
       toast({
-        title: 'Recommendations Generated',
-        description: 'Your personalized styling suggestions are ready!',
+        title: t('ai.recommendationsReady'),
+        description: t('ai.recommendationsReadyDesc'),
       });
     } catch (error) {
       console.error('Styling recommendation error:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to generate recommendations. Please try again.',
+        title: t('ai.error'),
+        description: t('ai.recommendationsFailed'),
         variant: 'destructive',
       });
     } finally {
@@ -142,9 +151,9 @@ export const PersonalizedStyling = () => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-2">AI Fashion Consultant</h2>
+        <h2 className="text-3xl font-bold mb-2">{t('ai.personalizedStyling.subtitle')}</h2>
         <p className="text-muted-foreground">
-          Get personalized jewelry recommendations based on your style preferences and lifestyle
+          {t('ai.personalizedStyling.description')}
         </p>
       </div>
 
@@ -154,26 +163,26 @@ export const PersonalizedStyling = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Style Profile
+              {t('ai.styleProfile')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">{t('ai.nameRequired')}</Label>
                 <Input
                   id="name"
                   value={profile.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Enter your name"
+                  placeholder={t('ai.namePlaceholder')}
                 />
               </div>
 
               <div>
-                <Label htmlFor="age">Age Range</Label>
+                <Label htmlFor="age">{t('ai.ageRange')}</Label>
                 <Select value={profile.age} onValueChange={(value) => handleInputChange('age', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select age range" />
+                    <SelectValue placeholder={t('ai.selectAge')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="18-25">18-25</SelectItem>
@@ -186,27 +195,27 @@ export const PersonalizedStyling = () => {
               </div>
 
               <div>
-                <Label htmlFor="occasion">Occasion *</Label>
+                <Label htmlFor="occasion">{t('ai.occasionRequired')}</Label>
                 <Select value={profile.occasion} onValueChange={(value) => handleInputChange('occasion', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select occasion" />
+                    <SelectValue placeholder={t('ai.selectOccasion')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="daily">Daily Wear</SelectItem>
-                    <SelectItem value="office">Office/Work</SelectItem>
-                    <SelectItem value="wedding">Wedding</SelectItem>
-                    <SelectItem value="party">Party/Event</SelectItem>
-                    <SelectItem value="festival">Festival</SelectItem>
-                    <SelectItem value="special">Special Occasion</SelectItem>
+                    <SelectItem value="daily">{t('ai.dailyWear')}</SelectItem>
+                    <SelectItem value="office">{t('ai.office')}</SelectItem>
+                    <SelectItem value="wedding">{t('ai.wedding')}</SelectItem>
+                    <SelectItem value="party">{t('ai.party')}</SelectItem>
+                    <SelectItem value="festival">{t('ai.festival')}</SelectItem>
+                    <SelectItem value="special">{t('ai.special')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="budget">Budget Range</Label>
+                <Label htmlFor="budget">{t('ai.budgetRange')}</Label>
                 <Select value={profile.budget} onValueChange={(value) => handleInputChange('budget', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select budget range" />
+                    <SelectValue placeholder={t('ai.selectBudget')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="under-10k">Under ₹10,000</SelectItem>
@@ -219,59 +228,59 @@ export const PersonalizedStyling = () => {
               </div>
 
               <div>
-                <Label htmlFor="style">Style Preference *</Label>
+                <Label htmlFor="style">{t('ai.styleRequired')}</Label>
                 <Select value={profile.style} onValueChange={(value) => handleInputChange('style', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select style" />
+                    <SelectValue placeholder={t('ai.selectStyle')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="minimalist">Minimalist</SelectItem>
-                    <SelectItem value="classic">Classic</SelectItem>
-                    <SelectItem value="modern">Modern</SelectItem>
-                    <SelectItem value="bohemian">Bohemian</SelectItem>
-                    <SelectItem value="traditional">Traditional</SelectItem>
-                    <SelectItem value="bold">Bold/Statement</SelectItem>
+                    <SelectItem value="minimalist">{t('ai.minimalist')}</SelectItem>
+                    <SelectItem value="classic">{t('ai.classic')}</SelectItem>
+                    <SelectItem value="modern">{t('ai.modern')}</SelectItem>
+                    <SelectItem value="bohemian">{t('ai.bohemian')}</SelectItem>
+                    <SelectItem value="traditional">{t('ai.traditional')}</SelectItem>
+                    <SelectItem value="bold">{t('ai.bold')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="skinTone">Skin Tone</Label>
+                <Label htmlFor="skinTone">{t('ai.skinTone')}</Label>
                 <Select value={profile.skinTone} onValueChange={(value) => handleInputChange('skinTone', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select skin tone" />
+                    <SelectValue placeholder={t('ai.selectSkinTone')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="warm">Warm</SelectItem>
-                    <SelectItem value="cool">Cool</SelectItem>
-                    <SelectItem value="neutral">Neutral</SelectItem>
+                    <SelectItem value="warm">{t('ai.warm')}</SelectItem>
+                    <SelectItem value="cool">{t('ai.cool')}</SelectItem>
+                    <SelectItem value="neutral">{t('ai.neutral')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="lifestyle">Lifestyle</Label>
+                <Label htmlFor="lifestyle">{t('ai.lifestyle')}</Label>
                 <Select value={profile.lifestyle} onValueChange={(value) => handleInputChange('lifestyle', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select lifestyle" />
+                    <SelectValue placeholder={t('ai.selectLifestyle')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="social">Social</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
-                    <SelectItem value="formal">Formal</SelectItem>
+                    <SelectItem value="active">{t('ai.active')}</SelectItem>
+                    <SelectItem value="professional">{t('ai.professional')}</SelectItem>
+                    <SelectItem value="social">{t('ai.social')}</SelectItem>
+                    <SelectItem value="casual">{t('ai.casual')}</SelectItem>
+                    <SelectItem value="formal">{t('ai.formal')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="preferences">Additional Preferences</Label>
+                <Label htmlFor="preferences">{t('ai.preferences')}</Label>
                 <Textarea
                   id="preferences"
                   value={profile.preferences}
                   onChange={(e) => handleInputChange('preferences', e.target.value)}
-                  placeholder="Any specific preferences or requirements..."
+                  placeholder={t('ai.preferencesPlaceholder')}
                   rows={3}
                 />
               </div>
@@ -284,12 +293,12 @@ export const PersonalizedStyling = () => {
                 {processing ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating...
+                    {t('ai.generating')}
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Get Recommendations
+                    {t('ai.getRecommendations')}
                   </>
                 )}
               </Button>
@@ -302,7 +311,7 @@ export const PersonalizedStyling = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Heart className="h-5 w-5" />
-              Personalized Recommendations
+              {t('ai.recommendations')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -310,7 +319,7 @@ export const PersonalizedStyling = () => {
               <div className="space-y-6">
                 {/* Profile Summary */}
                 <div className="bg-muted/50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">Style Profile Summary</h3>
+                  <h3 className="font-semibold mb-2">{t('ai.profileSummary')}</h3>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="outline">{profile.style}</Badge>
                     <Badge variant="outline">{profile.occasion}</Badge>
@@ -330,14 +339,25 @@ export const PersonalizedStyling = () => {
                       {category.items.map((item, itemIndex) => (
                         <Card key={itemIndex} className="border-l-4 border-l-primary">
                           <CardContent className="p-4">
-                            <h4 className="font-medium">{item.name}</h4>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {item.description}
-                            </p>
-                            <p className="text-sm mb-2">
-                              <strong>Why:</strong> {item.reason}
-                            </p>
-                            <Badge variant="secondary">{item.price}</Badge>
+                            <div className="flex gap-4">
+                              <div className="flex-shrink-0">
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name}
+                                  className="w-16 h-16 object-cover rounded-lg"
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="font-medium">{item.name}</h4>
+                                <p className="text-sm text-muted-foreground mb-2">
+                                  {item.description}
+                                </p>
+                                <p className="text-sm mb-2">
+                                  <strong>Why:</strong> {item.reason}
+                                </p>
+                                <Badge variant="secondary">{item.price}</Badge>
+                              </div>
+                            </div>
                           </CardContent>
                         </Card>
                       ))}
@@ -348,8 +368,7 @@ export const PersonalizedStyling = () => {
                 <Alert>
                   <Sparkles className="h-4 w-4" />
                   <AlertDescription>
-                    These recommendations are AI-generated based on your preferences. 
-                    Visit our gallery to see available products or consult with our experts for personalized assistance.
+                    {t('ai.recommendationsNote')}
                   </AlertDescription>
                 </Alert>
               </div>
@@ -357,7 +376,7 @@ export const PersonalizedStyling = () => {
               <div className="text-center py-12">
                 <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">
-                  Fill out your style profile to get personalized jewelry recommendations
+                  {t('ai.fillProfile')}
                 </p>
               </div>
             )}
