@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ProductForm } from './ProductForm';
-import { Loader2, Pencil, Trash2, Search, Filter, Camera, Eye } from 'lucide-react';
+import { Loader2, Pencil, Trash2, Search, Filter } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,8 +21,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { VirtualTryOn } from './VirtualTryOn';
-import { ImageRecognition } from './ImageRecognition';
 
 interface ProductType {
   id: string;
@@ -210,28 +208,11 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">{t('gallery.title')}</h2>
-        <div className="flex items-center gap-4">
-          {isOwner && (
-            <div className="text-sm text-green-600 font-medium">
-              {t('gallery.ownerMode')}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* AI Features Section */}
-      <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border">
-        <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <Eye className="h-5 w-5" />
-          AI-Powered Features
-        </h3>
-        <div className="flex flex-wrap gap-3">
-          <VirtualTryOn products={products} />
-          <ImageRecognition products={products} />
-        </div>
-        <p className="text-sm text-muted-foreground mt-2">
-          Experience cutting-edge AI technology for jewelry shopping
-        </p>
+        {isOwner && (
+          <div className="text-sm text-green-600 font-medium">
+            {t('gallery.ownerMode')}
+          </div>
+        )}
       </div>
 
       {/* Search and Filter Section */}
