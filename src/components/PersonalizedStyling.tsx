@@ -70,61 +70,82 @@ export const PersonalizedStyling = () => {
       await new Promise(resolve => setTimeout(resolve, 2500));
       
       // Generate Indian jewelry recommendations based on profile
+      const isMarathi = t('ai.title') === 'AI-संचालित वैशिष्ट्ये';
+      
       const mockRecommendations: StyleRecommendation[] = [
         {
-          category: 'Traditional Necklaces',
+          category: isMarathi ? 'पारंपरिक हार' : 'Traditional Necklaces',
           items: [
             {
-              name: 'Kundan Meenakari Necklace',
-              description: 'Handcrafted gold necklace with kundan stones and colorful meenakari work',
-              reason: 'Perfect for weddings and festive occasions, matches traditional Indian style',
+              name: isMarathi ? 'कुंदन मिनाकारी हार' : 'Kundan Meenakari Necklace',
+              description: isMarathi ? 'कुंदन दगडांसह हस्तकला सोन्याचा हार आणि रंगीत मिनाकारी काम' : 'Handcrafted gold necklace with kundan stones and colorful meenakari work',
+              reason: isMarathi ? 'लग्न आणि सण प्रसंगांसाठी योग्य, पारंपरिक भारतीय शैलीशी जुळते' : 'Perfect for weddings and festive occasions, matches traditional Indian style',
               price: '₹45,000 - ₹85,000',
-              image: '/lovable-uploads/177cb67f-d365-4177-b967-ece97a39e31e.png'
+              image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=200&h=200&fit=crop&crop=center'
             },
             {
-              name: 'Temple Jewelry Set',
-              description: 'South Indian temple style necklace with intricate designs',
-              reason: 'Ideal for religious ceremonies and cultural events',
+              name: isMarathi ? 'मंदिर दागिने सेट' : 'Temple Jewelry Set',
+              description: isMarathi ? 'गुंतागुंतीच्या डिझाइनसह दक्षिण भारतीय मंदिर शैलीचा हार' : 'South Indian temple style necklace with intricate designs',
+              reason: isMarathi ? 'धार्मिक समारंभ आणि सांस्कृतिक कार्यक्रमांसाठी आदर्श' : 'Ideal for religious ceremonies and cultural events',
               price: '₹35,000 - ₹60,000',
-              image: '/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png'
+              image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=200&h=200&fit=crop&crop=center'
             }
           ]
         },
         {
-          category: 'Earrings',
+          category: isMarathi ? 'कानातले' : 'Earrings',
           items: [
             {
-              name: 'Chandelier Earrings',
-              description: 'Heavy gold chandelier earrings with precious stones',
-              reason: 'Statement piece perfect for special occasions and your bold style',
+              name: isMarathi ? 'झुमरी कानातले' : 'Chandelier Earrings',
+              description: isMarathi ? 'मौल्यवान दगडांसह जड सोन्याचे झुमरी कानातले' : 'Heavy gold chandelier earrings with precious stones',
+              reason: isMarathi ? 'विशेष प्रसंगांसाठी आणि तुमच्या धाडसी शैलीसाठी परफेक्ट स्टेटमेंट पीस' : 'Statement piece perfect for special occasions and your bold style',
               price: '₹25,000 - ₹40,000',
-              image: '/lovable-uploads/3f8f1fdc-9e82-4a9f-8c32-95ca7161e97e.png'
+              image: 'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?w=200&h=200&fit=crop&crop=center'
             },
             {
-              name: 'Jhumka Earrings',
-              description: 'Classic Indian jhumka with pearls and gold work',
-              reason: 'Versatile design suitable for both casual and formal wear',
+              name: isMarathi ? 'झुमका कानातले' : 'Jhumka Earrings',
+              description: isMarathi ? 'मोत्या आणि सोन्याच्या कामासह क्लासिक भारतीय झुमका' : 'Classic Indian jhumka with pearls and gold work',
+              reason: isMarathi ? 'अनौपचारिक आणि औपचारिक दोन्ही पोशाखांसाठी योग्य बहुउद्देशीय डिझाइन' : 'Versatile design suitable for both casual and formal wear',
               price: '₹15,000 - ₹25,000',
-              image: '/lovable-uploads/726ba192-f434-4ff0-8deb-c3e3ace6f5aa.png'
+              image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=200&h=200&fit=crop&crop=center'
             }
           ]
         },
         {
-          category: 'Bangles & Bracelets',
+          category: isMarathi ? 'बांगड्या आणि ब्रेसलेट' : 'Bangles & Bracelets',
           items: [
             {
-              name: 'Antique Gold Bangles',
-              description: 'Traditional antique finish gold bangles set',
-              reason: 'Classic Indian jewelry piece that complements your traditional style',
+              name: isMarathi ? 'अँटीक सोन्याच्या बांगड्या' : 'Antique Gold Bangles',
+              description: isMarathi ? 'पारंपरिक अँटीक फिनिश सोन्याच्या बांगड्यांचा सेट' : 'Traditional antique finish gold bangles set',
+              reason: isMarathi ? 'तुमच्या पारंपरिक शैलीला पूरक असणारा क्लासिक भारतीय दागिन्यांचा तुकडा' : 'Classic Indian jewelry piece that complements your traditional style',
               price: '₹20,000 - ₹35,000',
-              image: '/lovable-uploads/177cb67f-d365-4177-b967-ece97a39e31e.png'
+              image: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=200&h=200&fit=crop&crop=center'
             },
             {
-              name: 'Kada Bracelet',
-              description: 'Thick gold kada with engraved patterns',
-              reason: 'Perfect for daily wear and professional settings',
+              name: isMarathi ? 'कडा ब्रेसलेट' : 'Kada Bracelet',
+              description: isMarathi ? 'कोरीव काम असलेला जाड सोन्याचा कडा' : 'Thick gold kada with engraved patterns',
+              reason: isMarathi ? 'दैनंदिन वापरासाठी आणि व्यावसायिक सेटिंगसाठी परफेक्ट' : 'Perfect for daily wear and professional settings',
               price: '₹12,000 - ₹18,000',
-              image: '/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png'
+              image: 'https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=200&h=200&fit=crop&crop=center'
+            }
+          ]
+        },
+        {
+          category: isMarathi ? 'अंगठ्या' : 'Rings',
+          items: [
+            {
+              name: isMarathi ? 'नवरत्न अंगठी' : 'Navratna Ring',
+              description: isMarathi ? 'नऊ रत्नांसह पारंपरिक भारतीय अंगठी' : 'Traditional Indian ring with nine precious stones',
+              reason: isMarathi ? 'ज्योतिषशास्त्रीय फायदे आणि पारंपरिक महत्त्वासह' : 'With astrological benefits and traditional significance',
+              price: '₹30,000 - ₹50,000',
+              image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200&h=200&fit=crop&crop=center'
+            },
+            {
+              name: isMarathi ? 'कुंतल अंगठी' : 'Kuntal Ring',
+              description: isMarathi ? 'फूल डिझाइनसह नाजूक सोन्याची अंगठी' : 'Delicate gold ring with floral design',
+              reason: isMarathi ? 'दैनंदिन वापरासाठी आणि आपल्या सुरुवातीच्या शैलीसाठी योग्य' : 'Suitable for daily wear and your elegant style',
+              price: '₹8,000 - ₹15,000',
+              image: 'https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=200&h=200&fit=crop&crop=center'
             }
           ]
         }
