@@ -60,6 +60,9 @@ export const Header = () => {
     name: 'Jewelry Gallery',
     href: '/jewelry'
   }, {
+    name: 'AI Features',
+    href: '/ai-features'
+  }, {
     name: t('nav.help'),
     href: '/help'
   }, {
