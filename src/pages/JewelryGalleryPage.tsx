@@ -12,23 +12,14 @@ import { Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Logo } from '@/components/Logo';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { VoiceSearch } from '@/components/VoiceSearch';
-import { AIAssistant } from '@/components/AIAssistant';
-import { VoiceRateInquiry } from '@/components/VoiceRateInquiry';
-import { SimpleVisualInterface } from '@/components/SimpleVisualInterface';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 const JewelryGalleryPage = () => {
   const [isOwner, setIsOwner] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const [user, setUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  const { t } = useLanguage();
 
   console.log("JewelryGalleryPage - isOwner:", isOwner, "loading:", loading, "user:", user); // Debug log
 
@@ -123,15 +114,6 @@ const JewelryGalleryPage = () => {
     });
   };
 
-  const handleFeatureSelect = (feature: string) => {
-    setSelectedFeature(feature);
-    if (feature === 'voice') {
-      // Voice search will be handled by the VoiceSearch component
-    } else if (feature === 'rates') {
-      // Voice rate inquiry will be handled by the VoiceRateInquiry component
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -161,50 +143,7 @@ const JewelryGalleryPage = () => {
             )}
           </div>
         </div>
-        
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold text-center mb-8">
-              {t('jewelry_gallery')}
-            </h1>
-            
-            {/* Simple Visual Interface for Village Customers */}
-            <div className="mb-8">
-              <SimpleVisualInterface onFeatureSelect={handleFeatureSelect} />
-            </div>
-            
-            <Tabs defaultValue="gallery" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="gallery">{t('gallery.title')}</TabsTrigger>
-                <TabsTrigger value="voice">{t('voice_search')}</TabsTrigger>
-                <TabsTrigger value="assistant">{t('ai_assistant')}</TabsTrigger>
-                <TabsTrigger value="rates">{t('voice_rate_inquiry')}</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="gallery" className="space-y-8">
-                <div className="lg:hidden">
-                  <VoiceSearch onSearch={setSearchTerm} />
-                </div>
-                <JewelryGallery isOwner={!loading && user && isOwner} />
-              </TabsContent>
-              
-              <TabsContent value="voice" className="space-y-8">
-                <VoiceSearch onSearch={setSearchTerm} />
-                <div className="mt-8">
-                  <JewelryGallery isOwner={!loading && user && isOwner} />
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="assistant" className="space-y-8">
-                <AIAssistant />
-              </TabsContent>
-              
-              <TabsContent value="rates" className="space-y-8">
-                <VoiceRateInquiry />
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
+        <JewelryGallery isOwner={!loading && user && isOwner} />
       </main>
       <Footer />
     </div>
