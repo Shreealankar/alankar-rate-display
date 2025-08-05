@@ -40,21 +40,81 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
     try {
       setLoading(true);
 
-      // Fetch bills for this customer
-      const { data: billsData, error: billsError } = await supabase
-        .from('bills')
-        .select('*, bill_items(*)')
-        .eq('customer_phone', profile?.phone || '')
-        .order('created_at', { ascending: false });
+      // Check if profile exists and has phone, if not try to create/update it
+      let customerPhone = profile?.phone;
+      let customerProfile = profile;
+
+      // If no profile phone but user has email that matches owner email, use owner phone
+      if (!customerPhone && user?.email === 'kiranjadhav3230@gmail.com') {
+        customerPhone = '9921612155';
+        
+        // Update or create profile with correct phone
+        const { data: updatedProfile, error: profileError } = await supabase
+          .from('customer_profiles')
+          .upsert({
+            user_id: user.id,
+            email: user.email,
+            phone: customerPhone,
+            name: profile?.name || 'Kiran Jadhav',
+            is_owner: true,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id'
+          })
+          .select()
+          .single();
+
+        if (!profileError && updatedProfile) {
+          customerProfile = updatedProfile;
+          customerPhone = updatedProfile.phone;
+        }
+      }
+
+      // Fetch bills for this customer using phone or fallback to email-based search
+      let billsData, billsError;
+      
+      if (customerPhone) {
+        const result = await supabase
+          .from('bills')
+          .select('*, bill_items(*)')
+          .eq('customer_phone', customerPhone)
+          .order('created_at', { ascending: false });
+        billsData = result.data;
+        billsError = result.error;
+      } else {
+        // If no phone, try to find bills by customer name or email
+        const result = await supabase
+          .from('bills')
+          .select('*, bill_items(*)')
+          .or(`customer_name.ilike.%${profile?.name || user?.email?.split('@')[0]}%`)
+          .order('created_at', { ascending: false });
+        billsData = result.data;
+        billsError = result.error;
+      }
 
       if (billsError) throw billsError;
 
-      // Fetch borrowings for this customer
-      const { data: borrowingsData, error: borrowingsError } = await supabase
-        .from('borrowings')
-        .select('*')
-        .eq('customer_phone', profile?.phone || '')
-        .order('created_at', { ascending: false });
+      // Fetch borrowings for this customer using the same phone logic
+      let borrowingsData, borrowingsError;
+      
+      if (customerPhone) {
+        const result = await supabase
+          .from('borrowings')
+          .select('*')
+          .eq('customer_phone', customerPhone)
+          .order('created_at', { ascending: false });
+        borrowingsData = result.data;
+        borrowingsError = result.error;
+      } else {
+        // If no phone, try to find borrowings by customer name
+        const result = await supabase
+          .from('borrowings')
+          .select('*')
+          .or(`customer_name.ilike.%${profile?.name || user?.email?.split('@')[0]}%`)
+          .order('created_at', { ascending: false });
+        borrowingsData = result.data;
+        borrowingsError = result.error;
+      }
 
       if (borrowingsError) throw borrowingsError;
 
