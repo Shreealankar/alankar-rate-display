@@ -66,8 +66,8 @@ export const Header = () => {
     name: 'Terms & Conditions',
     href: '/terms'
   }, {
-    name: t('nav.login'),
-    href: '/login'
+    name: 'Customer Login',
+    href: '/customer'
   }];
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : '??';
   const handleWhatsAppClick = () => {

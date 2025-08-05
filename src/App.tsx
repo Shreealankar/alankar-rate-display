@@ -13,6 +13,7 @@ import HelpPage from "./pages/HelpPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage"; 
 import JewelryGalleryPage from "./pages/JewelryGalleryPage";
+import CustomerPortal from "./pages/CustomerPortal";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/jewelry" element={<JewelryGalleryPage />} />
+              <Route path="/customer" element={<CustomerPortal />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

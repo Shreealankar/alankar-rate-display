@@ -7,6 +7,10 @@ import { Footer } from '@/components/layout/Footer';
 import { HomeCarousel } from '@/components/HomeCarousel';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { LanguageSelectionDialog } from '@/components/LanguageSelectionDialog';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { User, Receipt, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useState } from 'react';
 
 const HomePage = () => {
@@ -124,6 +128,91 @@ const HomePage = () => {
                   </h3>
                   <p className="text-muted-foreground">
                     {t('features.support.description')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Customer Portal Section */}
+          <section className="py-16 bg-gradient-to-r from-primary/5 to-secondary/5">
+            <div className="container px-4">
+              <div className="max-w-4xl mx-auto text-center">
+                <h2 className="text-3xl font-bold mb-4">
+                  {language === 'mr' ? 'ग्राहक पोर्टल' : 'Customer Portal'}
+                </h2>
+                <p className="text-lg text-muted-foreground mb-8">
+                  {language === 'mr' ? 
+                    'आपले बिल, खरेदी इतिहास आणि थकबाकी पहा' : 
+                    'View your bills, purchase history, and outstanding amounts'
+                  }
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <Card className="text-center">
+                    <CardHeader>
+                      <Receipt className="h-8 w-8 mx-auto text-primary mb-2" />
+                      <CardTitle className="text-lg">
+                        {language === 'mr' ? 'बिल पहा' : 'View Bills'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        {language === 'mr' ? 
+                          'आपल्या सर्व खरेदीचे बिल आणि पेमेंट स्थिती' : 
+                          'All your purchase bills and payment status'
+                        }
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="text-center">
+                    <CardHeader>
+                      <ShoppingBag className="h-8 w-8 mx-auto text-primary mb-2" />
+                      <CardTitle className="text-lg">
+                        {language === 'mr' ? 'खरेदी इतिहास' : 'Purchase History'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        {language === 'mr' ? 
+                          'आपण खरेदी केलेले सर्व दागिने आणि त्यांची माहिती' : 
+                          'All jewelry purchases and their details'
+                        }
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="text-center">
+                    <CardHeader>
+                      <User className="h-8 w-8 mx-auto text-primary mb-2" />
+                      <CardTitle className="text-lg">
+                        {language === 'mr' ? 'प्रोफाइल व्यवस्थापन' : 'Profile Management'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        {language === 'mr' ? 
+                          'आपली वैयक्तिक माहिती आणि संपर्क तपशील' : 
+                          'Your personal information and contact details'
+                        }
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-4">
+                  <Button asChild size="lg" className="text-lg px-8 py-3">
+                    <Link to="/customer">
+                      <User className="mr-2 h-5 w-5" />
+                      {language === 'mr' ? 'ग्राहक लॉगिन' : 'Customer Login'}
+                    </Link>
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'mr' ? 
+                      'नवीन ग्राहक? आपण साइन अप देखील करू शकता किंवा गेस्ट म्हणून ब्राउझ करू शकता' : 
+                      'New customer? You can also sign up or browse as a guest'
+                    }
                   </p>
                 </div>
               </div>
