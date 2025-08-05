@@ -5,11 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, User, Receipt, Package, Phone, Mail, LogOut, IndianRupee, Calendar, ShoppingBag } from 'lucide-react';
+import { Loader2, User, Receipt, Package, Phone, Mail, LogOut, IndianRupee, Calendar, ShoppingBag, Edit, Eye } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface CustomerDashboardProps {
   user: any;
@@ -21,9 +24,11 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
   const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [bills, setBills] = useState<any[]>([]);
-  const [borrowings, setBorrowings] = useState<any[]>([]);
   const [totalDue, setTotalDue] = useState(0);
-  const [totalBorrowed, setTotalBorrowed] = useState(0);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editName, setEditName] = useState(profile?.name || '');
+  const [editPhone, setEditPhone] = useState(profile?.phone || '');
+  const [selectedBill, setSelectedBill] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -122,56 +127,12 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
 
       if (billsError) throw billsError;
 
-      // Fetch borrowings for this customer using the same strategies
-      let borrowingsData, borrowingsError;
-      
-      if (customerPhone) {
-        // Primary: Search by phone number
-        const result = await supabase
-          .from('borrowings')
-          .select('*')
-          .eq('customer_phone', customerPhone)
-          .order('created_at', { ascending: false });
-        borrowingsData = result.data;
-        borrowingsError = result.error;
-      } else if (customerEmail) {
-        // Secondary: Search by email or name patterns
-        const emailName = customerEmail.split('@')[0];
-        const customerName = profile?.name || '';
-        
-        // Try multiple search patterns
-        const searchPatterns = [];
-        if (customerName) searchPatterns.push(`customer_name.ilike.%${customerName}%`);
-        if (emailName) searchPatterns.push(`customer_name.ilike.%${emailName}%`);
-        
-        if (searchPatterns.length > 0) {
-          const result = await supabase
-            .from('borrowings')
-            .select('*')
-            .or(searchPatterns.join(','))
-            .order('created_at', { ascending: false });
-          borrowingsData = result.data;
-          borrowingsError = result.error;
-        } else {
-          borrowingsData = [];
-          borrowingsError = null;
-        }
-      } else {
-        borrowingsData = [];
-        borrowingsError = null;
-      }
-
-      if (borrowingsError) throw borrowingsError;
-
       setBills(billsData || []);
-      setBorrowings(borrowingsData || []);
 
       // Calculate totals
       const totalBillDue = (billsData || []).reduce((sum, bill) => sum + (bill.balance_amount || 0), 0);
-      const totalBorrowingBalance = (borrowingsData || []).reduce((sum, borrowing) => sum + (borrowing.balance_amount || 0), 0);
 
       setTotalDue(totalBillDue);
-      setTotalBorrowed(totalBorrowingBalance);
 
     } catch (error) {
       console.error('Error fetching customer data:', error);
@@ -198,6 +159,36 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
       });
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      const { error } = await supabase
+        .from('customer_profiles')
+        .update({
+          name: editName,
+          phone: editPhone,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: t('profile.updated'),
+        description: t('profile.updateSuccess'),
+      });
+      setEditingProfile(false);
+      // Refresh the data
+      fetchCustomerData();
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: t('profile.error'),
+        description: t('profile.updateError'),
+        variant: "destructive",
+      });
     }
   };
 
@@ -287,44 +278,87 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Borrowed</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('customer.remainingAmount')}</CardTitle>
             <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{formatCurrency(totalBorrowed)}</div>
+            <div className="text-2xl font-bold text-orange-600">{formatCurrency(totalDue)}</div>
             <p className="text-xs text-muted-foreground">
-              Active borrowings
+              {t('customer.totalRemaining')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Bills</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('customer.totalBills')}</CardTitle>
             <Receipt className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{bills.length}</div>
             <p className="text-xs text-muted-foreground">
-              Purchase history
+              {t('customer.purchaseHistory')}
             </p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="bills">Bills</TabsTrigger>
-          <TabsTrigger value="borrowings">Borrowings</TabsTrigger>
-          <TabsTrigger value="purchases">Purchases</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="profile">{t('customer.profile')}</TabsTrigger>
+          <TabsTrigger value="bills">{t('customer.bills')}</TabsTrigger>
+          <TabsTrigger value="purchases">{t('customer.purchases')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Your account details</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>{t('customer.profileInfo')}</CardTitle>
+                <CardDescription>{t('customer.accountDetails')}</CardDescription>
+              </div>
+              <Dialog open={editingProfile} onOpenChange={setEditingProfile}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Edit className="h-4 w-4 mr-2" />
+                    {t('customer.editProfile')}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>{t('customer.editProfile')}</DialogTitle>
+                    <DialogDescription>{t('customer.editProfileDesc')}</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="edit-name">{t('customer.name')}</Label>
+                      <Input
+                        id="edit-name"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        placeholder={t('customer.enterName')}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-phone">{t('customer.mobile')}</Label>
+                      <Input
+                        id="edit-phone"
+                        value={editPhone}
+                        onChange={(e) => setEditPhone(e.target.value)}
+                        placeholder={t('customer.enterMobile')}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={handleUpdateProfile} className="flex-1">
+                        {t('customer.saveChanges')}
+                      </Button>
+                      <Button variant="outline" onClick={() => setEditingProfile(false)} className="flex-1">
+                        {t('customer.cancel')}
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-4">
@@ -332,8 +366,8 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
                   <User className="h-8 w-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">{profile?.name || 'Customer'}</h3>
-                  <p className="text-muted-foreground">Valued Customer</p>
+                  <h3 className="text-lg font-semibold">{profile?.name || t('customer.customer')}</h3>
+                  <p className="text-muted-foreground">{t('customer.valuedCustomer')}</p>
                 </div>
               </div>
               <Separator />
@@ -344,11 +378,11 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
                 </div>
                 <div className="flex items-center space-x-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{profile?.phone || 'Not provided'}</span>
+                  <span>{profile?.phone || t('customer.notProvided')}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span>Joined {formatDate(profile?.created_at || user?.created_at)}</span>
+                  <span>{t('customer.joined')} {formatDate(profile?.created_at || user?.created_at)}</span>
                 </div>
               </div>
             </CardContent>
@@ -358,31 +392,34 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
         <TabsContent value="bills" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Bills & Invoices</CardTitle>
-              <CardDescription>Your purchase bills and payment status</CardDescription>
+              <CardTitle>{t('customer.billsInvoices')}</CardTitle>
+              <CardDescription>{t('customer.billsDesc')}</CardDescription>
             </CardHeader>
             <CardContent>
               {bills.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No bills found for your account.</p>
+                <p className="text-center text-muted-foreground py-8">{t('customer.noBills')}</p>
               ) : (
                 <ScrollArea className="h-96">
                   <div className="space-y-4">
                     {bills.map((bill) => (
-                      <div key={bill.id} className="p-4 border rounded-lg">
+                      <div key={bill.id} className="p-4 border rounded-lg cursor-pointer hover:bg-muted/50" onClick={() => setSelectedBill(bill)}>
                         <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-semibold">Bill #{bill.bill_number}</h4>
+                          <div className="flex-1">
+                            <h4 className="font-semibold">{t('customer.billNumber')} #{bill.bill_number}</h4>
                             <p className="text-sm text-muted-foreground">{formatDate(bill.created_at)}</p>
                           </div>
-                          <Badge variant={bill.balance_amount > 0 ? "destructive" : "default"}>
-                            {bill.balance_amount > 0 ? "Pending" : "Paid"}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={bill.balance_amount > 0 ? "destructive" : "default"}>
+                              {bill.balance_amount > 0 ? t('customer.pending') : t('customer.paid')}
+                            </Badge>
+                            <Eye className="h-4 w-4 text-muted-foreground" />
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>Total: {formatCurrency(bill.final_amount)}</div>
-                          <div>Paid: {formatCurrency(bill.paid_amount)}</div>
-                          <div>Balance: {formatCurrency(bill.balance_amount)}</div>
-                          <div>Items: {bill.bill_items?.length || 0}</div>
+                          <div>{t('customer.total')}: {formatCurrency(bill.final_amount)}</div>
+                          <div>{t('customer.paid')}: {formatCurrency(bill.paid_amount)}</div>
+                          <div>{t('customer.balance')}: {formatCurrency(bill.balance_amount)}</div>
+                          <div>{t('customer.items')}: {bill.bill_items?.length || 0}</div>
                         </div>
                       </div>
                     ))}
@@ -391,67 +428,92 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
               )}
             </CardContent>
           </Card>
+
+          {/* Bill Details Dialog */}
+          <Dialog open={!!selectedBill} onOpenChange={() => setSelectedBill(null)}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>{t('customer.billDetails')} #{selectedBill?.bill_number}</DialogTitle>
+                <DialogDescription>{formatDate(selectedBill?.created_at)}</DialogDescription>
+              </DialogHeader>
+              {selectedBill && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>{t('customer.customerName')}</Label>
+                      <p className="font-medium">{selectedBill.customer_name}</p>
+                    </div>
+                    <div>
+                      <Label>{t('customer.phone')}</Label>
+                      <p className="font-medium">{selectedBill.customer_phone}</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div>
+                    <Label>{t('customer.billItems')}</Label>
+                    {selectedBill.bill_items && selectedBill.bill_items.length > 0 ? (
+                      <div className="space-y-2 mt-2">
+                        {selectedBill.bill_items.map((item: any, index: number) => (
+                          <div key={index} className="p-3 border rounded">
+                            <div className="flex justify-between">
+                              <div>
+                                <p className="font-medium">{item.item_name}</p>
+                                <p className="text-sm text-muted-foreground">{item.metal_type} - {item.purity}</p>
+                                <p className="text-sm">{item.weight_grams}g @ {formatCurrency(item.rate_per_gram)}/g</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="font-medium">{formatCurrency(item.total_amount)}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground">{t('customer.noItems')}</p>
+                    )}
+                  </div>
+                  <Separator />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>{t('customer.totalAmount')}</Label>
+                      <p className="text-lg font-bold">{formatCurrency(selectedBill.final_amount)}</p>
+                    </div>
+                    <div>
+                      <Label>{t('customer.paidAmount')}</Label>
+                      <p className="text-lg font-bold text-green-600">{formatCurrency(selectedBill.paid_amount)}</p>
+                    </div>
+                    <div>
+                      <Label>{t('customer.balanceAmount')}</Label>
+                      <p className="text-lg font-bold text-red-600">{formatCurrency(selectedBill.balance_amount)}</p>
+                    </div>
+                    <div>
+                      <Label>{t('customer.paymentMethod')}</Label>
+                      <p className="capitalize">{selectedBill.payment_method}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
-        <TabsContent value="borrowings" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Borrowings</CardTitle>
-              <CardDescription>Your borrowing history and outstanding amounts</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {borrowings.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No borrowings found for your account.</p>
-              ) : (
-                <ScrollArea className="h-96">
-                  <div className="space-y-4">
-                    {borrowings.map((borrowing) => (
-                      <div key={borrowing.id} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-semibold">Borrowing</h4>
-                            <p className="text-sm text-muted-foreground">{formatDate(borrowing.borrowed_date)}</p>
-                          </div>
-                          <Badge variant={borrowing.status === 'active' ? "default" : "secondary"}>
-                            {borrowing.status}
-                          </Badge>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>Borrowed: {formatCurrency(borrowing.borrowed_amount)}</div>
-                          <div>Interest: {borrowing.interest_rate}%</div>
-                          <div>Paid: {formatCurrency(borrowing.paid_amount)}</div>
-                          <div>Balance: {formatCurrency(borrowing.balance_amount)}</div>
-                        </div>
-                        {borrowing.due_date && (
-                          <p className="text-sm text-muted-foreground mt-2">
-                            Due: {formatDate(borrowing.due_date)}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="purchases" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Purchase History</CardTitle>
-              <CardDescription>Detailed view of your jewelry purchases</CardDescription>
+              <CardTitle>{t('customer.purchaseHistory')}</CardTitle>
+              <CardDescription>{t('customer.purchaseHistoryDesc')}</CardDescription>
             </CardHeader>
             <CardContent>
               {bills.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No purchases found.</p>
+                <p className="text-center text-muted-foreground py-8">{t('customer.noPurchases')}</p>
               ) : (
                 <ScrollArea className="h-96">
                   <div className="space-y-6">
                     {bills.map((bill) => (
                       <div key={bill.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-center mb-4">
-                          <h4 className="font-semibold">Bill #{bill.bill_number}</h4>
+                          <h4 className="font-semibold">{t('customer.billNumber')} #{bill.bill_number}</h4>
                           <span className="text-sm text-muted-foreground">{formatDate(bill.created_at)}</span>
                         </div>
                         {bill.bill_items && bill.bill_items.length > 0 && (
