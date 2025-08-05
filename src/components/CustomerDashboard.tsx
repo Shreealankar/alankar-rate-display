@@ -45,6 +45,11 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
       let customerEmail = profile?.email || user?.email;
       let customerProfile = profile;
 
+      console.log('CustomerDashboard - User:', user?.email);
+      console.log('CustomerDashboard - Profile:', profile);
+      console.log('CustomerDashboard - Customer phone:', customerPhone);
+      console.log('CustomerDashboard - Customer email:', customerEmail);
+
       // If no profile phone but user has email that matches owner email, use owner phone
       if (!customerPhone && user?.email === 'kiranjadhav3230@gmail.com') {
         customerPhone = '9921612155';
@@ -93,6 +98,10 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
         if (customerName) searchPatterns.push(`customer_name.ilike.%${customerName}%`);
         if (emailName) searchPatterns.push(`customer_name.ilike.%${emailName}%`);
         
+        console.log('CustomerDashboard - Search patterns:', searchPatterns);
+        console.log('CustomerDashboard - Customer name:', customerName);
+        console.log('CustomerDashboard - Email name:', emailName);
+        
         if (searchPatterns.length > 0) {
           const result = await supabase
             .from('bills')
@@ -101,6 +110,7 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
             .order('created_at', { ascending: false });
           billsData = result.data;
           billsError = result.error;
+          console.log('CustomerDashboard - Bills search result:', billsData);
         } else {
           billsData = [];
           billsError = null;
