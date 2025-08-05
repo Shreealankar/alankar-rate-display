@@ -42,6 +42,7 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
 
       // Check if profile exists and has phone, if not try to create/update it
       let customerPhone = profile?.phone;
+      let customerEmail = profile?.email || user?.email;
       let customerProfile = profile;
 
       // If no profile phone but user has email that matches owner email, use owner phone
@@ -70,10 +71,11 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
         }
       }
 
-      // Fetch bills for this customer using phone or fallback to email-based search
+      // Fetch bills for this customer using multiple strategies
       let billsData, billsError;
       
       if (customerPhone) {
+        // Primary: Search by phone number
         const result = await supabase
           .from('bills')
           .select('*, bill_items(*)')
@@ -81,23 +83,40 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
           .order('created_at', { ascending: false });
         billsData = result.data;
         billsError = result.error;
+      } else if (customerEmail) {
+        // Secondary: Search by email or name patterns
+        const emailName = customerEmail.split('@')[0];
+        const customerName = profile?.name || '';
+        
+        // Try multiple search patterns
+        const searchPatterns = [];
+        if (customerName) searchPatterns.push(`customer_name.ilike.%${customerName}%`);
+        if (emailName) searchPatterns.push(`customer_name.ilike.%${emailName}%`);
+        
+        if (searchPatterns.length > 0) {
+          const result = await supabase
+            .from('bills')
+            .select('*, bill_items(*)')
+            .or(searchPatterns.join(','))
+            .order('created_at', { ascending: false });
+          billsData = result.data;
+          billsError = result.error;
+        } else {
+          billsData = [];
+          billsError = null;
+        }
       } else {
-        // If no phone, try to find bills by customer name or email
-        const result = await supabase
-          .from('bills')
-          .select('*, bill_items(*)')
-          .or(`customer_name.ilike.%${profile?.name || user?.email?.split('@')[0]}%`)
-          .order('created_at', { ascending: false });
-        billsData = result.data;
-        billsError = result.error;
+        billsData = [];
+        billsError = null;
       }
 
       if (billsError) throw billsError;
 
-      // Fetch borrowings for this customer using the same phone logic
+      // Fetch borrowings for this customer using the same strategies
       let borrowingsData, borrowingsError;
       
       if (customerPhone) {
+        // Primary: Search by phone number
         const result = await supabase
           .from('borrowings')
           .select('*')
@@ -105,15 +124,31 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
           .order('created_at', { ascending: false });
         borrowingsData = result.data;
         borrowingsError = result.error;
+      } else if (customerEmail) {
+        // Secondary: Search by email or name patterns
+        const emailName = customerEmail.split('@')[0];
+        const customerName = profile?.name || '';
+        
+        // Try multiple search patterns
+        const searchPatterns = [];
+        if (customerName) searchPatterns.push(`customer_name.ilike.%${customerName}%`);
+        if (emailName) searchPatterns.push(`customer_name.ilike.%${emailName}%`);
+        
+        if (searchPatterns.length > 0) {
+          const result = await supabase
+            .from('borrowings')
+            .select('*')
+            .or(searchPatterns.join(','))
+            .order('created_at', { ascending: false });
+          borrowingsData = result.data;
+          borrowingsError = result.error;
+        } else {
+          borrowingsData = [];
+          borrowingsError = null;
+        }
       } else {
-        // If no phone, try to find borrowings by customer name
-        const result = await supabase
-          .from('borrowings')
-          .select('*')
-          .or(`customer_name.ilike.%${profile?.name || user?.email?.split('@')[0]}%`)
-          .order('created_at', { ascending: false });
-        borrowingsData = result.data;
-        borrowingsError = result.error;
+        borrowingsData = [];
+        borrowingsError = null;
       }
 
       if (borrowingsError) throw borrowingsError;
