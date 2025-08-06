@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Receipt, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
@@ -23,20 +23,34 @@ const HomePage = () => {
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  useEffect(() => {
+    // Check if language was already selected
+    const languageSelected = localStorage.getItem('languageSelected');
+    if (languageSelected) {
+      setShowLanguageDialog(false);
+    }
+  }, []);
+
   const handleAnimationComplete = () => {
     setShowLoading(false);
-    setShowLanguageDialog(true);
+    const languageSelected = localStorage.getItem('languageSelected');
+    if (!languageSelected) {
+      setShowLanguageDialog(true);
+    } else {
+      setShowAuth(true);
+    }
   };
 
   const handleLanguageDialogClose = () => {
     setShowLanguageDialog(false);
+    localStorage.setItem('languageSelected', 'true');
     setShowAuth(true);
   };
 
   const handleAuthSuccess = (user: any, profile: any) => {
     setIsAuthenticated(true);
     setShowAuth(false);
-    navigate('/customer');
+    // Stay on home page after authentication
   };
 
   if (showLoading) {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Mail, Phone, UserPlus, LogIn, User } from 'lucide-react';
+import { Loader2, Mail, Phone, UserPlus, LogIn, User, KeyRound } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -22,6 +22,8 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -204,6 +206,44 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.protocol}//${window.location.host}/`,
+      });
+
+      if (error) {
+        setError(error.message);
+        toast({
+          title: "Reset Failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Reset Email Sent",
+        description: "Please check your email for password reset instructions.",
+      });
+      setShowForgotPassword(false);
+      setResetEmail('');
+    } catch (err: any) {
+      setError(err.message);
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">
       <Card>
@@ -214,11 +254,62 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
+          {showForgotPassword ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="reset-email" className="text-sm font-medium">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="Enter your email for password reset"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="space-y-2">
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending Reset Email...
+                    </>
+                  ) : (
+                    <>
+                      <KeyRound className="mr-2 h-4 w-4" />
+                      Send Reset Email
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="w-full" 
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  Back to Sign In
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
@@ -273,6 +364,18 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
                     </>
                   )}
                 </Button>
+                
+                <div className="text-center">
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    size="sm"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-primary hover:underline"
+                  >
+                    Forgot Password?
+                  </Button>
+                </div>
               </form>
             </TabsContent>
 
@@ -376,6 +479,7 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
               </form>
             </TabsContent>
           </Tabs>
+          )}
 
           <div className="mt-6 text-center">
             <div className="relative">
