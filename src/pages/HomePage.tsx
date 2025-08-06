@@ -7,16 +7,21 @@ import { Footer } from '@/components/layout/Footer';
 import { HomeCarousel } from '@/components/HomeCarousel';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { LanguageSelectionDialog } from '@/components/LanguageSelectionDialog';
+import { CustomerAuth } from '@/components/CustomerAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Receipt, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
   const [showLoading, setShowLoading] = useState(true);
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleAnimationComplete = () => {
     setShowLoading(false);
@@ -25,10 +30,21 @@ const HomePage = () => {
 
   const handleLanguageDialogClose = () => {
     setShowLanguageDialog(false);
+    setShowAuth(true);
+  };
+
+  const handleAuthSuccess = (user: any, profile: any) => {
+    setIsAuthenticated(true);
+    setShowAuth(false);
+    navigate('/customer');
   };
 
   if (showLoading) {
     return <LoadingAnimation onComplete={handleAnimationComplete} />;
+  }
+
+  if (showAuth && !isAuthenticated) {
+    return <CustomerAuth onAuthSuccess={handleAuthSuccess} />;
   }
 
   return (

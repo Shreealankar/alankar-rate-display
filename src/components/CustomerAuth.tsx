@@ -42,7 +42,7 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.protocol}//${window.location.host}/`,
           data: {
             name,
             phone,
