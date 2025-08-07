@@ -14,24 +14,62 @@ import { User, Receipt, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const HomePage = () => {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
-  const [showLoading, setShowLoading] = useState(true);
+  const [showLoading, setShowLoading] = useState(() => !localStorage.getItem('hasVisited'));
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if language was already selected
-    const languageSelected = localStorage.getItem('languageSelected');
-    if (languageSelected) {
-      setShowLanguageDialog(false);
-    }
+    // Check for existing session first
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsAuthenticated(true);
+        setShowAuth(false);
+        setShowLoading(false);
+        return;
+      }
+
+      // If no session and first visit, show loading animation
+      const hasVisited = localStorage.getItem('hasVisited');
+      if (!hasVisited) {
+        setShowLoading(true);
+      } else {
+        setShowLoading(false);
+        // Check if language was already selected
+        const languageSelected = localStorage.getItem('languageSelected');
+        if (!languageSelected) {
+          setShowLanguageDialog(true);
+        } else {
+          setShowAuth(true);
+        }
+      }
+    };
+
+    checkSession();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session) {
+          setIsAuthenticated(true);
+          setShowAuth(false);
+        } else {
+          setIsAuthenticated(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleAnimationComplete = () => {
+    localStorage.setItem('hasVisited', 'true');
     setShowLoading(false);
     const languageSelected = localStorage.getItem('languageSelected');
     if (!languageSelected) {
