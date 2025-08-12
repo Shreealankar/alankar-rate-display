@@ -28,7 +28,12 @@ const HomePage = () => {
     // Check for existing session first
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
+      
+      // Check for existing guest or user login
+      const hasGuestLogin = localStorage.getItem('guestLogin');
+      const hasDeviceId = localStorage.getItem('deviceId');
+      
+      if (session || hasGuestLogin || hasDeviceId) {
         setIsAuthenticated(true);
         setShowAuth(false);
         setShowLoading(false);
@@ -60,7 +65,12 @@ const HomePage = () => {
           setIsAuthenticated(true);
           setShowAuth(false);
         } else {
-          setIsAuthenticated(false);
+          // Check if guest is still logged in
+          const hasGuestLogin = localStorage.getItem('guestLogin');
+          const hasDeviceId = localStorage.getItem('deviceId');
+          if (!hasGuestLogin && !hasDeviceId) {
+            setIsAuthenticated(false);
+          }
         }
       }
     );
