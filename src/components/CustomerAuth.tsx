@@ -28,8 +28,8 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
   const { toast } = useToast();
 
   // Special owner credentials
-  const OWNER_EMAIL = 'kiranjadhav3230@gmail.com';
-  const OWNER_PHONE = '9921612155';
+  const OWNER_EMAIL = 'kiranjadhav3231@gmail.com';
+  const OWNER_PASSWORD = 'Kapil@2005';
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +37,17 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
     setError('');
 
     try {
-      // Check if this is the owner credentials
-      const isOwner = email === OWNER_EMAIL && phone === OWNER_PHONE;
+      // Prevent owner email from signing up
+      if (email === OWNER_EMAIL) {
+        setError('This email is reserved. Please use sign-in instead.');
+        toast({
+          title: "Sign Up Not Allowed",
+          description: "This email is reserved. Please use sign-in instead.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -48,7 +57,7 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
           data: {
             name,
             phone,
-            is_owner: isOwner
+            is_owner: false
           }
         }
       });
@@ -67,19 +76,10 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
         // Save device login for persistent session
         localStorage.setItem('deviceId', crypto.randomUUID());
         
-        if (isOwner) {
-          localStorage.setItem('ownerLogin', 'true');
-          toast({
-            title: "Owner Access Granted",
-            description: "Welcome back, Owner! Redirecting to admin dashboard...",
-          });
-          setTimeout(() => navigate('/login'), 2000);
-        } else {
-          toast({
-            title: "Account Created",
-            description: "Please check your email to verify your account.",
-          });
-        }
+        toast({
+          title: "Account Created",
+          description: "Please check your email to verify your account.",
+        });
       }
     } catch (err: any) {
       setError(err.message);
@@ -99,6 +99,18 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
     setError('');
 
     try {
+      // Check if this is the owner trying to login
+      if (email === OWNER_EMAIL && password === OWNER_PASSWORD) {
+        localStorage.setItem('ownerLogin', 'true');
+        localStorage.setItem('deviceId', crypto.randomUUID());
+        toast({
+          title: "Owner Access Granted",
+          description: "Welcome back, Owner! Redirecting to admin dashboard...",
+        });
+        setTimeout(() => navigate('/login'), 2000);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -125,21 +137,11 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
         // Save device login for persistent session
         localStorage.setItem('deviceId', crypto.randomUUID());
         
-        // Check if this is owner login
-        if (profile?.is_owner || (email === OWNER_EMAIL)) {
-          localStorage.setItem('ownerLogin', 'true');
-          toast({
-            title: "Owner Access Granted",
-            description: "Welcome back, Owner! Redirecting to admin dashboard...",
-          });
-          setTimeout(() => navigate('/login'), 2000);
-        } else {
-          onAuthSuccess(data.user, profile);
-          toast({
-            title: "Welcome Back",
-            description: "Successfully signed in to your account.",
-          });
-        }
+        onAuthSuccess(data.user, profile);
+        toast({
+          title: "Welcome Back",
+          description: "Successfully signed in to your account.",
+        });
       }
     } catch (err: any) {
       setError(err.message);
@@ -449,10 +451,10 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
                   />
                 </div>
 
-                {email === OWNER_EMAIL && phone === OWNER_PHONE && (
-                  <Alert>
-                    <AlertDescription className="text-yellow-600">
-                      Owner credentials detected. This will create an admin account.
+                {email === OWNER_EMAIL && (
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      This email is reserved for owner access. Please use sign-in instead.
                     </AlertDescription>
                   </Alert>
                 )}
