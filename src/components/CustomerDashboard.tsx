@@ -278,13 +278,13 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('customer.remainingAmount')}</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Paid Amount</CardTitle>
             <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{formatCurrency(totalDue)}</div>
+            <div className="text-2xl font-bold text-green-600">{formatCurrency(bills.reduce((sum, bill) => sum + (bill.paid_amount || 0), 0))}</div>
             <p className="text-xs text-muted-foreground">
-              {t('customer.totalRemaining')}
+              Total amount paid across all bills
             </p>
           </CardContent>
         </Card>
