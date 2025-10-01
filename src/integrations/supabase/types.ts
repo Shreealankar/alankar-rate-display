@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -21,6 +21,8 @@ export type Database = {
           id: string
           item_name: string
           making_charges: number | null
+          making_charges_percentage: number | null
+          making_charges_type: string | null
           metal_type: string
           other_charges: number | null
           purity: string
@@ -35,6 +37,8 @@ export type Database = {
           id?: string
           item_name: string
           making_charges?: number | null
+          making_charges_percentage?: number | null
+          making_charges_type?: string | null
           metal_type?: string
           other_charges?: number | null
           purity?: string
@@ -49,6 +53,8 @@ export type Database = {
           id?: string
           item_name?: string
           making_charges?: number | null
+          making_charges_percentage?: number | null
+          making_charges_type?: string | null
           metal_type?: string
           other_charges?: number | null
           purity?: string
@@ -305,6 +311,36 @@ export type Database = {
         }
         Relationships: []
       }
+      email_otps: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          is_verified: boolean
+          otp_code: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          is_verified?: boolean
+          otp_code: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          is_verified?: boolean
+          otp_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       jewelry_items: {
         Row: {
           created_at: string
@@ -381,38 +417,77 @@ export type Database = {
       }
       products: {
         Row: {
+          barcode: string | null
           category: Database["public"]["Enums"]["product_category"]
           created_at: string
           description: string | null
           id: string
           image_url: string | null
+          making_charges_manual: number | null
+          making_charges_percentage: number | null
+          making_charges_type: string | null
+          minimum_stock: number | null
+          name_english: string
+          name_marathi: string | null
+          other_charges: number | null
+          pieces: number | null
           purity: string
-          title: string
+          status: string | null
+          stock_quantity: number | null
+          stone_charges: number | null
+          title: string | null
           type: string
+          unique_number: string | null
           updated_at: string
           weight_grams: number
         }
         Insert: {
+          barcode?: string | null
           category: Database["public"]["Enums"]["product_category"]
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          making_charges_manual?: number | null
+          making_charges_percentage?: number | null
+          making_charges_type?: string | null
+          minimum_stock?: number | null
+          name_english?: string
+          name_marathi?: string | null
+          other_charges?: number | null
+          pieces?: number | null
           purity?: string
-          title: string
+          status?: string | null
+          stock_quantity?: number | null
+          stone_charges?: number | null
+          title?: string | null
           type?: string
+          unique_number?: string | null
           updated_at?: string
           weight_grams: number
         }
         Update: {
+          barcode?: string | null
           category?: Database["public"]["Enums"]["product_category"]
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          making_charges_manual?: number | null
+          making_charges_percentage?: number | null
+          making_charges_type?: string | null
+          minimum_stock?: number | null
+          name_english?: string
+          name_marathi?: string | null
+          other_charges?: number | null
+          pieces?: number | null
           purity?: string
-          title?: string
+          status?: string | null
+          stock_quantity?: number | null
+          stone_charges?: number | null
+          title?: string | null
           type?: string
+          unique_number?: string | null
           updated_at?: string
           weight_grams?: number
         }
@@ -442,6 +517,7 @@ export type Database = {
       rates: {
         Row: {
           id: string
+          is_locked: boolean | null
           metal_type: string
           rate_per_gram: number
           updated_at: string
@@ -449,6 +525,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          is_locked?: boolean | null
           metal_type: string
           rate_per_gram: number
           updated_at?: string
@@ -456,6 +533,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          is_locked?: boolean | null
           metal_type?: string
           rate_per_gram?: number
           updated_at?: string
@@ -492,9 +570,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_email_otps: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_expired_otps: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       generate_bill_number: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      generate_product_barcode: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_product_unique_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      update_rate_lock_status: {
+        Args: { p_is_locked: boolean; p_metal_type: string }
+        Returns: undefined
       }
     }
     Enums: {
