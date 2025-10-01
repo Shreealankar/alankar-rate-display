@@ -11,6 +11,7 @@ import { LanguageSelectionDialog } from '@/components/LanguageSelectionDialog';
 import { CustomerAuth } from '@/components/CustomerAuth';
 import { DiyaAnimation } from '@/components/diwali/DiyaAnimation';
 import { SparkleEffect } from '@/components/diwali/SparkleEffect';
+import { DiwaliWelcomeScreen } from '@/components/diwali/DiwaliWelcomeScreen';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Receipt, ShoppingBag } from 'lucide-react';
@@ -28,6 +29,15 @@ const HomePage = () => {
   const [showLoading, setShowLoading] = useState(() => !localStorage.getItem('hasVisited'));
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [showDiwaliWelcome, setShowDiwaliWelcome] = useState(() => {
+    const hasSeenWelcome = sessionStorage.getItem('diwaliWelcomeSeen');
+    return !hasSeenWelcome && isDiwaliTheme;
+  });
+
+  const handleCloseDiwaliWelcome = () => {
+    sessionStorage.setItem('diwaliWelcomeSeen', 'true');
+    setShowDiwaliWelcome(false);
+  };
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -117,6 +127,8 @@ const HomePage = () => {
 
   return (
     <>
+      {showDiwaliWelcome && <DiwaliWelcomeScreen onClose={handleCloseDiwaliWelcome} />}
+      
       <LanguageSelectionDialog 
         open={showLanguageDialog} 
         onClose={handleLanguageDialogClose} 
