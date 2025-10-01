@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
+import { DiwaliThemeProvider } from "@/contexts/DiwaliThemeContext";
 import { ThemeProvider } from "next-themes";
 import { useEffect } from "react";
 import HomePage from "./pages/HomePage";
@@ -51,13 +52,15 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <LanguageProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AppContent />
-        </TooltipProvider>
-      </LanguageProvider>
+      <DiwaliThemeProvider>
+        <LanguageProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <AppContent />
+          </TooltipProvider>
+        </LanguageProvider>
+      </DiwaliThemeProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

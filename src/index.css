@@ -63,3 +63,134 @@
     @apply bg-gradient-to-br from-white via-white/90 to-white/70 bg-clip-text text-transparent;
   }
 }
+
+/* Diwali Theme Styles */
+.diwali-theme {
+  --background: 20 15% 8%;
+  --foreground: 35 100% 95%;
+  --card: 25 20% 12%;
+  --card-foreground: 35 100% 95%;
+  --primary: 38 92% 50%;
+  --primary-foreground: 20 10% 5%;
+  --accent: 25 85% 45%;
+  --accent-foreground: 35 100% 95%;
+  --border: 30 30% 25%;
+}
+
+/* Diya (Oil Lamp) Styles */
+.diya {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  opacity: 0;
+  animation: diya-appear 1s ease-out forwards;
+}
+
+@keyframes diya-appear {
+  to { opacity: 1; }
+}
+
+.diya .flame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 18px;
+  background: linear-gradient(to top, #ff6b00, #ffd700, #fff);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flicker 1.5s ease-in-out infinite;
+  filter: blur(1px);
+  box-shadow: 
+    0 0 10px #ff6b00,
+    0 0 20px #ff8c00,
+    0 0 30px #ffa500;
+}
+
+@keyframes flicker {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1) scaleY(1);
+    opacity: 1;
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(0.95) scaleY(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Sparkle Effects */
+.sparkle {
+  background: radial-gradient(circle, #ffd700 0%, #ffed4e 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+@keyframes sparkle-fade {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* Diwali Card Enhancements */
+.diwali-theme .glass-morphism {
+  @apply border-amber-500/30 shadow-amber-500/20;
+  box-shadow: 0 8px 32px rgba(251, 191, 36, 0.15);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .diya {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .diya .flame {
+    width: 10px;
+    height: 15px;
+  }
+}
+
+/* Intensity Variations */
+.diwali-theme[data-diwali-intensity="subtle"] .diya {
+  opacity: 0.5;
+}
+
+.diwali-theme[data-diwali-intensity="subtle"] .sparkle {
+  opacity: 0.4;
+}
+
+.diwali-theme[data-diwali-intensity="full"] .diya .flame {
+  box-shadow: 
+    0 0 15px #ff6b00,
+    0 0 30px #ff8c00,
+    0 0 45px #ffa500;
+}
+
+/* Diwali Gradient Text */
+.diwali-theme .text-gradient {
+  @apply bg-gradient-to-br from-amber-200 via-yellow-300 to-orange-300 bg-clip-text text-transparent;
+}
+
+/* Festive Border Animation */
+@keyframes border-glow {
+  0%, 100% {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 10px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    border-color: hsl(var(--accent));
+    box-shadow: 0 0 20px hsl(var(--accent) / 0.5);
+  }
+}
+
+.diwali-theme .festive-card {
+  animation: border-glow 3s ease-in-out infinite;
+}
