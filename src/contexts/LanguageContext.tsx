@@ -36,6 +36,9 @@ const translations: Record<Language, Record<string, string>> = {
     'home.lastUpdated': 'Last updated',
     'home.rateError': 'Unable to fetch current rates',
     'home.tryAgainLater': 'Please try again later',
+    'home.rateLocked': 'Due to some technical error, the rate is locked by Shree Alankar Owner',
+    'home.askOnWhatsApp': 'For Gold and Silver Rate Ask on WhatsApp',
+    'home.whatsappMessage': 'Hello Shree Alankar, I would like to know the current Gold and Silver rates. Thank you!',
     
     // Notification dialog
     'notification.title': 'Get Rate Updates via SMS',
@@ -99,6 +102,10 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.success': 'Rates updated successfully',
     'dashboard.notificationTitle': 'SMS Notification Settings',
     'dashboard.notificationDescription': 'Add mobile numbers to receive rate update notifications',
+    'dashboard.lockRates': 'Lock Rates',
+    'dashboard.unlockRates': 'Unlock Rates',
+    'dashboard.ratesLocked': 'Rates are now locked',
+    'dashboard.ratesUnlocked': 'Rates are now unlocked',
     
     // Feature Section Translations
     'features.craftsmanship.title': 'Quality Craftsmanship',
@@ -224,6 +231,9 @@ const translations: Record<Language, Record<string, string>> = {
     'home.lastUpdated': 'शेवटचे अपडेट',
     'home.rateError': 'सध्याचे दर आणण्यात अडचण',
     'home.tryAgainLater': 'कृपया नंतर पुन्हा प्रयत्न करा',
+    'home.rateLocked': 'काही तांत्रिक त्रुटीमुळे, श्री अलंकार मालकाने दर लॉक केले आहेत',
+    'home.askOnWhatsApp': 'सोने आणि चांदीचा दर WhatsApp वर विचारा',
+    'home.whatsappMessage': 'नमस्कार श्री अलंकार, मला सध्याचे सोने आणि चांदीचे दर जाणून घ्यायचे आहेत. धन्यवाद!',
     
     // Notification dialog
     'notification.title': 'एसएमएस द्वारे दर अपडेट्स मिळवा',
@@ -287,6 +297,10 @@ const translations: Record<Language, Record<string, string>> = {
     'dashboard.success': 'दर यशस्वीरित्या अपडेट केले',
     'dashboard.notificationTitle': 'एसएमएस सूचना सेटिंग्ज',
     'dashboard.notificationDescription': 'दर अपडेट सूचना प्राप्त करण्यासाठी मोबाईल नंबर जोडा',
+    'dashboard.lockRates': 'दर लॉक करा',
+    'dashboard.unlockRates': 'दर अनलॉक करा',
+    'dashboard.ratesLocked': 'दर आता लॉक केले आहेत',
+    'dashboard.ratesUnlocked': 'दर आता अनलॉक केले आहेत',
     
     // Feature Section Translations
     'features.craftsmanship.title': 'उच्च दर्जाची कारागिरी',

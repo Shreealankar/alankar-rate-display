@@ -9,7 +9,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Lock, LockOpen } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { 
   generateRateChangeMessage, 
   getMobileNumber, 
@@ -32,6 +34,7 @@ const DashboardPage = () => {
   const [initialLoading, setInitialLoading] = useState(true);
   const [oldGoldRate, setOldGoldRate] = useState<number | null>(null);
   const [oldSilverRate, setOldSilverRate] = useState<number | null>(null);
+  const [isRatesLocked, setIsRatesLocked] = useState(false);
   
   // Check if user is logged in
   useEffect(() => {
@@ -127,11 +130,16 @@ const DashboardPage = () => {
           if (goldRateData) {
             setGoldRate(goldRateData.rate_per_gram.toString());
             setOldGoldRate(goldRateData.rate_per_gram);
+            setIsRatesLocked(goldRateData.is_locked || false);
           }
           
           if (silverRateData) {
             setSilverRate(silverRateData.rate_per_gram.toString());
             setOldSilverRate(silverRateData.rate_per_gram);
+            // Use gold rate's lock status as the primary lock state
+            if (!goldRateData) {
+              setIsRatesLocked(silverRateData.is_locked || false);
+            }
           }
         }
       } catch (err) {
@@ -152,6 +160,50 @@ const DashboardPage = () => {
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
     navigate('/');
+  };
+
+  const handleLockToggle = async (checked: boolean) => {
+    try {
+      setIsLoading(true);
+      
+      // Update both gold and silver rates lock status
+      const { error: goldError } = await supabase
+        .from('rates')
+        .update({ is_locked: checked })
+        .eq('metal_type', 'gold');
+
+      const { error: silverError } = await supabase
+        .from('rates')
+        .update({ is_locked: checked })
+        .eq('metal_type', 'silver');
+
+      if (goldError || silverError) {
+        console.error('Error updating lock status:', goldError || silverError);
+        toast({
+          title: "Error",
+          description: "Failed to update lock status.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsRatesLocked(checked);
+      toast({
+        title: checked ? t('dashboard.ratesLocked') : t('dashboard.ratesUnlocked'),
+        description: checked 
+          ? "Customers will see a locked message with WhatsApp contact option" 
+          : "Rates are now visible to customers",
+      });
+    } catch (error) {
+      console.error('Error toggling lock:', error);
+      toast({
+        title: "Error",
+        description: "Failed to toggle lock status.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -354,6 +406,32 @@ const DashboardPage = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
+                    {/* Lock/Unlock Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-muted rounded-lg mb-6">
+                      <div className="flex items-center gap-3">
+                        {isRatesLocked ? (
+                          <Lock className="h-5 w-5 text-amber-600" />
+                        ) : (
+                          <LockOpen className="h-5 w-5 text-green-600" />
+                        )}
+                        <div>
+                          <Label htmlFor="lock-toggle" className="font-semibold">
+                            {isRatesLocked ? t('dashboard.unlockRates') : t('dashboard.lockRates')}
+                          </Label>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {isRatesLocked 
+                              ? "Customers see locked message with WhatsApp button" 
+                              : "Rates are visible to all customers"}
+                          </p>
+                        </div>
+                      </div>
+                      <Switch
+                        id="lock-toggle"
+                        checked={isRatesLocked}
+                        onCheckedChange={handleLockToggle}
+                        disabled={isLoading || initialLoading}
+                      />
+                    </div>
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="space-y-2">
                         <label htmlFor="goldRate" className="text-sm font-medium">
