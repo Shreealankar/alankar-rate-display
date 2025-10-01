@@ -117,11 +117,6 @@ const translations: Record<Language, Record<string, string>> = {
     'features.support.title': 'Dedicated Support',
     'features.support.description': 'Exceptional customer service and expert guidance for your jewelry needs.',
     
-    // Diwali Festival
-    'diwali.greeting': 'Happy Diwali!',
-    'diwali.wish': 'May this festival of lights bring prosperity and joy',
-    'diwali.blessing': 'Wishing you and your family a blessed Diwali',
-    
     // Jewelry Gallery
     'gallery.title': 'Jewelry Gallery',
     'gallery.ownerMode': 'Owner Mode - You can manage products',
@@ -316,11 +311,6 @@ const translations: Record<Language, Record<string, string>> = {
     
     'features.support.title': 'समर्पित ग्राहक सेवा',
     'features.support.description': 'तुमच्या दागिने आवश्यकतांसाठी असाधारण ग्राहक सेवा आणि तज्ञांचे मार्गदर्शन.',
-    
-    // Diwali Festival
-    'diwali.greeting': 'दिवाळीच्या हार्दिक शुभेच्छा!',
-    'diwali.wish': 'या प्रकाशाच्या सणात तुमच्या जीवनात समृद्धी आणि आनंद येवो',
-    'diwali.blessing': 'तुम्हाला आणि तुमच्या कुटुंबाला दिवाळीच्या शुभेच्छा',
     
     // Jewelry Gallery
     'gallery.title': 'दागिने गॅलरी',
