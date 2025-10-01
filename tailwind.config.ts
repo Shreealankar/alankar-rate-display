@@ -19,10 +19,6 @@ export default {
       }
     },
     extend: {
-      fontFamily: {
-        'marathi': ['Noto Sans Devanagari', 'Hind', 'sans-serif'],
-        'sans': ['system-ui', '-apple-system', 'sans-serif'],
-      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
