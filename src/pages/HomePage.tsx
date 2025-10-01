@@ -23,6 +23,8 @@ const HomePage = () => {
   const { t, language } = useLanguage();
   const { isDiwaliTheme, themeIntensity } = useDiwaliTheme();
   const navigate = useNavigate();
+  
+  console.log('🎊 Diwali Theme Status:', { isDiwaliTheme, themeIntensity });
   const [showLoading, setShowLoading] = useState(() => !localStorage.getItem('hasVisited'));
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
   const [showAuth, setShowAuth] = useState(false);

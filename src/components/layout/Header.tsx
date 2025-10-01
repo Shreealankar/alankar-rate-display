@@ -15,6 +15,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useLanguage } from '@/contexts/LanguageContext';
 export const Header = () => {
   const { isDiwaliTheme } = useDiwaliTheme();
+  console.log('🎊 Header Diwali Status:', isDiwaliTheme);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
