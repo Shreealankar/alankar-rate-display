@@ -24,12 +24,12 @@ interface DiwaliThemeProviderProps {
 export const DiwaliThemeProvider: React.FC<DiwaliThemeProviderProps> = ({ children }) => {
   const [isDiwaliTheme, setIsDiwaliTheme] = useState(() => {
     const saved = localStorage.getItem('diwaliTheme');
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true; // Enable by default
   });
 
   const [themeIntensity, setThemeIntensity] = useState<'subtle' | 'moderate' | 'full'>(() => {
     const saved = localStorage.getItem('diwaliThemeIntensity');
-    return (saved as 'subtle' | 'moderate' | 'full') || 'moderate';
+    return (saved as 'subtle' | 'moderate' | 'full') || 'full'; // Full intensity by default
   });
 
   useEffect(() => {
