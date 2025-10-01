@@ -1,6 +1,5 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useDiwaliTheme } from '@/contexts/DiwaliThemeContext';
 import { RateDisplay } from '@/components/RateDisplay';
 import { FeaturedProducts } from '@/components/FeaturedProducts';
 import { Header } from '@/components/layout/Header';
@@ -9,9 +8,6 @@ import { HomeCarousel } from '@/components/HomeCarousel';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { LanguageSelectionDialog } from '@/components/LanguageSelectionDialog';
 import { CustomerAuth } from '@/components/CustomerAuth';
-import { DiyaAnimation } from '@/components/diwali/DiyaAnimation';
-import { SparkleEffect } from '@/components/diwali/SparkleEffect';
-import { DiwaliWelcomeScreen } from '@/components/diwali/DiwaliWelcomeScreen';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Receipt, ShoppingBag } from 'lucide-react';
@@ -22,22 +18,10 @@ import { supabase } from '@/integrations/supabase/client';
 
 const HomePage = () => {
   const { t, language } = useLanguage();
-  const { isDiwaliTheme, themeIntensity } = useDiwaliTheme();
   const navigate = useNavigate();
-  
-  console.log('🎊 Diwali Theme Status:', { isDiwaliTheme, themeIntensity });
   const [showLoading, setShowLoading] = useState(() => !localStorage.getItem('hasVisited'));
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const [showDiwaliWelcome, setShowDiwaliWelcome] = useState(() => {
-    const hasSeenWelcome = sessionStorage.getItem('diwaliWelcomeSeen');
-    return !hasSeenWelcome && isDiwaliTheme;
-  });
-
-  const handleCloseDiwaliWelcome = () => {
-    sessionStorage.setItem('diwaliWelcomeSeen', 'true');
-    setShowDiwaliWelcome(false);
-  };
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -127,20 +111,10 @@ const HomePage = () => {
 
   return (
     <>
-      {showDiwaliWelcome && <DiwaliWelcomeScreen onClose={handleCloseDiwaliWelcome} />}
-      
       <LanguageSelectionDialog 
         open={showLanguageDialog} 
         onClose={handleLanguageDialogClose} 
       />
-      
-      {/* Diwali Theme Decorations */}
-      {isDiwaliTheme && (
-        <>
-          {(themeIntensity === 'moderate' || themeIntensity === 'full') && <DiyaAnimation />}
-          {themeIntensity === 'full' && <SparkleEffect />}
-        </>
-      )}
       
       <div className="flex flex-col min-h-screen">
         <Header />
