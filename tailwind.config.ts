@@ -21,6 +21,7 @@ export default {
     extend: {
       fontFamily: {
         'marathi': ['Noto Sans Devanagari', 'Hind', 'sans-serif'],
+        'marathi-diwali': ['"Tiro Devanagari Marathi"', '"Noto Sans Devanagari"', 'serif'],
         'sans': ['system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {

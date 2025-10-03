@@ -23,7 +23,8 @@ export const LanguageSelectionDialog: React.FC<LanguageSelectionDialogProps> = (
 
   const handleLanguageSelect = (lang: 'en' | 'mr') => {
     setLanguage(lang);
-    onClose();
+    // Small delay before closing to ensure language is set
+    setTimeout(() => onClose(), 100);
   };
 
   return (
