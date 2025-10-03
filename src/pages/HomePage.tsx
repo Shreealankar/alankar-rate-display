@@ -32,8 +32,8 @@ const HomePage = () => {
   const [showDiwaliWelcome, setShowDiwaliWelcome] = useState(false);
 
   const handleCloseDiwaliWelcome = () => {
-    sessionStorage.setItem('diwaliWelcomeSeen', 'true');
     setShowDiwaliWelcome(false);
+    setShowAuth(true);
   };
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -106,9 +106,8 @@ const HomePage = () => {
     setShowLanguageDialog(false);
     localStorage.setItem('languageSelected', 'true');
     
-    // Show Diwali welcome after language selection (only once per session)
-    const hasSeenWelcome = sessionStorage.getItem('diwaliWelcomeSeen');
-    if (!hasSeenWelcome && isDiwaliTheme) {
+    // Show Diwali welcome after language selection every time if theme is enabled
+    if (isDiwaliTheme) {
       setShowDiwaliWelcome(true);
     } else {
       setShowAuth(true);

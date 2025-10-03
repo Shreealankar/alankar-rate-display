@@ -31,24 +31,24 @@ export const DiwaliWelcomeScreen: React.FC<DiwaliWelcomeScreenProps> = ({ onClos
   const isMarathi = language === 'mr';
 
   return (
-    <div 
+      <div 
       className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-500 ${
         show ? 'opacity-100' : 'opacity-0'
       }`}
       style={{
-        background: 'linear-gradient(135deg, #1a0a2e 0%, #0f0520 50%, #1a0a2e 100%)'
+        background: 'radial-gradient(ellipse at center, #2d1810 0%, #1a0f0a 50%, #0a0505 100%)'
       }}
     >
-      {/* Fireworks Container - More fireworks for better effect */}
+      {/* Sky Shot Fireworks Animation */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <div
             key={i}
-            className="firework"
+            className="skyshot"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
+              left: `${20 + Math.random() * 60}%`,
+              bottom: '0',
+              animationDelay: `${Math.random() * 3}s`,
             }}
           />
         ))}
@@ -69,44 +69,60 @@ export const DiwaliWelcomeScreen: React.FC<DiwaliWelcomeScreenProps> = ({ onClos
         show ? 'scale-100 translate-y-0' : 'scale-50 translate-y-20'
       }`}>
         {/* Decorative Diyas */}
-        <div className="flex justify-center gap-4 sm:gap-8 mb-6 sm:mb-8">
-          <div className="diya-large" />
-          <div className="diya-large hidden sm:block" style={{ animationDelay: '0.2s' }} />
-          <div className="diya-large" style={{ animationDelay: '0.4s' }} />
+        <div className="flex justify-center gap-3 sm:gap-6 mb-4 sm:mb-6">
+          <div className="diya-large animate-float" />
+          <div className="diya-large animate-float hidden sm:block" style={{ animationDelay: '0.3s' }} />
+          <div className="diya-large animate-float" style={{ animationDelay: '0.6s' }} />
         </div>
 
         {/* Main Greeting */}
-        <h1 className={`text-3xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 text-gradient-diwali animate-pulse-slow ${
+        <h1 className={`text-4xl sm:text-6xl md:text-8xl font-bold mb-3 sm:mb-5 animate-pulse-slow ${
           isMarathi ? 'font-marathi-diwali' : ''
-        }`}>
+        }`}
+        style={{
+          background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 25%, #ff8c00 50%, #ff6347 75%, #ffd700 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundSize: '200% 200%',
+          animation: 'gradient-shift 3s ease infinite, pulse-slow 2s ease-in-out infinite'
+        }}>
           {isMarathi ? '🪔 दिवाळीच्या हार्दिक शुभेच्छा! 🪔' : '🪔 Happy Diwali! 🪔'}
         </h1>
 
-        {/* Message */}
-        <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 backdrop-blur-md rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border-2 border-amber-400/50 shadow-2xl mx-auto">
-          <p className={`text-lg sm:text-2xl md:text-3xl font-semibold text-amber-100 mb-2 sm:mb-4 ${
+        {/* Message Card */}
+        <div className="relative backdrop-blur-xl bg-gradient-to-br from-amber-900/40 via-orange-800/30 to-red-900/40 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 border-2 border-amber-500/60 shadow-2xl mx-auto max-w-2xl">
+          {/* Decorative corners */}
+          <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-yellow-400 rounded-tl-2xl"></div>
+          <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-yellow-400 rounded-tr-2xl"></div>
+          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-yellow-400 rounded-bl-2xl"></div>
+          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-yellow-400 rounded-br-2xl"></div>
+          
+          <p className={`text-xl sm:text-3xl md:text-4xl font-semibold text-amber-200 mb-3 sm:mb-4 ${
             isMarathi ? 'font-marathi-diwali' : ''
           }`}>
-            {isMarathi ? 'यांच्या तर्फे' : 'From'}
+            {isMarathi ? 'यांच्या तर्फे शुभेच्छा' : 'Warm Wishes From'}
           </p>
-          <p className={`text-xl sm:text-3xl md:text-4xl font-bold text-yellow-300 mb-1 sm:mb-2 ${
+          <p className={`text-2xl sm:text-4xl md:text-5xl font-bold text-yellow-300 mb-2 sm:mb-3 ${
             isMarathi ? 'font-marathi-diwali' : ''
-          }`}>
+          }`}
+          style={{
+            textShadow: '0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 140, 0, 0.5)'
+          }}>
             {isMarathi ? 'किरण रघुनाथ जाधव' : 'Kiran Raghunath Jadhav'}
           </p>
-          <p className={`text-base sm:text-xl md:text-2xl text-amber-200 ${
+          <p className={`text-lg sm:text-2xl md:text-3xl text-orange-200 mb-4 sm:mb-6 ${
             isMarathi ? 'font-marathi-diwali' : ''
           }`}>
             {isMarathi ? '(श्री अलंकार मालक)' : '(Shree Alankar Owner)'}
           </p>
           
-          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-amber-400/30">
-            <p className={`text-sm sm:text-lg text-amber-100/90 italic ${
+          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t-2 border-amber-400/40">
+            <p className={`text-base sm:text-xl md:text-2xl text-amber-100 leading-relaxed ${
               isMarathi ? 'font-marathi-diwali' : ''
             }`}>
               {isMarathi 
-                ? 'या दिवाळीच्या सणात तुमच्या जीवनात आनंद, समृद्धी आणि सुख यावो ही इच्छा! ✨' 
-                : 'May this festival of lights bring joy, prosperity, and happiness to your life! ✨'
+                ? 'या दिवाळीच्या पावन सणाच्या निमित्ताने तुम्हा सर्वांना आणि तुमच्या कुटुंबाला आनंद, समृद्धी, सुख आणि शांती लाभो ही मनःपूर्वक शुभेच्छा! ✨' 
+                : 'May this auspicious festival of Diwali bring abundant joy, prosperity, peace, and happiness to you and your family! ✨'
               }
             </p>
           </div>
@@ -130,11 +146,14 @@ export const DiwaliWelcomeScreen: React.FC<DiwaliWelcomeScreenProps> = ({ onClos
         {/* Continue Button */}
         <Button
           onClick={handleClose}
-          className={`mt-6 sm:mt-8 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold py-4 sm:py-6 px-8 sm:px-12 rounded-full text-base sm:text-lg shadow-2xl transform hover:scale-105 transition-all ${
+          className={`mt-6 sm:mt-8 bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white font-bold py-5 sm:py-7 px-10 sm:px-16 rounded-full text-lg sm:text-xl shadow-2xl transform hover:scale-110 transition-all border-2 border-yellow-400/50 ${
             isMarathi ? 'font-marathi-diwali' : ''
           }`}
+          style={{
+            boxShadow: '0 0 30px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 140, 0, 0.4)'
+          }}
         >
-          {isMarathi ? 'श्री अलंकार वर जा' : 'Continue to Shree Alankar'}
+          {isMarathi ? '✨ श्री अलंकार वर जा ✨' : '✨ Enter Shree Alankar ✨'}
         </Button>
       </div>
     </div>

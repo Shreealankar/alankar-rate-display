@@ -23,11 +23,8 @@ interface DiwaliThemeProviderProps {
 
 export const DiwaliThemeProvider: React.FC<DiwaliThemeProviderProps> = ({ children }) => {
   const [isDiwaliTheme, setIsDiwaliTheme] = useState(() => {
-    // Always enable Diwali theme by default
-    const enabled = true;
-    localStorage.setItem('diwaliTheme', JSON.stringify(enabled));
-    // Clear the welcome screen flag so it shows again
-    sessionStorage.removeItem('diwaliWelcomeSeen');
+    const saved = localStorage.getItem('diwaliTheme');
+    const enabled = saved ? JSON.parse(saved) : true;
     console.log('🎊 Diwali Theme Initialized:', enabled);
     return enabled;
   });
