@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,7 +107,7 @@ const BookingPage = () => {
     }
   };
 
-  const t = content[language as keyof typeof content] || content.english;
+  const t = language && content[language as keyof typeof content] ? content[language as keyof typeof content] : content.english;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,21 +194,21 @@ const BookingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 py-12 px-4 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <Sparkles className="absolute top-20 left-10 w-8 h-8 text-amber-400 animate-pulse" />
-        <Sparkles className="absolute top-40 right-20 w-6 h-6 text-yellow-400 animate-pulse delay-100" />
-        <Sparkles className="absolute bottom-40 left-1/4 w-10 h-10 text-amber-300 animate-pulse delay-200" />
-        <Sparkles className="absolute bottom-20 right-1/3 w-7 h-7 text-yellow-300 animate-pulse delay-300" />
-      </div>
-
-      <div className="max-w-3xl mx-auto relative z-10">
-        <Card className="shadow-2xl border-amber-200 bg-white/95 backdrop-blur">
-          <CardHeader className="text-center bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-t-lg">
-            <CardTitle className="text-3xl font-bold mb-2">{t.title}</CardTitle>
-            <CardDescription className="text-amber-50 text-lg">{t.subtitle}</CardDescription>
-          </CardHeader>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-1">
+        <section className="py-16 bg-background">
+          <div className="container px-4">
+            <div className="max-w-3xl mx-auto">
+              <Card className="shadow-lg border">
+                <CardHeader className="text-center space-y-2">
+                  <div className="flex items-center justify-center gap-2 text-primary">
+                    <Sparkles className="w-6 h-6" />
+                    <CardTitle className="text-3xl font-bold">{t.title}</CardTitle>
+                    <Sparkles className="w-6 h-6" />
+                  </div>
+                  <CardDescription className="text-lg">{t.subtitle}</CardDescription>
+                </CardHeader>
           
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -342,7 +344,8 @@ const BookingPage = () => {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold py-6 text-lg"
+                size="lg"
+                className="w-full font-bold py-6 text-lg"
                 disabled={loading || !termsAccepted}
               >
                 {loading ? (
@@ -357,7 +360,11 @@ const BookingPage = () => {
             </form>
           </CardContent>
         </Card>
-      </div>
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
     </div>
   );
 };
