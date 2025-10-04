@@ -34,6 +34,8 @@ const BookingPage = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingCode, setBookingCode] = useState("");
   
   const [formData, setFormData] = useState({
     fullName: "",
@@ -61,6 +63,10 @@ const BookingPage = () => {
       hideTerms: "Hide Terms & Conditions",
       bookNow: "Book Now Your Gold",
       termsRequired: "Please accept the terms and conditions",
+      successTitle: "Successfully Booked Your Gold!",
+      successMessage: "For tracking, please open Customer Login",
+      bookingNumber: "Booking Number",
+      bookAnother: "Book Another Gold",
       types: {
         "24k_gold_995": "24K Gold 995",
         "24k_gold_normal": "24K Gold Normal",
@@ -91,6 +97,10 @@ const BookingPage = () => {
       hideTerms: "अटी व शर्ती लपवा",
       bookNow: "आता आपले सोने बुक करा",
       termsRequired: "कृपया अटी व शर्ती स्वीकारा",
+      successTitle: "तुमचे सोने यशस्वीरित्या बुक झाले!",
+      successMessage: "ट्रॅकिंगसाठी, कृपया कस्टमर लॉगिन उघडा",
+      bookingNumber: "बुकिंग क्रमांक",
+      bookAnother: "दुसरे सोने बुक करा",
       types: {
         "24k_gold_995": "२४ कॅरेट सोने ९९५",
         "24k_gold_normal": "२४ कॅरेट सोने सामान्य",
@@ -177,12 +187,21 @@ const BookingPage = () => {
         },
       });
 
-      toast({
-        title: "Booking Successful!",
-        description: `Your booking code is ${booking.booking_code}. We will contact you soon.`,
+      setBookingCode(booking.booking_code);
+      setBookingSuccess(true);
+      
+      // Reset form
+      setFormData({
+        fullName: "",
+        primaryMobile: "",
+        secondaryMobile: "",
+        email: "",
+        fullAddress: "",
+        bookingType: "",
+        goldWeight: "",
       });
-
-      navigate('/customer-portal');
+      setTermsAccepted(false);
+      setShowTerms(false);
     } catch (error: any) {
       console.error("Booking error:", error);
       
@@ -228,7 +247,27 @@ const BookingPage = () => {
                 </CardHeader>
           
           <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {bookingSuccess ? (
+              <div className="space-y-6 text-center py-8">
+                <div className="flex items-center justify-center">
+                  <CheckCircle2 className="w-20 h-20 text-green-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-foreground">{t.successTitle}</h2>
+                <div className="bg-primary/10 border-2 border-primary rounded-lg p-6">
+                  <p className="text-sm text-muted-foreground mb-2">{t.bookingNumber}</p>
+                  <p className="text-4xl font-bold text-primary">{bookingCode}</p>
+                </div>
+                <p className="text-lg text-muted-foreground">{t.successMessage}</p>
+                <Button
+                  onClick={() => setBookingSuccess(false)}
+                  size="lg"
+                  className="w-full font-bold"
+                >
+                  {t.bookAnother}
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">{t.fullName}</Label>
@@ -388,6 +427,7 @@ const BookingPage = () => {
                 )}
               </Button>
             </form>
+            )}
           </CardContent>
         </Card>
             </div>
