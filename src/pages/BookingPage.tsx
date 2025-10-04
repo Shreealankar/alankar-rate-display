@@ -108,7 +108,7 @@ const BookingPage = () => {
     }
   };
 
-  const t = language && content[language as keyof typeof content] ? content[language as keyof typeof content] : content.english;
+  const t = language === 'mr' ? content.marathi : content.english;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -342,10 +342,10 @@ const BookingPage = () => {
                 </Button>
 
                 {showTerms && (
-                  <Alert className="bg-amber-50 border-amber-200">
+                  <Alert className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
                     <AlertDescription>
-                      <h3 className="font-bold text-lg mb-3 text-amber-900">{t.terms.title}</h3>
-                      <ol className="list-decimal list-inside space-y-2 text-sm">
+                      <h3 className="font-bold text-lg mb-3 text-amber-900 dark:text-amber-100">{t.terms.title}</h3>
+                      <ol className="list-decimal list-inside space-y-2 text-sm text-foreground">
                         <li>{t.terms.point1}</li>
                         <li>{t.terms.point2}</li>
                         <li>{t.terms.point3}</li>

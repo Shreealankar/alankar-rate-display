@@ -494,7 +494,15 @@ const DashboardPage = () => {
               </TabsContent>
               
               <TabsContent value="bookings">
-                <OwnerBookingsManagement />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Booking Management</CardTitle>
+                    <CardDescription>View and manage customer bookings</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <OwnerBookingsManagement />
+                  </CardContent>
+                </Card>
               </TabsContent>
               
               <TabsContent value="carousel">
