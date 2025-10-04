@@ -67,8 +67,8 @@ export const Header = () => {
     name: t('nav.help'),
     href: '/help'
   }, {
-    name: 'Terms & Conditions',
-    href: '/terms'
+    name: language === 'mr' ? 'सोने बुकिंग' : 'Gold Booking',
+    href: '/booking'
   }, {
     name: 'Customer Login',
     href: '/customer'

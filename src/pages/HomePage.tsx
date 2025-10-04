@@ -241,6 +241,43 @@ const HomePage = () => {
             </div>
           </section>
 
+          {/* Gold Booking Card */}
+          <section className="py-8 bg-gradient-to-br from-amber-50 via-yellow-50 to-amber-100 dark:from-amber-900/20 dark:via-yellow-900/20 dark:to-amber-900/20">
+            <div className="container px-4">
+              <Card className="max-w-2xl mx-auto shadow-xl border-amber-300 bg-white/95 dark:bg-slate-900/95 backdrop-blur hover:shadow-2xl transition-all duration-300 animate-fade-in">
+                <CardHeader className="text-center bg-gradient-to-r from-amber-500 to-yellow-500 text-white rounded-t-lg">
+                  <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
+                    <ShoppingBag className="h-6 w-6" />
+                    {language === 'mr' ? 'सोने आणि दागिने बुकिंग' : 'Gold & Jewellery Booking'}
+                  </CardTitle>
+                  <CardDescription className="text-amber-50 text-base">
+                    {language === 'mr' 
+                      ? 'आजच आपले सोने बुक करा आणि आपली गुंतवणूक सुरक्षित करा' 
+                      : 'Book your gold today and secure your investment'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="text-center space-y-4">
+                    <p className="text-muted-foreground">
+                      {language === 'mr'
+                        ? '24K सोने, नियमित सोने किंवा सोन्याचे दागिने तुमच्या आवश्यकतेनुसार बुक करा. सुरक्षित आणि सोपी बुकिंग प्रक्रिया.'
+                        : 'Book 24K Gold, Regular Gold, or Gold Jewellery as per your needs. Safe and easy booking process.'}
+                    </p>
+                    <Button 
+                      asChild 
+                      size="lg" 
+                      className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold"
+                    >
+                      <Link to="/booking">
+                        {language === 'mr' ? 'आता बुक करा' : 'Book Now'}
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
           {/* Customer Portal Section */}
           <section className="py-16 bg-gradient-to-r from-primary/5 to-secondary/5">
             <div className="container px-4">

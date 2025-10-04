@@ -147,6 +147,65 @@ export type Database = {
           },
         ]
       }
+      bookings: {
+        Row: {
+          booking_code: string
+          booking_type: string
+          created_at: string
+          customer_id: string | null
+          email: string
+          full_address: string
+          full_name: string
+          gold_weight: number
+          id: string
+          primary_mobile: string
+          secondary_mobile: string | null
+          status: string
+          terms_accepted: boolean
+          updated_at: string
+        }
+        Insert: {
+          booking_code: string
+          booking_type: string
+          created_at?: string
+          customer_id?: string | null
+          email: string
+          full_address: string
+          full_name: string
+          gold_weight: number
+          id?: string
+          primary_mobile: string
+          secondary_mobile?: string | null
+          status?: string
+          terms_accepted?: boolean
+          updated_at?: string
+        }
+        Update: {
+          booking_code?: string
+          booking_type?: string
+          created_at?: string
+          customer_id?: string | null
+          email?: string
+          full_address?: string
+          full_name?: string
+          gold_weight?: number
+          id?: string
+          primary_mobile?: string
+          secondary_mobile?: string | null
+          status?: string
+          terms_accepted?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       borrowings: {
         Row: {
           balance_amount: number
@@ -579,6 +638,10 @@ export type Database = {
         Returns: undefined
       }
       generate_bill_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_booking_code: {
         Args: Record<PropertyKey, never>
         Returns: string
       }

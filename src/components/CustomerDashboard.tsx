@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { BookingsList } from '@/components/BookingsList';
 
 interface CustomerDashboardProps {
   user: any;
@@ -21,7 +22,7 @@ interface CustomerDashboardProps {
 }
 
 export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboardProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [bills, setBills] = useState<any[]>([]);
   const [totalDue, setTotalDue] = useState(0);
@@ -304,8 +305,11 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profile">{t('customer.profile')}</TabsTrigger>
+          <TabsTrigger value="bookings">
+            {language === 'mr' ? 'बुकिंग' : 'Bookings'}
+          </TabsTrigger>
           <TabsTrigger value="bills">{t('customer.bills')}</TabsTrigger>
           <TabsTrigger value="purchases">{t('customer.purchases')}</TabsTrigger>
         </TabsList>
@@ -385,6 +389,20 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
                   <span>{t('customer.joined')} {formatDate(profile?.created_at || user?.created_at)}</span>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="bookings" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{language === 'mr' ? 'माझी बुकिंग' : 'My Bookings'}</CardTitle>
+              <CardDescription>
+                {language === 'mr' ? 'तुमची सर्व सोने आणि दागिन्यांची बुकिंग पहा' : 'View all your gold and jewellery bookings'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BookingsList />
             </CardContent>
           </Card>
         </TabsContent>

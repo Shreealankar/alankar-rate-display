@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import TermsPage from "./pages/TermsPage";
+import BookingPage from "./pages/BookingPage";
 import HelpPage from "./pages/HelpPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage"; 
@@ -38,6 +39,7 @@ const AppContent = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        <Route path="/booking" element={<BookingPage />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
