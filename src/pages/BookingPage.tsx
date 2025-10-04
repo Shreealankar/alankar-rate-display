@@ -105,7 +105,7 @@ const BookingPage = () => {
     }
   };
 
-  const t = content[language];
+  const t = content[language as keyof typeof content] || content.english;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
