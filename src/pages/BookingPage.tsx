@@ -33,6 +33,7 @@ const BookingPage = () => {
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
   const [formData, setFormData] = useState({
     fullName: "",
@@ -123,6 +124,7 @@ const BookingPage = () => {
 
     try {
       setLoading(true);
+      setErrors({});
 
       const validated = bookingSchema.parse({
         ...formData,
@@ -138,7 +140,7 @@ const BookingPage = () => {
           .from('customer_profiles')
           .select('id')
           .eq('user_id', session.session.user.id)
-          .single();
+          .maybeSingle();
         
         customerId = profile?.id;
       }
@@ -183,11 +185,26 @@ const BookingPage = () => {
       navigate('/customer-portal');
     } catch (error: any) {
       console.error("Booking error:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create booking",
-        variant: "destructive",
-      });
+      
+      if (error.name === 'ZodError') {
+        const formattedErrors: Record<string, string> = {};
+        error.issues.forEach((issue: any) => {
+          const field = issue.path[0];
+          formattedErrors[field] = issue.message;
+        });
+        setErrors(formattedErrors);
+        toast({
+          title: "Validation Error",
+          description: "Please check the form and correct the errors.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create booking",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -220,7 +237,9 @@ const BookingPage = () => {
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     required
+                    className={errors.fullName ? "border-destructive" : ""}
                   />
+                  {errors.fullName && <p className="text-sm text-destructive">{errors.fullName}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -231,7 +250,9 @@ const BookingPage = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
+                    className={errors.email ? "border-destructive" : ""}
                   />
+                  {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                 </div>
               </div>
 
@@ -244,7 +265,9 @@ const BookingPage = () => {
                     onChange={(e) => setFormData({ ...formData, primaryMobile: e.target.value })}
                     placeholder="9876543210"
                     required
+                    className={errors.primaryMobile ? "border-destructive" : ""}
                   />
+                  {errors.primaryMobile && <p className="text-sm text-destructive">{errors.primaryMobile}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -254,7 +277,9 @@ const BookingPage = () => {
                     value={formData.secondaryMobile}
                     onChange={(e) => setFormData({ ...formData, secondaryMobile: e.target.value })}
                     placeholder="9876543210"
+                    className={errors.secondaryMobile ? "border-destructive" : ""}
                   />
+                  {errors.secondaryMobile && <p className="text-sm text-destructive">{errors.secondaryMobile}</p>}
                 </div>
               </div>
 
@@ -266,7 +291,9 @@ const BookingPage = () => {
                   onChange={(e) => setFormData({ ...formData, fullAddress: e.target.value })}
                   required
                   rows={3}
+                  className={errors.fullAddress ? "border-destructive" : ""}
                 />
+                {errors.fullAddress && <p className="text-sm text-destructive">{errors.fullAddress}</p>}
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
@@ -277,7 +304,7 @@ const BookingPage = () => {
                     onValueChange={(value) => setFormData({ ...formData, bookingType: value })}
                     required
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={errors.bookingType ? "border-destructive" : ""}>
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -286,6 +313,7 @@ const BookingPage = () => {
                       <SelectItem value="gold_jewellery">{t.types["gold_jewellery"]}</SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.bookingType && <p className="text-sm text-destructive">{errors.bookingType}</p>}
                 </div>
 
                 <div className="space-y-2">
@@ -297,7 +325,9 @@ const BookingPage = () => {
                     value={formData.goldWeight}
                     onChange={(e) => setFormData({ ...formData, goldWeight: e.target.value })}
                     required
+                    className={errors.goldWeight ? "border-destructive" : ""}
                   />
+                  {errors.goldWeight && <p className="text-sm text-destructive">{errors.goldWeight}</p>}
                 </div>
               </div>
 
