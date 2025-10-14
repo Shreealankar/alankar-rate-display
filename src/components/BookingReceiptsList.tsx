@@ -404,9 +404,19 @@ export const BookingReceiptsList = () => {
                 <Receipt className="h-5 w-5 text-green-500" />
                 {receipt.bookings.booking_code}
               </CardTitle>
-              <Badge variant="default">
-                {language === 'mr' ? 'पुष्टी केलेले' : 'Confirmed'}
-              </Badge>
+              <div className="flex gap-2">
+                <Badge variant="default">
+                  {language === 'mr' ? 'पुष्टी केलेले' : 'Confirmed'}
+                </Badge>
+                <Button 
+                  onClick={() => handleDownloadReceipt(receipt)}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {language === 'mr' ? 'डाउनलोड' : 'Download'}
+                </Button>
+              </div>
             </div>
             <CardDescription>
               {new Date(receipt.created_at).toLocaleDateString(
@@ -416,50 +426,38 @@ export const BookingReceiptsList = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-muted-foreground text-xs">
-                    {language === 'mr' ? 'प्रकार' : 'Type'}
-                  </p>
-                  <p className="font-medium">{getBookingTypeLabel(receipt.bookings.booking_type)}</p>
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">{language === 'mr' ? 'नाव' : 'Name'}</p>
+                <p className="font-medium">{receipt.bookings.full_name}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <IndianRupee className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-muted-foreground text-xs">
-                    {language === 'mr' ? 'भुगतान केलेली रक्कम' : 'Paid Amount'}
-                  </p>
-                  <p className="font-medium text-green-600">{formatCurrency(receipt.paid_amount)}</p>
-                </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{language === 'mr' ? 'प्रकार' : 'Type'}</p>
+                <p className="font-medium">{getBookingTypeLabel(receipt.bookings.booking_type)}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground">{language === 'mr' ? 'वजन' : 'Weight'}</p>
+                <p className="font-medium">{receipt.bookings.gold_weight}g</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{language === 'mr' ? 'भुगतान केलेली रक्कम' : 'Paid Amount'}</p>
+                <p className="font-medium text-green-600">{formatCurrency(receipt.paid_amount)}</p>
               </div>
             </div>
             {receipt.jewelry_name && (
-              <div className="text-sm">
-                <p className="text-muted-foreground text-xs">
-                  {language === 'mr' ? 'दागिन्याचे नाव' : 'Jewelry Name'}
-                </p>
+              <div>
+                <p className="text-sm text-muted-foreground">{language === 'mr' ? 'दागिन्याचे नाव' : 'Jewelry Name'}</p>
                 <p className="font-medium">{receipt.jewelry_name}</p>
               </div>
             )}
             {receipt.notes && (
-              <div className="text-sm">
-                <p className="text-muted-foreground text-xs">
-                  {language === 'mr' ? 'टिप्पण्या' : 'Notes'}
-                </p>
+              <div>
+                <p className="text-sm text-muted-foreground">{language === 'mr' ? 'टिप्पण्या' : 'Notes'}</p>
                 <p className="text-muted-foreground">{receipt.notes}</p>
               </div>
             )}
-            <Button 
-              onClick={() => handleDownloadReceipt(receipt)}
-              className="w-full"
-              variant="outline"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              {language === 'mr' ? 'रसीद प्रिंट/डाउनलोड करा' : 'Print/Download Receipt'}
-            </Button>
           </CardContent>
         </Card>
       ))}
