@@ -160,6 +160,28 @@
     width: 10px;
     height: 15px;
   }
+  
+  /* Mobile optimization for Diwali welcome screen */
+  .diya-large {
+    width: 45px;
+    height: 35px;
+  }
+  
+  .diya-large::before {
+    top: -15px;
+    width: 12px;
+    height: 25px;
+  }
+  
+  /* Reduce skyshot count on mobile for better performance */
+  .skyshot:nth-child(n+8) {
+    display: none;
+  }
+  
+  /* Reduce sparkle count on mobile */
+  .sparkle-float:nth-child(n+11) {
+    display: none;
+  }
 }
 
 /* Large Diya for Welcome Screen */

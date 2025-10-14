@@ -40,7 +40,7 @@ export const DiwaliWelcomeScreen: React.FC<DiwaliWelcomeScreenProps> = ({ onClos
       }}
     >
       {/* Sky Shot Fireworks Animation */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(15)].map((_, i) => (
           <div
             key={i}
@@ -69,9 +69,8 @@ export const DiwaliWelcomeScreen: React.FC<DiwaliWelcomeScreenProps> = ({ onClos
         show ? 'scale-100 translate-y-0' : 'scale-50 translate-y-20'
       }`}>
         {/* Decorative Diyas */}
-        <div className="flex justify-center gap-3 sm:gap-6 mb-4 sm:mb-6">
+        <div className="flex justify-center gap-4 sm:gap-6 mb-4 sm:mb-6">
           <div className="diya-large animate-float" />
-          <div className="diya-large animate-float hidden sm:block" style={{ animationDelay: '0.3s' }} />
           <div className="diya-large animate-float" style={{ animationDelay: '0.6s' }} />
         </div>
 

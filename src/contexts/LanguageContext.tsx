@@ -417,7 +417,17 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // Create the provider component properly as a function component
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
+  const [language, setLanguageState] = useState<Language>(() => {
+    // Load language from localStorage on initialization
+    const savedLanguage = localStorage.getItem('preferred-language');
+    return (savedLanguage === 'en' || savedLanguage === 'mr') ? savedLanguage : 'en';
+  });
+
+  // Custom setLanguage that persists to localStorage
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    localStorage.setItem('preferred-language', lang);
+  };
 
   // Translation function
   const t = (key: string) => {
