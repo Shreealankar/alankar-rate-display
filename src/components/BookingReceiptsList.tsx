@@ -118,47 +118,252 @@ export const BookingReceiptsList = () => {
   };
 
   const handleDownloadReceipt = (receipt: any) => {
-    // Create a simple text receipt
-    const receiptText = `
-═══════════════════════════════════════════
-    ${language === 'mr' ? 'बुकिंग रसीद' : 'BOOKING RECEIPT'}
-═══════════════════════════════════════════
+    // Create a professional HTML receipt
+    const receiptHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Receipt - ${receipt.bookings.booking_code}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .receipt-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #d4af37;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #d4af37;
+            font-size: 32px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .receipt-title {
+            text-align: center;
+            background: #d4af37;
+            color: white;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .booking-code {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 2px dashed #d4af37;
+        }
+        .info-section {
+            margin: 25px 0;
+        }
+        .info-section h3 {
+            color: #d4af37;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            width: 40%;
+        }
+        .info-value {
+            color: #333;
+            width: 60%;
+            text-align: right;
+        }
+        .amount-section {
+            background: #f9f9f9;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #d4af37;
+        }
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 18px;
+        }
+        .amount-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .amount-value {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 22px;
+        }
+        .notes-section {
+            background: #fffbf0;
+            border: 1px solid #d4af37;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .notes-section h4 {
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #d4af37;
+            color: #666;
+            font-size: 14px;
+        }
+        .footer p {
+            margin: 5px 0;
+        }
+        .thank-you {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d4af37;
+            margin-bottom: 10px;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .receipt-container {
+                box-shadow: none;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container">
+        <div class="header">
+            <h1>⭐ Shree Ambabai Jewellers ⭐</h1>
+            <p>Premium Gold & Jewellery Booking</p>
+        </div>
 
-${language === 'mr' ? 'बुकिंग कोड' : 'Booking Code'}: ${receipt.bookings.booking_code}
-${language === 'mr' ? 'तारीख' : 'Date'}: ${new Date(receipt.created_at).toLocaleDateString(
-      language === 'mr' ? 'mr-IN' : 'en-IN',
-      { year: 'numeric', month: 'long', day: 'numeric' }
-    )}
+        <div class="receipt-title">
+            ${language === 'mr' ? 'बुकिंग रसीद' : 'BOOKING RECEIPT'}
+        </div>
 
-${language === 'mr' ? 'ग्राहक माहिती' : 'Customer Information'}:
-${language === 'mr' ? 'नाव' : 'Name'}: ${receipt.bookings.full_name}
+        <div class="booking-code">
+            ${language === 'mr' ? 'बुकिंग क्रमांक' : 'BOOKING NO'}: ${receipt.bookings.booking_code}
+        </div>
 
-${language === 'mr' ? 'बुकिंग तपशील' : 'Booking Details'}:
-${language === 'mr' ? 'प्रकार' : 'Type'}: ${getBookingTypeLabel(receipt.bookings.booking_type)}
-${language === 'mr' ? 'वजन' : 'Weight'}: ${receipt.bookings.gold_weight}g
-${receipt.jewelry_name ? `${language === 'mr' ? 'दागिन्याचे नाव' : 'Jewelry Name'}: ${receipt.jewelry_name}\n` : ''}
-${language === 'mr' ? 'भुगतान केलेली रक्कम' : 'Paid Amount'}: ${formatCurrency(receipt.paid_amount)}
+        <div class="info-section">
+            <h3>${language === 'mr' ? '📅 रसीद माहिती' : '📅 Receipt Information'}</h3>
+            <div class="info-row">
+                <span class="info-label">${language === 'mr' ? 'रसीद तारीख' : 'Receipt Date'}:</span>
+                <span class="info-value">${new Date(receipt.created_at).toLocaleDateString(
+                  language === 'mr' ? 'mr-IN' : 'en-IN',
+                  { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }
+                )}</span>
+            </div>
+        </div>
 
-${receipt.notes ? `${language === 'mr' ? 'टिप्पण्या' : 'Notes'}: ${receipt.notes}\n` : ''}
-═══════════════════════════════════════════
-${language === 'mr' ? 'धन्यवाद!' : 'Thank you for your business!'}
-═══════════════════════════════════════════
+        <div class="info-section">
+            <h3>${language === 'mr' ? '👤 ग्राहक तपशील' : '👤 Customer Details'}</h3>
+            <div class="info-row">
+                <span class="info-label">${language === 'mr' ? 'नाव' : 'Name'}:</span>
+                <span class="info-value">${receipt.bookings.full_name}</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>${language === 'mr' ? '💍 बुकिंग तपशील' : '💍 Booking Details'}</h3>
+            <div class="info-row">
+                <span class="info-label">${language === 'mr' ? 'बुकिंग प्रकार' : 'Booking Type'}:</span>
+                <span class="info-value">${getBookingTypeLabel(receipt.bookings.booking_type)}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">${language === 'mr' ? 'सोन्याचे वजन' : 'Gold Weight'}:</span>
+                <span class="info-value">${receipt.bookings.gold_weight} ${language === 'mr' ? 'ग्रॅम' : 'grams'}</span>
+            </div>
+            ${receipt.jewelry_name ? `
+            <div class="info-row">
+                <span class="info-label">${language === 'mr' ? 'दागिन्याचे नाव' : 'Jewelry Name'}:</span>
+                <span class="info-value">${receipt.jewelry_name}</span>
+            </div>
+            ` : ''}
+            <div class="info-row">
+                <span class="info-label">${language === 'mr' ? 'स्थिती' : 'Status'}:</span>
+                <span class="info-value" style="color: #28a745; font-weight: bold;">${language === 'mr' ? '✓ पुष्टी केलेले' : '✓ CONFIRMED'}</span>
+            </div>
+        </div>
+
+        <div class="amount-section">
+            <div class="amount-row">
+                <span class="amount-label">${language === 'mr' ? '💰 भुगतान केलेली रक्कम' : '💰 Amount Paid'}:</span>
+                <span class="amount-value">${formatCurrency(receipt.paid_amount)}</span>
+            </div>
+        </div>
+
+        ${receipt.notes ? `
+        <div class="notes-section">
+            <h4>${language === 'mr' ? '📝 टिप्पण्या' : '📝 Notes'}:</h4>
+            <p>${receipt.notes}</p>
+        </div>
+        ` : ''}
+
+        <div class="footer">
+            <p class="thank-you">${language === 'mr' ? '🙏 धन्यवाद! 🙏' : '🙏 Thank You! 🙏'}</p>
+            <p>${language === 'mr' ? 'आमच्यावर विश्वास ठेवल्याबद्दल धन्यवाद' : 'Thank you for trusting us with your precious jewelry booking'}</p>
+            <p style="margin-top: 15px; font-size: 12px;">${language === 'mr' ? 'ही संगणक-निर्मित पावती आहे' : 'This is a computer-generated receipt'}</p>
+        </div>
+    </div>
+</body>
+</html>
     `.trim();
 
-    // Create blob and download
-    const blob = new Blob([receiptText], { type: 'text/plain' });
+    // Create blob and open in new window for printing/downloading
+    const blob = new Blob([receiptHTML], { type: 'text/html' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `booking-receipt-${receipt.bookings.booking_code}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    const printWindow = window.open(url, '_blank');
+    
+    if (printWindow) {
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 250);
+      };
+    }
 
     toast({
-      title: language === 'mr' ? 'रसीद डाउनलोड झाली' : 'Receipt Downloaded',
-      description: language === 'mr' ? 'तुमची बुकिंग रसीद यशस्वीरीत्या डाउनलोड झाली' : 'Your booking receipt has been downloaded successfully',
+      title: language === 'mr' ? 'रसीद तयार झाली' : 'Receipt Ready',
+      description: language === 'mr' ? 'तुमची बुकिंग रसीद प्रिंट/डाउनलोड साठी तयार आहे' : 'Your booking receipt is ready to print/download',
     });
   };
 
@@ -253,7 +458,7 @@ ${language === 'mr' ? 'धन्यवाद!' : 'Thank you for your business!'}
               variant="outline"
             >
               <Download className="h-4 w-4 mr-2" />
-              {language === 'mr' ? 'रसीद डाउनलोड करा' : 'Download Receipt'}
+              {language === 'mr' ? 'रसीद प्रिंट/डाउनलोड करा' : 'Print/Download Receipt'}
             </Button>
           </CardContent>
         </Card>
