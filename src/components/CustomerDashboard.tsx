@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BookingsList } from '@/components/BookingsList';
+import { BookingReceiptsList } from '@/components/BookingReceiptsList';
 
 interface CustomerDashboardProps {
   user: any;
@@ -305,10 +306,13 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="profile">{t('customer.profile')}</TabsTrigger>
           <TabsTrigger value="bookings">
             {language === 'mr' ? 'बुकिंग' : 'Bookings'}
+          </TabsTrigger>
+          <TabsTrigger value="receipts">
+            {language === 'mr' ? 'रसीद' : 'Receipts'}
           </TabsTrigger>
           <TabsTrigger value="bills">{t('customer.bills')}</TabsTrigger>
           <TabsTrigger value="purchases">{t('customer.purchases')}</TabsTrigger>
@@ -403,6 +407,20 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
             </CardHeader>
             <CardContent>
               <BookingsList />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="receipts" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{language === 'mr' ? 'बुकिंग रसीद' : 'Booking Receipts'}</CardTitle>
+              <CardDescription>
+                {language === 'mr' ? 'तुमच्या पुष्टी केलेल्या बुकिंगच्या रसीद डाउनलोड करा' : 'Download receipts for your confirmed bookings'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BookingReceiptsList />
             </CardContent>
           </Card>
         </TabsContent>
