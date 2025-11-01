@@ -3,8 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/Logo';
 import { LanguageToggle } from '@/components/LanguageToggle';
-import { DiwaliBanner } from '@/components/diwali/DiwaliBanner';
-import { useDiwaliTheme } from '@/contexts/DiwaliThemeContext';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu, MessageSquare, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -14,8 +12,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '@/contexts/LanguageContext';
 export const Header = () => {
-  const { isDiwaliTheme } = useDiwaliTheme();
-  console.log('🎊 Header Diwali Status:', isDiwaliTheme);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -80,9 +76,6 @@ export const Header = () => {
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
   };
   return <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      {/* Diwali Banner */}
-      {isDiwaliTheme && <DiwaliBanner />}
-      
       <div className="container flex h-16 items-center">
         <div className="mr-4 hidden md:flex">
           <div className="flex items-center gap-4">
