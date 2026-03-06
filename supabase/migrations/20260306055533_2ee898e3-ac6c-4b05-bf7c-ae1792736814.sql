@@ -1,0 +1,1 @@
+CREATE SEQUENCE IF NOT EXISTS public.product_unique_number_seq START 1;
