@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Gem } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,7 +24,6 @@ export const FeaturedProducts = () => {
     const fetchFeaturedProducts = async () => {
       try {
         setLoading(true);
-        
         const { data, error } = await supabase
           .from('products')
           .select('*')
@@ -36,7 +34,6 @@ export const FeaturedProducts = () => {
           console.error('Error fetching products:', error);
           return;
         }
-        
         setProducts(data as ProductType[]);
       } catch (error) {
         console.error('Error fetching featured products:', error);
@@ -48,81 +45,60 @@ export const FeaturedProducts = () => {
     fetchFeaturedProducts();
   }, []);
 
-  if (loading) {
-    return (
-      <section className="py-16 bg-background">
-        <div className="container px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-4">Featured Products</h2>
-            <p className="text-muted-foreground">Discover our exquisite collection</p>
-          </div>
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (products.length === 0) {
-    return (
-      <section className="py-16 bg-background">
-        <div className="container px-4">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-4">Featured Products</h2>
-            <p className="text-muted-foreground">Discover our exquisite collection</p>
-          </div>
-          <Card className="text-center py-12">
-            <CardContent>
-              <p className="text-muted-foreground">No products available at the moment</p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="py-16 bg-background">
+    <section className="py-20">
       <div className="container px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold mb-4">Featured Products</h2>
+        <div className="text-center mb-12">
+          <p className="text-primary text-sm tracking-[0.2em] uppercase mb-3">Curated For You</p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">Featured Products</h2>
           <p className="text-muted-foreground">Discover our exquisite collection</p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {products.map((product) => (
-            <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="aspect-square relative overflow-hidden bg-muted">
-                {product.image_url ? (
-                  <img 
-                    src={product.image_url} 
-                    alt={product.title}
-                    className="object-cover w-full h-full" 
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full w-full text-muted-foreground">
-                    No image
-                  </div>
-                )}
-              </div>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg line-clamp-1">{product.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-1 text-sm">
-                  <p>Category: <span className="font-medium capitalize">{product.category}</span></p>
-                  <p>Type: <span className="font-medium capitalize">{product.type}</span></p>
-                  <p>Purity: <span className="font-medium">{product.purity}</span></p>
-                  <p>Weight: <span className="font-medium">{product.weight_grams}g</span></p>
+
+        {loading ? (
+          <div className="flex justify-center items-center py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          </div>
+        ) : products.length === 0 ? (
+          <div className="card-luxury p-12 text-center max-w-md mx-auto">
+            <Gem className="h-10 w-10 text-primary/40 mx-auto mb-4" />
+            <p className="text-muted-foreground">No products available at the moment</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            {products.map((product) => (
+              <div key={product.id} className="card-luxury group cursor-pointer hover:border-primary/30 transition-all duration-500">
+                <div className="aspect-square relative overflow-hidden bg-secondary/30">
+                  {product.image_url ? (
+                    <img 
+                      src={product.image_url} 
+                      alt={product.title || 'Product'}
+                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" 
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full w-full">
+                      <Gem className="h-12 w-12 text-primary/20" />
+                    </div>
+                  )}
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                <div className="p-5">
+                  <h3 className="font-display text-base font-semibold truncate mb-2">{product.title || 'Untitled'}</h3>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">{product.type}</span>
+                    <span className="capitalize">{product.category}</span>
+                    <span>•</span>
+                    <span>{product.purity}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">{product.weight_grams}g</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         
         <div className="text-center">
-          <Button asChild>
+          <Button asChild variant="outline" className="border-primary/30 hover:border-primary/60 hover:bg-primary/5">
             <Link to="/jewelry" className="inline-flex items-center gap-2">
               View All Products
               <ArrowRight className="h-4 w-4" />
