@@ -6,82 +6,82 @@ interface LoadingAnimationProps {
 }
 
 export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ onComplete }) => {
-  const [showLogo, setShowLogo] = useState(false);
-  const [showText, setShowText] = useState(false);
+  const [phase, setPhase] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    // Animation sequence - extended to 4 seconds
-    const timer1 = setTimeout(() => setShowLogo(true), 200);
-    const timer2 = setTimeout(() => setShowText(true), 800);
-    const timer3 = setTimeout(() => setFadeOut(true), 3500);
-    const timer4 = setTimeout(() => onComplete(), 4000);
+    const t1 = setTimeout(() => setPhase(1), 200);
+    const t2 = setTimeout(() => setPhase(2), 800);
+    const t3 = setTimeout(() => setPhase(3), 1500);
+    const t4 = setTimeout(() => setFadeOut(true), 3500);
+    const t5 = setTimeout(() => onComplete(), 4000);
 
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-    };
+    return () => { [t1, t2, t3, t4, t5].forEach(clearTimeout); };
   }, [onComplete]);
 
   return (
-    <div className={`fixed inset-0 bg-gradient-to-b from-black to-zinc-900 flex items-center justify-center z-50 transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
-      <div className="text-center">
-        {/* Logo Animation */}
-        <div className={`mb-8 transition-all duration-1000 transform ${showLogo ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-75 translate-y-8'}`}>
-          <img 
-            src="/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png" 
-            alt="Shree Alankar Logo" 
-            className="w-32 h-32 mx-auto object-contain animate-pulse"
+    <div className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-700 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}
+         style={{ background: 'radial-gradient(ellipse at center, hsl(240 10% 8%) 0%, hsl(240 10% 2%) 100%)' }}>
+      
+      {/* Ambient gold particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-primary/30"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `particle-float ${3 + Math.random() * 4}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 3}s`,
+              ['--tx' as any]: `${(Math.random() - 0.5) * 100}px`,
+              ['--ty' as any]: `${-50 - Math.random() * 100}px`,
+            }}
           />
+        ))}
+      </div>
+
+      <div className="relative text-center">
+        {/* Logo with glow */}
+        <div className={`mb-8 transition-all duration-1000 ${phase >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+          <div className="relative inline-block">
+            <img 
+              src="/lovable-uploads/9b6e08d1-e086-49fd-a568-e16983ee39e8.png" 
+              alt="Shree Alankar Logo" 
+              className="w-28 h-28 mx-auto object-contain relative z-10"
+            />
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-glow-pulse" />
+          </div>
         </div>
 
-        {/* Text Animation */}
-        <div className={`transition-all duration-1000 transform ${showText ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 tracking-wide">
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.1s' }}>S</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.2s' }}>h</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.3s' }}>r</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.4s' }}>e</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.5s' }}>e</span>
-            <span className="inline-block animate-fade-in mx-3" style={{ animationDelay: '0.6s' }}></span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.7s' }}>A</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.8s' }}>l</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '0.9s' }}>a</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '1.0s' }}>n</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '1.1s' }}>k</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '1.2s' }}>a</span>
-            <span className="inline-block animate-fade-in" style={{ animationDelay: '1.3s' }}>r</span>
+        {/* Brand name */}
+        <div className={`transition-all duration-1000 ${phase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+          <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-3">
+            <span className="text-gradient-gold">Shree Alankar</span>
           </h1>
-          <p className="text-xl text-gold-light animate-fade-in" style={{ animationDelay: '1.5s' }}>
-            Gold & Silver Jewelry Shop Since 1998
+        </div>
+
+        {/* Tagline */}
+        <div className={`transition-all duration-1000 ${phase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <p className="text-muted-foreground text-lg tracking-[0.2em] uppercase font-light">
+            Gold & Silver Jewelry Since 1998
           </p>
         </div>
 
-        {/* Loading indicator */}
-        <div className="mt-8">
-          <div className="w-16 h-1 bg-primary/30 rounded-full mx-auto overflow-hidden">
+        {/* Loading bar */}
+        <div className="mt-10">
+          <div className="w-48 h-[2px] bg-primary/10 rounded-full mx-auto overflow-hidden">
             <div 
-              className="h-full bg-primary rounded-full"
+              className="h-full rounded-full"
               style={{ 
+                background: 'linear-gradient(90deg, hsl(43 90% 62%), hsl(43 100% 75%))',
                 animation: 'loading-bar 4s ease-out forwards',
                 width: '0%'
               }}
-            ></div>
+            />
           </div>
         </div>
       </div>
-
-      {/* Inline CSS for the loading bar animation */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @keyframes loading-bar {
-            0% { width: 0%; }
-            100% { width: 100%; }
-          }
-        `
-      }} />
     </div>
   );
 };
