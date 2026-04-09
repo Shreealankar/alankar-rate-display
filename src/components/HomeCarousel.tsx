@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Card, CardContent } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 import Autoplay from 'embla-carousel-autoplay';
@@ -21,7 +20,6 @@ export const HomeCarousel = () => {
 
   const fetchActiveImages = async () => {
     try {
-      console.log('Fetching carousel images...');
       const { data, error } = await supabase
         .from('carousel_images')
         .select('*')
@@ -29,67 +27,43 @@ export const HomeCarousel = () => {
         .order('display_order', { ascending: true });
 
       if (error) {
-        console.error('Error fetching carousel images:', error);
         setError(error.message);
         throw error;
       }
-      
-      console.log('Fetched carousel images:', data);
       setImages(data || []);
     } catch (error) {
-      console.error('Error fetching carousel images:', error);
       setError('Failed to load carousel images');
     } finally {
       setLoading(false);
     }
   };
 
-  // Show loading state
   if (loading) {
     return (
-      <section className="py-8 bg-background">
+      <section className="py-16">
         <div className="container px-4">
-          <div className="flex justify-center items-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin" />
-            <span className="ml-2">Loading images...</span>
+          <div className="flex justify-center items-center py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
           </div>
         </div>
       </section>
     );
   }
 
-  // Show error state
-  if (error) {
-    return (
-      <section className="py-8 bg-background">
-        <div className="container px-4">
-          <div className="text-center py-12">
-            <p className="text-red-500">Error loading carousel: {error}</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  // Show empty state with message for debugging
-  if (images.length === 0) {
-    return (
-      <section className="py-8 bg-background">
-        <div className="container px-4">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No active carousel images found. Please add some images in the dashboard.</p>
-          </div>
-        </div>
-      </section>
-    );
+  if (error || images.length === 0) {
+    return null;
   }
 
   return (
-    <section className="py-8 bg-background">
+    <section className="py-20 relative">
       <div className="container px-4">
-        <h2 className="text-2xl font-bold text-center mb-6">Our Gallery</h2>
+        <div className="text-center mb-12">
+          <p className="text-primary text-sm tracking-[0.2em] uppercase mb-3">Gallery</p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold">Our Collection</h2>
+        </div>
+        
         <Carousel 
-          className="w-full max-w-4xl mx-auto"
+          className="w-full max-w-5xl mx-auto"
           plugins={[
             Autoplay({
               delay: 4000,
@@ -105,36 +79,33 @@ export const HomeCarousel = () => {
           <CarouselContent>
             {images.map((image) => (
               <CarouselItem key={image.id}>
-                <Card className="border-0 shadow-lg">
-                  <CardContent className="p-0 relative">
-                    <AspectRatio ratio={16/9}>
-                      <img
-                        src={image.image_url}
-                        alt={image.title}
-                        className="object-cover w-full h-full rounded-lg"
-                        onError={(e) => {
-                          console.error('Image failed to load:', image.image_url);
-                          e.currentTarget.src = '/placeholder.svg';
-                        }}
-                      />
-                    </AspectRatio>
-                    {(image.title || image.description) && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-lg">
-                        <h3 className="text-white text-xl font-semibold mb-2">{image.title}</h3>
-                        {image.description && (
-                          <p className="text-white/90 text-sm">{image.description}</p>
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                <div className="card-luxury overflow-hidden group">
+                  <AspectRatio ratio={16/9}>
+                    <img
+                      src={image.image_url}
+                      alt={image.title}
+                      className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
+                  </AspectRatio>
+                  {(image.title || image.description) && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-8">
+                      <h3 className="font-display text-foreground text-xl font-semibold mb-1">{image.title}</h3>
+                      {image.description && (
+                        <p className="text-muted-foreground text-sm">{image.description}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </CarouselItem>
             ))}
           </CarouselContent>
           {images.length > 1 && (
             <>
-              <CarouselPrevious />
-              <CarouselNext />
+              <CarouselPrevious className="border-primary/20 hover:border-primary/40 hover:bg-primary/10 text-primary" />
+              <CarouselNext className="border-primary/20 hover:border-primary/40 hover:bg-primary/10 text-primary" />
             </>
           )}
         </Carousel>
