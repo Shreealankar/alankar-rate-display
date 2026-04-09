@@ -871,6 +871,66 @@ export type Database = {
           },
         ]
       }
+      payment_receipts: {
+        Row: {
+          amount: number
+          bill_id: string | null
+          bill_number: string | null
+          created_at: string
+          customer_id: string | null
+          customer_name: string
+          customer_phone: string
+          id: string
+          notes: string | null
+          payment_method: string | null
+          receipt_type: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          bill_id?: string | null
+          bill_number?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name: string
+          customer_phone: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          receipt_type?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          bill_id?: string | null
+          bill_number?: string | null
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string
+          customer_phone?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string | null
+          receipt_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_receipts_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_receipts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_transfers: {
         Row: {
           created_at: string
@@ -951,6 +1011,7 @@ export type Database = {
           other_charges: number | null
           pieces: number | null
           purity: string
+          show_on_website: boolean | null
           status: string | null
           stock_quantity: number | null
           stone_charges: number | null
@@ -980,6 +1041,7 @@ export type Database = {
           other_charges?: number | null
           pieces?: number | null
           purity?: string
+          show_on_website?: boolean | null
           status?: string | null
           stock_quantity?: number | null
           stone_charges?: number | null
@@ -1009,6 +1071,7 @@ export type Database = {
           other_charges?: number | null
           pieces?: number | null
           purity?: string
+          show_on_website?: boolean | null
           status?: string | null
           stock_quantity?: number | null
           stone_charges?: number | null
@@ -1813,6 +1876,7 @@ export type Database = {
         Returns: boolean
       }
       is_authenticated_staff: { Args: never; Returns: boolean }
+      is_software_request: { Args: never; Returns: boolean }
       update_rate_lock_status: {
         Args: { p_is_locked: boolean; p_metal_type: string }
         Returns: undefined
