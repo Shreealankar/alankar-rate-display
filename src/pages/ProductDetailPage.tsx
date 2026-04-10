@@ -256,12 +256,12 @@ const ProductDetailPage = () => {
                 <Button
                   onClick={handleBookNow}
                   size="lg"
-                  className="flex-1 bg-gradient-to-r from-primary to-yellow-600 hover:from-primary/90 hover:to-yellow-600/90 text-primary-foreground font-semibold text-base py-6 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]"
+                  className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold text-base py-6 rounded-xl shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]"
                 >
                   <Gem className="h-5 w-5 mr-2" />
                   Book Now
                 </Button>
-                <ShareButton />
+                <ShareButton title={displayName} description={`${product.type} ${product.category} - ${product.purity}, ${product.weight_grams}g`} />
               </div>
 
               <p className="text-xs text-muted-foreground text-center sm:text-left">
