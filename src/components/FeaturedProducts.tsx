@@ -66,7 +66,7 @@ export const FeaturedProducts = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {products.map((product) => (
-              <div key={product.id} className="card-luxury group cursor-pointer hover:border-primary/30 transition-all duration-500">
+              <Link to={`/product/${product.id}`} key={product.id} className="card-luxury group cursor-pointer hover:border-primary/30 transition-all duration-500 block">
                 <div className="aspect-square relative overflow-hidden bg-secondary/30">
                   {product.image_url ? (
                     <img 
@@ -92,7 +92,7 @@ export const FeaturedProducts = () => {
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">{product.weight_grams}g</p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
