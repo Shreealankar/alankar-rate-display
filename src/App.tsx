@@ -15,6 +15,7 @@ import HelpPage from "./pages/HelpPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage"; 
 import JewelryGalleryPage from "./pages/JewelryGalleryPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 import CustomerPortal from "./pages/CustomerPortal";
 import NotFound from "./pages/NotFound";
 
@@ -43,6 +44,7 @@ const AppContent = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/jewelry" element={<JewelryGalleryPage />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/customer" element={<CustomerPortal />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

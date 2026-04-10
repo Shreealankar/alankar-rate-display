@@ -5,7 +5,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ProductForm } from './ProductForm';
-import { Loader2, Pencil, Trash2, Search, Filter } from 'lucide-react';
+import { Loader2, Pencil, Trash2, Search, Filter, Gem } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -41,6 +42,7 @@ interface JewelryGalleryProps {
 
 export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditProductDialog, setShowEditProductDialog] = useState(false);
@@ -356,19 +358,24 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="overflow-hidden">
-              <div className="aspect-square relative overflow-hidden bg-muted">
+            <Card 
+              key={product.id} 
+              className="overflow-hidden group cursor-pointer hover:border-primary/30 transition-all duration-500"
+              onClick={() => navigate(`/product/${product.id}`)}
+            >
+              <div className="aspect-square relative overflow-hidden bg-secondary/30">
                 {product.image_url ? (
                   <img 
                     src={product.image_url} 
                     alt={product.title}
-                    className="object-cover w-full h-full" 
+                    className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-110" 
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full w-full text-muted-foreground">
-                    {t('gallery.noImage')}
+                  <div className="flex items-center justify-center h-full w-full">
+                    <Gem className="h-12 w-12 text-primary/20" />
                   </div>
                 )}
+                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -377,12 +384,15 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-1 text-sm">
-                  <p>{t('gallery.categoryLabel')} <span className="font-medium capitalize">{t(`gallery.${product.category}`)}</span></p>
-                  <p>{t('gallery.typeLabel')} <span className="font-medium capitalize">{t(`gallery.${product.type}`)}</span></p>
-                  <p>{t('gallery.purityLabel')} <span className="font-medium">{product.purity}</span></p>
-                  <p>{t('gallery.weightLabel')} <span className="font-medium">{product.weight_grams}g</span></p>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs capitalize">{t(`gallery.${product.type}`)}</span>
+                    <span className="text-xs capitalize">{t(`gallery.${product.category}`)}</span>
+                    <span className="text-xs">•</span>
+                    <span className="text-xs">{product.purity}</span>
+                  </div>
+                  <p className="text-muted-foreground text-xs mt-1">{product.weight_grams}g</p>
                   {product.description && (
-                    <p className="line-clamp-2 text-muted-foreground mt-2">{product.description}</p>
+                    <p className="line-clamp-2 text-muted-foreground mt-2 text-xs">{product.description}</p>
                   )}
                 </div>
               </CardContent>
@@ -392,8 +402,8 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
                     variant="outline" 
                     size="sm"
                     className="flex items-center gap-1"
-                    onClick={() => {
-                      console.log("Edit button clicked for product:", product.title); // Debug log
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setCurrentProduct(product);
                       setShowEditProductDialog(true);
                     }}
@@ -405,8 +415,8 @@ export const JewelryGallery = ({ isOwner }: JewelryGalleryProps) => {
                     variant="destructive" 
                     size="sm"
                     className="flex items-center gap-1"
-                    onClick={() => {
-                      console.log("Delete button clicked for product:", product.title); // Debug log
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setCurrentProduct(product);
                       setShowDeleteProductDialog(true);
                     }}

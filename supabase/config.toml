@@ -3,3 +3,6 @@ project_id = "calzzyiqwaskxmbpbngm"
 
 [functions.send-sms]
 verify_jwt = true
+
+[functions.ai-product-autofill]
+verify_jwt = true
