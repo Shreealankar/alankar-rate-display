@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BookingsList } from '@/components/BookingsList';
 import { BookingReceiptsList } from '@/components/BookingReceiptsList';
+import { MyTickets } from '@/components/MyTickets';
 
 interface CustomerDashboardProps {
   user: any;
@@ -306,7 +307,7 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="profile">{t('customer.profile')}</TabsTrigger>
           <TabsTrigger value="bookings">
             {language === 'mr' ? 'बुकिंग' : 'Bookings'}
@@ -316,7 +317,24 @@ export const CustomerDashboard = ({ user, profile, onSignOut }: CustomerDashboar
           </TabsTrigger>
           <TabsTrigger value="bills">{t('customer.bills')}</TabsTrigger>
           <TabsTrigger value="purchases">{t('customer.purchases')}</TabsTrigger>
+          <TabsTrigger value="tickets">
+            {language === 'mr' ? 'तक्रारी' : 'My Tickets'}
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="tickets" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{language === 'mr' ? 'माझ्या तक्रारी' : 'My Complaint Tickets'}</CardTitle>
+              <CardDescription>
+                {language === 'mr' ? 'तुमच्या तक्रारींची स्थिती ट्रॅक करा' : 'Track the status of complaints you have submitted'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MyTickets userEmail={profile?.email || user?.email} />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="profile" className="mt-6">
           <Card>
