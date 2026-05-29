@@ -6,3 +6,9 @@ verify_jwt = true
 
 [functions.ai-product-autofill]
 verify_jwt = true
+
+[functions.send-complaint-email]
+verify_jwt = false
+
+[functions.send-complaint-update-email]
+verify_jwt = true
