@@ -435,6 +435,80 @@ export type Database = {
         }
         Relationships: []
       }
+      complaint_updates: {
+        Row: {
+          complaint_id: string
+          created_at: string
+          description: string | null
+          id: string
+          status: string
+        }
+        Insert: {
+          complaint_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          status: string
+        }
+        Update: {
+          complaint_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaint_updates_complaint_id_fkey"
+            columns: ["complaint_id"]
+            isOneToOne: false
+            referencedRelation: "complaints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      complaints: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          email: string
+          id: string
+          message: string
+          name: string
+          phone: string
+          status: string
+          subject: string
+          ticket_number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          email: string
+          id?: string
+          message: string
+          name: string
+          phone: string
+          status?: string
+          subject: string
+          ticket_number?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          status?: string
+          subject?: string
+          ticket_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       customer_profiles: {
         Row: {
           created_at: string
@@ -1857,6 +1931,7 @@ export type Database = {
       cleanup_expired_email_otps: { Args: never; Returns: undefined }
       cleanup_expired_otps: { Args: never; Returns: undefined }
       generate_bill_number: { Args: never; Returns: string }
+      generate_complaint_ticket_number: { Args: never; Returns: string }
       generate_estimate_number: { Args: never; Returns: string }
       generate_exchange_number: { Args: never; Returns: string }
       generate_job_number: { Args: never; Returns: string }
