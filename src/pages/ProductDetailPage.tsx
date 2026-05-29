@@ -63,7 +63,7 @@ const ProductDetailPage = () => {
   const handleBookNow = () => {
     if (!product) return;
     const message = `Hi, I'm interested in booking "${product.title || product.name_english}" (${product.type} - ${product.purity}, ${product.weight_grams}g). Please share more details.`;
-    const whatsappUrl = `https://wa.me/919307850850?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/919921612155?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
 
