@@ -208,6 +208,20 @@ export const CustomerAuth = ({ onAuthSuccess }: CustomerAuthProps) => {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/customer` },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      toast({ title: 'Google Sign-In Failed', description: err.message, variant: 'destructive' });
+      setIsLoading(false);
+    }
+  };
+
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
