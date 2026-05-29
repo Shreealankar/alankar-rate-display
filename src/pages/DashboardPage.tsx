@@ -22,6 +22,7 @@ import {
 import { WhatsAppForm } from '@/components/WhatsAppForm';
 import { CarouselManager } from '@/components/CarouselManager';
 import { OwnerBookingsManagement } from '@/components/OwnerBookingsManagement';
+import { ComplaintsManagement } from '@/components/ComplaintsManagement';
 
 const DashboardPage = () => {
   const { t } = useLanguage();
@@ -392,12 +393,17 @@ const DashboardPage = () => {
         <section className="py-8 bg-background">
           <div className="container px-4">
             <Tabs defaultValue="rates" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="rates">Update Rates</TabsTrigger>
                 <TabsTrigger value="bookings">Bookings</TabsTrigger>
+                <TabsTrigger value="complaints">Complaints</TabsTrigger>
                 <TabsTrigger value="carousel">Manage Carousel</TabsTrigger>
                 <TabsTrigger value="notifications">WhatsApp</TabsTrigger>
               </TabsList>
+
+              <TabsContent value="complaints">
+                <ComplaintsManagement />
+              </TabsContent>
               
               <TabsContent value="rates" className="space-y-6">
                 <Card className="max-w-md mx-auto">

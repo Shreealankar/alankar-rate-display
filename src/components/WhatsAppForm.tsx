@@ -1,150 +1,129 @@
-
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MessageSquare, Send } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Send, Loader2, CheckCircle2, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { saveMobileNumber, formatPhoneNumber } from '@/utils/notificationUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 export const WhatsAppForm = () => {
-  const { t } = useLanguage();
+  const { language } = useLanguage();
   const { toast } = useToast();
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [ticket, setTicket] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate mobile number
     if (mobile.length < 10) {
-      toast({
-        title: "Invalid Number",
-        description: "Please enter a valid mobile number",
-        variant: "destructive",
-      });
+      toast({ title: 'Invalid Number', description: 'Please enter a valid 10-digit mobile number', variant: 'destructive' });
       return;
     }
-    
-    // Format the phone number with +91 prefix
-    const formattedNumber = formatPhoneNumber(mobile);
-    
-    // Format the message for WhatsApp
-    const whatsappMessage = encodeURIComponent(
-      `Name: ${name}\nMobile: ${formattedNumber}\nMessage: ${message}`
-    );
-    
-    // Save the number for future rate notifications if user opted in
-    saveMobileNumber(formattedNumber);
-    
-    // Open WhatsApp with the pre-filled message
-    window.open(`https://wa.me/9921612155?text=${whatsappMessage}`, '_blank');
-    
-    toast({
-      title: "Message Sent",
-      description: "Your message has been sent via WhatsApp",
-    });
-    
-    // Reset form fields
-    setName('');
-    setMobile('');
-    setMessage('');
+    if (!email.includes('@')) {
+      toast({ title: 'Invalid Email', description: 'Please enter a valid email', variant: 'destructive' });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: inserted, error } = await supabase
+        .from('complaints')
+        .insert({ name, phone: mobile, email, subject, message })
+        .select('ticket_number, name, phone, email, subject, message')
+        .single();
+
+      if (error) throw error;
+
+      // Fire email (don't block on errors)
+      await supabase.functions.invoke('send-complaint-email', { body: inserted });
+
+      setTicket(inserted.ticket_number);
+      setName(''); setMobile(''); setEmail(''); setSubject(''); setMessage('');
+    } catch (err: any) {
+      toast({ title: 'Submission Failed', description: err.message || 'Please try again', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRateUpdateSubscribe = () => {
-    if (mobile.length < 10) {
-      toast({
-        title: "Invalid Number",
-        description: "Please enter a valid mobile number",
-        variant: "destructive",
-      });
-      return;
+  const copyTicket = () => {
+    if (ticket) {
+      navigator.clipboard.writeText(ticket);
+      toast({ title: 'Copied', description: 'Ticket number copied to clipboard' });
     }
-    
-    // Format and save the mobile number for rate updates
-    const formattedNumber = formatPhoneNumber(mobile);
-    saveMobileNumber(formattedNumber);
-    
-    toast({
-      title: "Subscribed",
-      description: "You've been subscribed to rate updates via WhatsApp",
-    });
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>{t('help.complaint')}</CardTitle>
-        <CardDescription>
-          Send your message directly via WhatsApp
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium">
-              {t('help.name')}
-            </label>
-            <Input
-              id="name"
-              placeholder={t('help.name')}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="mobile" className="text-sm font-medium">
-              {t('help.mobile')} (will be formatted with +91)
-            </label>
-            <Input
-              id="mobile"
-              type="tel"
-              placeholder="10-digit mobile number"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label htmlFor="message" className="text-sm font-medium">
-              {t('help.message')}
-            </label>
-            <Textarea
-              id="message"
-              placeholder={t('help.message')}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={4}
-              required
-            />
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-2">
-            <Button type="submit" className="flex-1" size="lg">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              {t('help.submit')}
+    <>
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>{language === 'mr' ? 'तक्रार सबमिट करा' : 'Submit a Complaint'}</CardTitle>
+          <CardDescription>
+            {language === 'mr'
+              ? 'आम्ही तुमची तक्रार ईमेलद्वारे प्राप्त करू आणि तिकीट क्रमांक देऊ.'
+              : 'We will receive your complaint via email and issue you a tracking ticket number.'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Name</label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Mobile (10-digit)</label>
+              <Input type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Subject</label>
+              <Input value={subject} onChange={(e) => setSubject(e.target.value)} required />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Message</label>
+              <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={4} required />
+            </div>
+            <Button type="submit" className="w-full" size="lg" disabled={loading}>
+              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</> : <><Send className="mr-2 h-4 w-4" /> Submit Complaint</>}
             </Button>
-            
-            <Button 
-              type="button" 
-              className="flex-1" 
-              size="lg" 
-              variant="outline"
-              onClick={handleRateUpdateSubscribe}
-            >
-              <Send className="mr-2 h-4 w-4" />
-              Subscribe to Updates
-            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Dialog open={!!ticket} onOpenChange={(o) => !o && setTicket(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-6 w-6 text-green-600" /> Complaint Submitted
+            </DialogTitle>
+            <DialogDescription>
+              Your complaint has been received. A confirmation email has been sent to you.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="bg-muted p-4 rounded-lg text-center">
+            <p className="text-sm text-muted-foreground">Your Ticket Number</p>
+            <p className="text-2xl font-bold text-primary tracking-wider mt-1">{ticket}</p>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+          <p className="text-sm text-muted-foreground">
+            Track this ticket anytime by signing into your customer portal.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={copyTicket}><Copy className="mr-2 h-4 w-4" /> Copy</Button>
+            <Button onClick={() => setTicket(null)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
