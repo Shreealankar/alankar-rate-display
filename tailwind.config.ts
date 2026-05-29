@@ -22,7 +22,7 @@ export default {
       fontFamily: {
         'display': ['"Playfair Display"', 'Georgia', 'serif'],
         'body': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        'marathi': ['"Baloo 2"', 'Mukta', '"Yatra One"', 'sans-serif'],
+        'marathi': ['"Tiro Devanagari Marathi"', 'Amita', 'Poppins', 'serif'],
       },
       colors: {
         border: 'hsl(var(--border))',
