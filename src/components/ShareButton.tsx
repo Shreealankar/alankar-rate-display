@@ -32,7 +32,7 @@ export const ShareButton = ({
   const [isOpen, setIsOpen] = useState(false);
 
   // Updated website URL
-  const websiteUrl = 'https://alankar-rate-display.lovable.app';
+  const websiteUrl = 'https://shreealankar.lovable.app';
   const instagramUrl = 'https://www.instagram.com/shreealankar2112/?igsh=bjRpNDVueDU3N2xw#';
   const youtubeUrl = 'http://www.youtube.com/@Shreealankar2112';
   
@@ -43,8 +43,10 @@ export const ShareButton = ({
   
   const shareText = `${title}\n\n${description}${locationInfo}${websiteInfo}${socialLinks}`;
   
-  // Always use the main website URL
-  const shareUrl = websiteUrl;
+  // Use provided product URL or fall back to main website URL
+  const shareUrl = url || websiteUrl;
+  // Product page specific text includes the link for WhatsApp preview
+  const productShareText = url ? `${title}\n\n${description}\n\n🔗 View: ${url}${socialLinks}` : shareText;
 
   const copyToClipboard = async () => {
     const textToCopy = imageUrl && !isRateShare 
@@ -93,9 +95,23 @@ export const ShareButton = ({
     try {
       const shareData: ShareData = {
         title,
-        text: shareText,
+        text: url ? productShareText : shareText,
         url: shareUrl,
       };
+
+      // Try to share image file if available
+      if (imageUrl && !isRateShare) {
+        try {
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+          const file = new File([blob], 'product-image.jpg', { type: blob.type || 'image/jpeg' });
+          await navigator.share({ ...shareData, files: [file] });
+          setIsOpen(false);
+          return;
+        } catch (fileError) {
+          console.log('File sharing not supported, falling back to URL share');
+        }
+      }
       
       await navigator.share(shareData);
       setIsOpen(false);
@@ -111,9 +127,11 @@ export const ShareButton = ({
     try {
       switch (platform) {
         case 'whatsapp':
-          const whatsappText = imageUrl && !isRateShare 
-            ? `${shareText}\n\n📸 Image: ${imageUrl}`
-            : shareText;
+          const whatsappText = url && !isRateShare
+            ? productShareText
+            : (imageUrl && !isRateShare 
+                ? `${shareText}\n\n📸 Image: ${imageUrl}` 
+                : shareText);
           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
           
           try {
@@ -124,7 +142,7 @@ export const ShareButton = ({
           break;
           
         case 'facebook':
-          const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+          const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(url ? productShareText : shareText)}`;
           
           try {
             window.open(facebookUrl, '_blank', 'noopener,noreferrer');
@@ -134,7 +152,7 @@ export const ShareButton = ({
           break;
           
         case 'twitter':
-          const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+          const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(url ? productShareText : shareText)}&url=${encodeURIComponent(shareUrl)}`;
           
           try {
             window.open(twitterUrl, '_blank', 'noopener,noreferrer');
