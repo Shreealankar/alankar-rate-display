@@ -43,8 +43,10 @@ export const ShareButton = ({
   
   const shareText = `${title}\n\n${description}${locationInfo}${websiteInfo}${socialLinks}`;
   
-  // Always use the main website URL
-  const shareUrl = websiteUrl;
+  // Use provided product URL or fall back to main website URL
+  const shareUrl = url || websiteUrl;
+  // Product page specific text includes the link for WhatsApp preview
+  const productShareText = url ? `${title}\n\n${description}\n\n🔗 View: ${url}${socialLinks}` : shareText;
 
   const copyToClipboard = async () => {
     const textToCopy = imageUrl && !isRateShare 
