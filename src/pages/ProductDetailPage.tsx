@@ -261,7 +261,12 @@ const ProductDetailPage = () => {
                   <Gem className="h-5 w-5 mr-2" />
                   Book Now
                 </Button>
-                <ShareButton title={displayName} description={`${product.type} ${product.category} - ${product.purity}, ${product.weight_grams}g`} />
+                <ShareButton 
+                  title={displayName} 
+                  description={`${product.type} ${product.category} - ${product.purity}, ${product.weight_grams}g`}
+                  url={`https://shreealankar.lovable.app/product/${product.id}`}
+                  imageUrl={product.image_url || undefined}
+                />
               </div>
 
               <p className="text-xs text-muted-foreground text-center sm:text-left">
