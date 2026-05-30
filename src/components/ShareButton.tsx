@@ -127,9 +127,11 @@ export const ShareButton = ({
     try {
       switch (platform) {
         case 'whatsapp':
-          const whatsappText = imageUrl && !isRateShare 
-            ? `${shareText}\n\n📸 Image: ${imageUrl}`
-            : shareText;
+          const whatsappText = url && !isRateShare
+            ? productShareText
+            : (imageUrl && !isRateShare 
+                ? `${shareText}\n\n📸 Image: ${imageUrl}` 
+                : shareText);
           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
           
           try {
@@ -140,7 +142,7 @@ export const ShareButton = ({
           break;
           
         case 'facebook':
-          const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+          const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(url ? productShareText : shareText)}`;
           
           try {
             window.open(facebookUrl, '_blank', 'noopener,noreferrer');
@@ -150,7 +152,7 @@ export const ShareButton = ({
           break;
           
         case 'twitter':
-          const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+          const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(url ? productShareText : shareText)}&url=${encodeURIComponent(shareUrl)}`;
           
           try {
             window.open(twitterUrl, '_blank', 'noopener,noreferrer');
