@@ -95,9 +95,23 @@ export const ShareButton = ({
     try {
       const shareData: ShareData = {
         title,
-        text: shareText,
+        text: url ? productShareText : shareText,
         url: shareUrl,
       };
+
+      // Try to share image file if available
+      if (imageUrl && !isRateShare) {
+        try {
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+          const file = new File([blob], 'product-image.jpg', { type: blob.type || 'image/jpeg' });
+          await navigator.share({ ...shareData, files: [file] });
+          setIsOpen(false);
+          return;
+        } catch (fileError) {
+          console.log('File sharing not supported, falling back to URL share');
+        }
+      }
       
       await navigator.share(shareData);
       setIsOpen(false);
