@@ -32,7 +32,7 @@ export const ShareButton = ({
   const [isOpen, setIsOpen] = useState(false);
 
   // Updated website URL
-  const websiteUrl = 'https://alankar-rate-display.lovable.app';
+  const websiteUrl = 'https://shreealankar.lovable.app';
   const instagramUrl = 'https://www.instagram.com/shreealankar2112/?igsh=bjRpNDVueDU3N2xw#';
   const youtubeUrl = 'http://www.youtube.com/@Shreealankar2112';
   
