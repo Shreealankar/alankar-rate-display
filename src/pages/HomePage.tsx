@@ -7,22 +7,17 @@ import { Footer } from '@/components/layout/Footer';
 import { HomeCarousel } from '@/components/HomeCarousel';
 import { LoadingAnimation } from '@/components/LoadingAnimation';
 import { LanguageSelectionDialog } from '@/components/LanguageSelectionDialog';
-import { CustomerAuth } from '@/components/CustomerAuth';
 import { Button } from '@/components/ui/button';
 import { User, Receipt, ShoppingBag, Gem, Shield, Phone, ArrowRight, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
 const HomePage = () => {
   const { t, language } = useLanguage();
-  const navigate = useNavigate();
   
   const [showLoading, setShowLoading] = useState(() => !localStorage.getItem('hasVisited'));
   const [showLanguageDialog, setShowLanguageDialog] = useState(false);
-  const [showAuth, setShowAuth] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -31,8 +26,6 @@ const HomePage = () => {
       const hasDeviceId = localStorage.getItem('deviceId');
       
       if (session || hasGuestLogin || hasDeviceId) {
-        setIsAuthenticated(true);
-        setShowAuth(false);
         setShowLoading(false);
         return;
       }
@@ -45,30 +38,11 @@ const HomePage = () => {
         const languageSelected = localStorage.getItem('languageSelected');
         if (!languageSelected) {
           setShowLanguageDialog(true);
-        } else {
-          setShowAuth(true);
         }
       }
     };
 
     checkSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (session) {
-          setIsAuthenticated(true);
-          setShowAuth(false);
-        } else {
-          const hasGuestLogin = localStorage.getItem('guestLogin');
-          const hasDeviceId = localStorage.getItem('deviceId');
-          if (!hasGuestLogin && !hasDeviceId) {
-            setIsAuthenticated(false);
-          }
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
   }, []);
 
   const handleAnimationComplete = () => {
@@ -77,29 +51,19 @@ const HomePage = () => {
     const languageSelected = localStorage.getItem('languageSelected');
     if (!languageSelected) {
       setShowLanguageDialog(true);
-    } else {
-      setShowAuth(true);
     }
   };
 
   const handleLanguageDialogClose = () => {
     setShowLanguageDialog(false);
     localStorage.setItem('languageSelected', 'true');
-    setShowAuth(true);
-  };
-
-  const handleAuthSuccess = (user: any, profile: any) => {
-    setIsAuthenticated(true);
-    setShowAuth(false);
   };
 
   if (showLoading) {
     return <LoadingAnimation onComplete={handleAnimationComplete} />;
   }
 
-  if (showAuth && !isAuthenticated) {
-    return <CustomerAuth onAuthSuccess={handleAuthSuccess} />;
-  }
+
 
   const features = [
     {
