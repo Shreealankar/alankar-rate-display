@@ -132,8 +132,24 @@ export const ShareButton = ({
             : (imageUrl && !isRateShare 
                 ? `${shareText}\n\n📸 Image: ${imageUrl}` 
                 : shareText);
+
+          // Try to share image file via native share (works with WhatsApp on mobile)
+          if (imageUrl && !isRateShare && navigator.canShare) {
+            try {
+              const response = await fetch(imageUrl);
+              const blob = await response.blob();
+              const file = new File([blob], 'product-image.jpg', { type: blob.type || 'image/jpeg' });
+              if (navigator.canShare({ files: [file] })) {
+                await navigator.share({ title, text: whatsappText, files: [file] });
+                setIsOpen(false);
+                break;
+              }
+            } catch (err) {
+              console.log('Image share failed, falling back to WhatsApp URL', err);
+            }
+          }
+
           const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
-          
           try {
             window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
           } catch {
