@@ -6,6 +6,7 @@ const NASHIK_WIDGET_URL = 'https://allindiabullion.com/widget/maharashtra/nashik
 export const RateDisplay = () => {
   const { language } = useLanguage();
   const isMarathi = language === 'mr';
+  const widgetUrl = isMarathi ? `${NASHIK_WIDGET_URL}?lang=mr` : NASHIK_WIDGET_URL;
 
   return (
     <div className="w-full px-4 py-10 text-center">
@@ -14,7 +15,7 @@ export const RateDisplay = () => {
       </h2>
       <div className="mx-auto w-full max-w-[440px] overflow-hidden">
         <iframe
-          src={NASHIK_WIDGET_URL}
+          src={widgetUrl}
           title={isMarathi ? 'नाशिकचे आजचे सोन्या-चांदीचे दर' : "Today's gold and silver rates in Nashik"}
           width="100%"
           height="354"
