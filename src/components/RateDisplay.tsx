@@ -22,7 +22,7 @@ export const RateDisplay = () => {
           className="block w-full border-0"
         />
         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-          {isMarathi ? 'नाशिकचे दर — ' : 'Nashik rates by '}
+          Nashik rates by{' '}
           <a
             href={NASHIK_RATES_URL}
             target="_blank"
